@@ -4,10 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Budget Flow</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
+    @font-face { 
+        font-family: 'Outfit'; 
+        font-style: normal; 
+        font-weight: 300; 
+        font-display: swap; 
+        src: url('https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJuktqQ4E.woff2') format('woff2'); 
+        unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; 
+    }
     /* === DESIGN SYSTEM === */
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -18,20 +27,22 @@
 
     /* === THEMES === */
     [data-theme="light"] {
-      --bg: #e0e5ec; --bg2: #f0f2f5; --card: #e0e5ec; --card2: #f8f9fc;
-      --border: rgba(255,255,255,0.5); --border2: #dde1e8; --text: #2d3142; --text2: #4b5563; --text3: #6b7280;
-      --shadow: 9px 9px 16px rgb(163,177,198,0.7), -9px -9px 16px rgba(255,255,255, 0.6);
-      --shadow-in: inset 6px 6px 12px #a3b1c6, inset -6px -6px 12px #ffffff;
-      --glass: rgba(255,255,255,.5); --glass-nav: rgba(255,255,255,.3);
+      --bg: #FFFFFF; --bg2: #F8F9FA; --card: #FFFFFF; --card2: #F8F9FA;
+      --border: rgba(0,0,0,0.05); --border2: #EEEEEE; --text: #1A1A1A; --text2: #4A4A4A; --text3: #888888;
+      --shadow: 4px 4px 12px rgba(0,0,0,0.03), -4px -4px 12px rgba(0,0,0,0.01);
+      --shadow-in: inset 2px 2px 5px rgba(0,0,0,0.05), inset -2px -2px 5px rgba(255,255,255,0.8);
+      --glass: rgba(255,255,255,0.7); --glass-nav: rgba(255,255,255,0.2);
       --green: #10b981; --green-bg: #dcfce7; --red: #ef4444; --red-bg: #fee2e2; --orange: #f59e0b;
+      --blue: #3b82f6; --blue-bg: #dbeafe;
     }
     [data-theme="dark"] {
-      --bg: #1a1d23; --bg2: #252830; --card: #1a1d23; --card2: #252830;
-      --border: rgba(255,255,255,0.1); --border2: #383c4a; --text: #f3f4f6; --text2: #d1d5db; --text3: #9ca3af;
-      --shadow: 9px 9px 16px #0d0f12, -9px -9px 16px #272c34;
-      --shadow-in: inset 6px 6px 12px #0d0f12, inset -6px -6px 12px #272c34;
-      --glass: rgba(26,29,35,.6); --glass-nav: rgba(26,29,35,.4);
-      --green: #34d399; --green-bg: rgba(52,211,153,.15); --red: #f87171; --red-bg: rgba(248,113,113,.15); --orange: #fbbf24;
+      --bg: #0A0A0A; --bg2: #141414; --card: #141414; --card2: #1A1A1A;
+      --border: rgba(255,255,255,0.05); --border2: #2A2A2A; --text: #F0F0F0; --text2: #A0A0A0; --text3: #666666;
+      --shadow: 4px 4px 12px rgba(0,0,0,0.5), -4px -4px 12px rgba(255,255,255,0.02);
+      --shadow-in: inset 2px 2px 5px rgba(0,0,0,0.6), inset -2px -2px 5px rgba(255,255,255,0.02);
+      --glass: rgba(10,10,10,0.7); --glass-nav: rgba(255,255,255,0.1);
+      --green: #34d399; --green-bg: rgba(52,211,153,0.15); --red: #f87171; --red-bg: rgba(248,113,113,0.15); --orange: #fbbf24;
+      --blue: #60a5fa; --blue-bg: rgba(96,165,250,0.15);
     }
 
     /* === ACCENTS === */
@@ -56,24 +67,108 @@
     
     .glass { background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,.2); border-radius: var(--r); }
 
-    .btn { min-width: 44px; min-height: 44px; padding: 14px 24px; border-radius: var(--r-btn); font-weight: 700; font-size: .95rem; border: none; cursor: pointer; transition: all .2s var(--ease); display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shadow); background: var(--card); color: var(--text); }
-    .btn:active { transform: scale(0.96); box-shadow: var(--shadow-in); }
-    .btn-p { background: var(--ac); color: #fff; box-shadow: 0 8px 20px var(--ac-sh); }
-    .btn-p:active { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 24px var(--ac-sh); }
+    .btn { min-width: 88px; min-height: 56px; padding: 16px 28px; border-radius: var(--r-btn); font-weight: 700; font-size: 1rem; border: 2px solid var(--ac); cursor: pointer; transition: all .25s var(--ease); display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px var(--ac-sh); background: #fff; color: var(--ac); }
+    .btn:active { transform: scale(0.96); background: var(--ac); color: #fff; box-shadow: 0 2px 6px var(--ac-sh); }
+    
+    .btn-p { 
+      background: linear-gradient(135deg, var(--ac), var(--ac2)); 
+      color: #fff; 
+      border: none; 
+      box-shadow: 0 8px 20px var(--ac-sh); 
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-p::after {
+      content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.1); opacity: 0; transition: 0.3s;
+    }
+    .btn-p:hover::after { opacity: 1; }
+    .btn-p:active { transform: translateY(1px); box-shadow: 0 4px 10px var(--ac-sh); }
+
+    .btn-rec {
+      min-width: 88px; height: 44px; padding: 8px 20px; border-radius: 22px;
+      background: #28a745; color: #fff; border: 2px solid #28a745; font-weight: 700; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.3s var(--ease); cursor: pointer; float: right;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+    }
+    .btn-rec.off { background: #fff; color: var(--text3); border-color: var(--border2); box-shadow: var(--shadow); }
+    .btn-rec i { font-size: 14px !important; color: inherit; }
+    
+    .cat-container { position: relative; display: flex; flex-direction: column; gap: 12px; }
+    .cat-row { display: flex; align-items: center; gap: 12px; }
+    .cat-sel-wrapper { flex: 1; position: relative; }
+    .cat-sel-wrapper::after {
+      content: '\f107'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      width: 28px; height: 28px; background: var(--card); border: 1px solid var(--border2);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--text3); pointer-events: none;
+    }
+    .btn-add-cat { 
+      min-width: 120px; min-height: 48px; padding: 12px 24px; border-radius: 24px;
+      border: 2px dashed var(--ac); background: #fff; color: var(--ac);
+      font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-add-cat:active { background: var(--ac-bg); }
+
+    .btn-o { background: #fff; color: var(--text); border: 2px solid var(--border2); box-shadow: var(--shadow); }
+    .btn-o:active { background: var(--bg2); border-color: var(--text3); }
 
     .cal-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--card); box-shadow: var(--shadow); border: none; color: var(--text); cursor: pointer; font-size: 14px; }
     
     .close-btn { width: 48px; height: 48px; padding: 8px; border-radius: 12px; background: var(--card); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; border: none; color: var(--text); cursor: pointer; font-size: 24px; font-weight: bold; }
     .close-btn:active { box-shadow: var(--shadow-in); transform: scale(0.95); }
 
-    .pill-btn { min-height: 44px; padding: 12px 24px; border-radius: 30px; border: 1.5px solid var(--ac); background: transparent; color: var(--ac); font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+    .pill-btn { min-width: 88px; min-height: 44px; padding: 12px 24px; border-radius: 30px; border: 1.5px solid var(--ac); background: transparent; color: var(--ac); font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
     .pill-btn.on { background: var(--ac); color: #fff; box-shadow: 0 5px 15px var(--ac-sh); }
     .pill-btn.dashed { border-style: dashed; border-width: 2px; opacity: 0.7; }
 
-    .inp { width: 100%; min-height: 44px; padding: 16px; border-radius: var(--r2); border: none; background: var(--card); box-shadow: var(--shadow-in); font-size: .9rem; color: var(--text); outline: none; transition: all .2s; }
-    .inp:focus { box-shadow: var(--shadow-in), 0 0 0 2px var(--ac); }
+    .btn-inset { 
+      width: 100%; padding: 20px; 
+      background: var(--card); box-shadow: var(--shadow-in); 
+      border-radius: 2rem; border: none; 
+      font-weight: 700; font-size: 1.125rem; 
+      color: var(--text); cursor: pointer; 
+      transition: all 0.3s ease-in-out; 
+      outline: none;
+    }
+    .btn-inset:focus { 
+      box-shadow: var(--shadow-in), 0 0 0 4px var(--ac-sh); 
+    }
+    .btn-inset:active { transform: scale(0.98); }
+
+    .inp { width: 100%; min-height: 56px; padding: 20px; border-radius: 2rem; border: none; background: #f5f5f5; box-shadow: var(--shadow-in); font-size: 1.125rem; font-weight: 700; color: var(--text2); outline: none; transition: all 0.3s ease-in-out; }
+    .inp:focus { box-shadow: var(--shadow-in), 0 0 0 4px var(--ac-sh); }
+    .inp::placeholder { color: var(--text3); opacity: 0.6; }
     
-    i { font-size: 24px !important; color: var(--ac); }
+    .btn i, .btn-p i, .close-btn-full i, .btn-rec i, .pill-btn i { color: #FFFFFF !important; }
+    
+    .add-btn-dash {
+      width: 100%; height: 56px; border-radius: var(--r2);
+      border: 2px dashed var(--text3); color: var(--text3);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      font-weight: 700; background: transparent; cursor: pointer; transition: 0.3s;
+      margin-top: 12px;
+    }
+    .add-btn-dash:active { background: var(--border); transform: scale(0.98); }
+    .section-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border2); }
+    .section-content { transition: max-height 0.3s ease-out; overflow: hidden; }
+    .section-content.collapsed { max-height: 0; }
+    
+    .ana-nav { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 8px; }
+    .ana-nav-item { padding: 8px 16px; border-radius: 20px; background: var(--card); border: 1px solid var(--border2); cursor: pointer; font-weight: 700; font-size: 0.8rem; white-space: nowrap; transition: 0.2s; }
+    .ana-nav-item.on { background: var(--ac); color: #fff; border-color: var(--ac); }
+    .section-header h3 { font-size: 1.125rem; font-weight: 800; }
+    .section-stat { font-size: 0.875rem; font-weight: 600; }
+    
+    .income-section { border-left: 4px solid var(--green); }
+    .income-section .section-header h3 { color: var(--green); }
+    .expense-section { border-left: 4px solid var(--red); }
+    .expense-section .section-header h3 { color: var(--red); }
+
+    .strat-btn { flex: 1; min-height: 48px; border-radius: 24px; border: 2px solid var(--border2); background: #fff; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease; }
+    .strat-btn.on { border-color: var(--ac); background: var(--ac-bg); color: var(--ac); box-shadow: 0 4px 12px var(--ac-sh); transform: translateY(-2px); }
 
     /* === MONTH LIST === */
     .month-list-container { display: flex; overflow-x: auto; padding: 12px 10px; border-radius: var(--r2); background: var(--shadow-in); margin-bottom: 24px; scroll-behavior: smooth; gap: 12px; -webkit-overflow-scrolling: touch; }
@@ -83,10 +178,10 @@
     .month-item.active { background: var(--ac); color: #fff; box-shadow: 0 4px 12px var(--ac-sh); border-color: var(--ac); }
     
     .filter-sort-bar { display: flex; gap: 12px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; }
-    .filter-sort-bar select { flex: 1; min-width: 120px; font-size: 0.75rem; padding: 8px 12px; height: 36px; }
+    .filter-sort-bar select { flex: 1; min-width: 120px; font-size: 0.75rem; padding: 8px 12px; height: 36px; background: #f5f5f5; }
 
     .month-picker-inline { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-    .month-picker-inline input[type="month"] { flex: 1; border: none; background: var(--card); box-shadow: var(--shadow); padding: 12px; border-radius: 15px; color: var(--text); font-family: var(--font); font-weight: 700; outline: none; }
+    .month-picker-inline input[type="month"] { flex: 1; border: none; background: #f5f5f5; box-shadow: var(--shadow); padding: 12px; border-radius: 15px; color: var(--text); font-family: var(--font); font-weight: 700; outline: none; }
 
     .close-btn-full { width: 100%; height: 56px; background: var(--red); color: #fff; border: none; border-radius: var(--r2); font-weight: 900; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); transition: 0.2s; margin-top: 24px; }
     .close-btn-full:active { transform: scale(0.98); opacity: 0.9; }
@@ -100,9 +195,44 @@
     .tab-btn.on { background: var(--ac); color: #fff; box-shadow: 0 4px 15px var(--ac-sh); }
 
     /* === NAVIGATION === */
-    .nav { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 480px; height: 80px; background: var(--glass-nav); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border-radius: 40px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,.15); box-shadow: 0 15px 35px rgba(0,0,0,0.1); z-index: 1000; }
-    .nb { background: none; border: none; color: var(--text3); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: .3s; width: 56px; height: 56px; border-radius: 50%; }
-    .nb.on { color: var(--ac); background: var(--shadow-in); box-shadow: var(--shadow); }
+    .nav { 
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); 
+      width: calc(100% - 40px); max-width: 480px; height: 80px; 
+      background: var(--glass-nav); 
+      backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
+      border-radius: 40px; display: flex; justify-content: space-around; align-items: center; 
+      border: 1px solid rgba(255,255,255,0.2); 
+      box-shadow: 0 8px 32px rgba(0,0,0,0.05); 
+      z-index: 1000;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav::before {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      transform: skewX(-15deg) scaleX(1.2);
+      filter: url(#glassDistortion);
+      pointer-events: none;
+    }
+    .nb { 
+      background: none; border: none; color: var(--text3); 
+      display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      transition: all 0.3s ease; width: 56px; height: 56px; border-radius: 50%;
+      position: relative; z-index: 2;
+    }
+    .nb.on { 
+      color: var(--ac); 
+      text-shadow: 0 0 15px rgba(255,255,255,0.8);
+      transform: translateY(-2px);
+    }
+    .nb.on::after {
+      content: ""; position: absolute; inset: 0;
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.1);
+      animation: glowPulse 2s infinite alternate;
+    }
+    @keyframes glowPulse { from { opacity: 0.5; transform: scale(0.95); } to { opacity: 1; transform: scale(1.05); } }
     .nb i { font-size: 1.5rem; }
     .nb span { display: none; }
 
@@ -124,6 +254,12 @@
   </style>
 </head>
 <body>
+  <svg style="display: none;">
+    <filter id="glassDistortion">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01 0.05" numOctaves="2" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
   <div id="loadingScreen" class="loading-screen">
     <div class="bf-coin">BF</div>
   </div>
@@ -134,10 +270,9 @@
       <div class="bf-coin" style="margin: 0 auto 32px;">BF</div>
       <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 8px; color: var(--ac);">Budget Flow</h1>
       <p style="color: var(--text2); margin-bottom: 40px; font-weight: 500;">Beautifully simple finance tracking.</p>
-      <div class="card">
-        <span class="lbl">Your Name</span>
-        <input id="inpN" class="inp mb20" placeholder="Enter your name">
-        <button class="btn btn-p" onclick="startOB()">Next <i class="fas fa-arrow-right"></i></button>
+      <div class="card" style="padding: 0; background: transparent; box-shadow: none; border: none;">
+        <input id="inpN" class="inp mb20" placeholder="Your Name">
+        <button class="btn btn-p" style="width: 100%;" onclick="startOB()">Next <i class="fas fa-arrow-right" style="color: #fff !important;"></i></button>
       </div>
     </div>
   </div>
@@ -146,7 +281,6 @@
   <div id="pgOB1" class="pg">
     <div class="fbc mb20">
       <h2 style="color: var(--ac); font-weight: 900;">Step 2: Income</h2>
-      <button class="pill-btn dashed" style="min-height: 44px; padding: 8px 16px;" onclick="addCat('inc')">+ Category</button>
     </div>
     <p class="mb20" style="color: var(--text2);">Add your monthly income sources (Recurring by default).</p>
     <div id="oIL" class="mb20"></div>
@@ -155,15 +289,26 @@
       <input id="oiN" class="inp mb20" placeholder="e.g. Salary">
       <span class="lbl">Amount</span>
       <input id="oiA" class="inp mb20" type="number" placeholder="0.00">
-      <span class="lbl">Category</span>
-      <select id="oiC" class="inp mb20"><option value="">No Category</option></select>
-      <div class="mb20">
-        <button id="oiR" class="pill-btn on" style="width:100%;" onclick="this.classList.toggle('on')">Recurring</button>
+      
+      <div class="cat-container mb20">
+        <span class="lbl">Category</span>
+        <div class="cat-row">
+          <div class="cat-sel-wrapper">
+            <select id="oiC" class="inp" style="padding-right: 50px;"><option value="">No Category</option></select>
+          </div>
+          <button class="btn-add-cat" onclick="addCat('inc')">+ Add Category</button>
+        </div>
       </div>
-      <button class="btn btn-p" onclick="addOBInc()">+ Add to List</button>
+
+      <div style="overflow: hidden; margin-bottom: 20px;">
+        <button id="oiR" class="btn-rec" onclick="this.classList.toggle('off'); const i = this.querySelector('i'); if(this.classList.contains('off')) i.style.display='none'; else i.style.display='block';">
+          <i class="fas fa-check"></i> Recurring
+        </button>
+      </div>
+      <button class="btn btn-o" style="width: 100%; border-color: var(--ac); color: var(--ac);" onclick="addOBInc()">+ Add to List</button>
     </div>
     <div style="padding: 20px 0;">
-      <button class="btn btn-p" style="width: 100%; background: var(--ac); color: #fff;" onclick="showPg('pgOB2')">Next: Expenses <i class="fas fa-arrow-right"></i></button>
+      <button class="btn btn-p" style="width: 100%;" onclick="showPg('pgOB2')">Next: Expenses <i class="fas fa-arrow-right" style="color: #fff !important;"></i></button>
     </div>
   </div>
 
@@ -171,29 +316,45 @@
   <div id="pgOB2" class="pg">
     <div class="fbc mb20">
       <h2 style="color: var(--ac); font-weight: 900;">Step 3: Expenses</h2>
-      <button class="pill-btn dashed" style="min-height: 44px; padding: 8px 16px;" onclick="addCat('exp')">+ Category</button>
     </div>
-    <p class="mb20" style="color: var(--text2);">Add your typical monthly expenses (Recurring by default).</p>
+    <p class="mb20" style="color: var(--text2);">Add your monthly expenses. Categorize them into Fixed (Rent, Utilities) and Variable (Groceries, Dining).</p>
     <div id="oEL" class="mb20"></div>
     <div class="card">
       <span class="lbl">Expense Name</span>
-      <input id="oeN" class="inp mb20" placeholder="e.g. Rent">
+      <input id="oeN" class="inp mb20" placeholder="e.g. Rent or Groceries">
       <span class="lbl">Amount</span>
-      <input id="oeA" class="inp mb20" type="number" placeholder="0.00">
-      <span class="lbl">Category</span>
-      <select id="oeC" class="inp mb20"><option value="">No Category</option></select>
+      <input id="oeA" class="inp mb20" type="number" min="0.01" step="0.01" placeholder="0.00">
+      
+      <div class="cat-container mb20">
+        <span class="lbl">Category</span>
+        <div class="cat-row">
+          <div class="cat-sel-wrapper">
+            <select id="oeC" class="inp" style="padding-right: 50px;"><option value="">No Category</option></select>
+          </div>
+          <button class="btn-add-cat" onclick="addCat('exp')">+ Add Category</button>
+        </div>
+      </div>
+
+      <span class="lbl">Expense Type</span>
+      <select id="oeT" class="inp mb20">
+        <option value="fixed">Fixed (e.g. Rent, Bills, Subs)</option>
+        <option value="variable">Variable (e.g. Food, Fun, Shopping)</option>
+      </select>
+
       <span class="lbl">Payment Method</span>
       <select id="oeP" class="inp mb20">
         <option value="cash">Cash</option>
         <option value="credit">Credit</option>
       </select>
-      <div class="mb20">
-        <button id="oeR" class="pill-btn on" style="width:100%;" onclick="this.classList.toggle('on')">Recurring</button>
+      <div style="overflow: hidden; margin-bottom: 20px;">
+        <button id="oeR" class="btn-rec" onclick="this.classList.toggle('off'); const i = this.querySelector('i'); if(this.classList.contains('off')) i.style.display='none'; else i.style.display='block';">
+          <i class="fas fa-check"></i> Recurring
+        </button>
       </div>
-      <button class="btn btn-p" onclick="addOBExp()">+ Add to List</button>
+      <button class="btn btn-o" style="width: 100%; border-color: var(--ac); color: var(--ac);" onclick="addOBExp()">+ Add to List</button>
     </div>
     <div style="padding: 20px 0;">
-      <button class="btn btn-p" style="width: 100%; background: var(--ac); color: #fff;" onclick="showPg('pgOB3')">Next: Balance <i class="fas fa-arrow-right"></i></button>
+      <button class="btn btn-p" style="width: 100%;" onclick="showPg('pgOB3')">Next: Balance <i class="fas fa-arrow-right" style="color: #fff !important;"></i></button>
     </div>
   </div>
 
@@ -204,7 +365,7 @@
     <div class="card mb20">
       <span class="lbl">Profile Nickname</span>
       <input id="regPN" class="inp mb20" placeholder="e.g. My 2024 Budget">
-      <button class="btn btn-p" onclick="finOB()">Complete Setup <i class="fas fa-check"></i></button>
+      <button class="btn btn-p" onclick="finOB()">Complete Setup <i class="fas fa-check" style="color: #fff !important;"></i></button>
     </div>
   </div>
 
@@ -220,44 +381,63 @@
       <div style="position: absolute; top: -20px; right: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div class="glass" style="padding: 16px; background: rgba(255,255,255,0.1); border: none;">
-          <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Actual Cash Balance</span>
+          <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Cash Balance</span>
           <div id="statNet" style="font-weight: 900; font-size: 1.2rem;">RM 0.00</div>
         </div>
-        <div class="glass" style="padding: 16px; background: rgba(255,255,255,0.1); border: none;">
+        <div class="glass" style="padding: 16px; background: rgba(255,255,255,0.1); border: none; cursor: pointer;" onclick="go('pgC')">
           <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Credit Utilisation</span>
           <div id="statCredit" style="font-weight: 900; font-size: 1.2rem;">RM 0.00</div>
         </div>
       </div>
     </div>
 
+    <div id="notifArea" class="mb20"></div>
+
     <div id="trackerContent">
-      <div class="fbc mb10 card neu-in" style="padding:16px; border-radius:20px;">
-        <div>
-          <h3 style="font-weight: 800; color: var(--text);">Income</h3>
-          <div id="hdrIncStat" style="font-size:0.7rem; color:var(--text2); font-weight:700;">Received: RM 0.00</div>
+      <div class="section-container income-section">
+        <div class="section-header" onclick="toggleSection('inc')">
+          <div>
+            <h3>Income</h3>           
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <i id="incChevron" class="fas fa-chevron-up"></i>
+          </div>
         </div>
-        <button class="pill-btn dashed" style="min-height: 32px; padding: 6px 12px; font-size: 0.7rem;" onclick="openM('mI')">+ Income</button>
-      </div>
-      <div id="iL" class="mb20"></div>
-
-      <div class="fbc mb10 card neu-in" style="padding:16px; border-radius:20px;">
-        <div>
-          <h3 style="font-weight: 800; color: var(--text);">Expenses</h3>
-          <div id="hdrExpStat" style="font-size:0.7rem; color:var(--text2); font-weight:700;">Cash: RM 0.00 | Credit: RM 0.00</div>
+        <div id="incContent" class="section-content">
+          <div id="iL"></div>
+          <button class="add-btn-dash" onclick="openM('mI')"><i class="fas fa-plus"></i> Add Income</button>
         </div>
-        <button class="pill-btn dashed" style="min-height: 32px; padding: 6px 12px; font-size: 0.7rem;" onclick="openM('mE')">+ Expense</button>
       </div>
 
-      <div class="filter-sort-bar">
-        <select id="expFilterCat" class="inp" onchange="render()"><option value="all">All Categories</option></select>
-        <select id="expSort" class="inp" onchange="render()">
-          <option value="none">Default Order</option>
-          <option value="high">Most Expensive</option>
-          <option value="low">Least Expensive</option>
-        </select>
+      <div class="section-container expense-section">
+        <div class="section-header" onclick="toggleSection('exp')">
+          <div>
+            <h3>Expenses</h3>            
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <i id="expChevron" class="fas fa-chevron-up"></i>
+          </div>
+        </div>
+        
+        <div id="expContent" class="section-content">
+          <div class="filter-sort-bar">
+            <select id="expFilterCat" class="inp" onchange="render()"><option value="all">All Categories</option></select>
+            <select id="expFilterType" class="inp" onchange="render()">
+              <option value="all">All Types</option>
+              <option value="fixed">Fixed Only</option>
+              <option value="variable">Variable Only</option>
+            </select>
+            <select id="expSort" class="inp" onchange="render()">
+              <option value="none">Default Order</option>
+              <option value="due">Due Date</option>
+              <option value="high">Most Expensive</option>
+              <option value="low">Least Expensive</option>
+            </select>
+          </div>
+          <div id="eL"></div>
+          <button class="add-btn-dash" onclick="addE()"><i class="fas fa-plus"></i> Add Expense</button>
+        </div>
       </div>
-      
-      <div id="eL" class="mb20"></div>
 
       <div id="dashPots" class="mb20"></div>
     </div>
@@ -314,22 +494,17 @@
   <!-- ANALYTICS PAGE -->
   <div id="pgD" class="pg">
     <h2 style="font-weight: 900; margin-bottom: 24px; color: var(--ac);">Analytics</h2>
-    <div class="fbc mb20" style="gap:12px;">
-      <button id="anaTabInc" class="tab-btn on" onclick="setAnaTab('inc')">Income</button>
-      <button id="anaTabExp" class="tab-btn" onclick="setAnaTab('exp')">Expenses</button>
+    
+    <div class="ana-nav">
+      <div class="ana-nav-item on" data-type="all" onclick="setAnaFilter('all')">Overview</div>
+      <div class="ana-nav-item" data-type="inc" onclick="setAnaFilter('inc')">Income</div>
+      <div class="ana-nav-item" data-type="exp" onclick="setAnaFilter('exp')">Expenses</div>
+      <div class="ana-nav-item" data-type="cred" onclick="setAnaFilter('cred')">Credit</div>
+      <div class="ana-nav-item" data-type="loan" onclick="setAnaFilter('loan')">Loans</div>
+      <div class="ana-nav-item" data-type="pot" onclick="setAnaFilter('pot')">Savings</div>
     </div>
-    <div class="card mb20">
-      <span class="lbl">Filter Categories</span>
-      <div id="anaCatList" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
-    </div>
-    <div class="card mb20">
-      <span class="lbl">Trends (Last 6 Months)</span>
-      <div style="height: 250px;"><canvas id="lineChart"></canvas></div>
-    </div>
-    <div class="card mb20">
-      <span class="lbl">Category Comparison</span>
-      <div style="height: 250px;"><canvas id="barChart"></canvas></div>
-    </div>
+
+    <div id="anaContent"></div>
   </div>
 
   <!-- SETTINGS PAGE -->
@@ -360,7 +535,7 @@
     <button class="nb on" onclick="go('pgT', this)"><i class="fas fa-wallet"></i></button>
     <button class="nb" onclick="go('pgL', this)"><i class="fas fa-hand-holding-dollar"></i></button>
     <button class="nb" onclick="go('pgC', this)"><i class="fas fa-credit-card"></i></button>
-    <button class="nb" onclick="go('pgS', this)"><i class="fas fa-piggy-bank"></i></button>
+    <button class="nb" onclick="go('pgS', this)"><i class="fas fa-jar"></i></button>
     <button class="nb" onclick="go('pgD', this)"><i class="fas fa-chart-line"></i></button>
     <button class="nb" onclick="go('pgSe', this)"><i class="fas fa-cog"></i></button>
   </nav>
@@ -373,26 +548,36 @@
       <span class="lbl">Amount</span><input id="fIA" class="inp mb20" type="number" step="0.01" placeholder="0.00">
       <span class="lbl">Category</span><select id="fIC" class="inp mb20"></select>
       <span class="lbl">Date</span><input id="fID" class="inp mb20" type="date">
-      <div class="mb20">
-        <button id="fIR" class="pill-btn on" style="width:100%;" onclick="this.classList.toggle('on')">Recurring</button>
+      <div style="overflow: hidden; margin-bottom: 20px;">
+        <button id="fIR" class="btn-rec" onclick="this.classList.toggle('off'); const i = this.querySelector('i'); if(this.classList.contains('off')) i.style.display='none'; else i.style.display='block';">
+          <i class="fas fa-check"></i> Recurring
+        </button>
       </div>
-      <button class="btn btn-p" onclick="addI()">Save Income</button>
+      <button class="btn btn-p" style="width: 100%;" onclick="addI()">Save Income</button>
     </div>
     <button class="close-btn-full" onclick="closeM('mI')"><i class="fas fa-times"></i> Close Window</button>
   </div>
 
-  <div id="mE" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
-    <h2 style="font-weight: 900; padding: 24px 20px 0;">Add Expense</h2>
+  <div id="mE" class="pg glass-modal">
+    <h2 style="font-weight: 900; padding: var(--s4) var(--s4) 0;">Edit/Add Expense</h2>
     <div class="card">
+      <input id="fEId" type="hidden">
       <span class="lbl">Name</span><input id="fEN" class="inp mb20" placeholder="e.g. Rent">
       <span class="lbl">Amount</span><input id="fEA" class="inp mb20" type="number" step="0.01" placeholder="0.00">
       <span class="lbl">Category</span><select id="fEC" class="inp mb20"></select>
+      <span class="lbl">Expense Type</span>
+      <select id="fET" class="inp mb20">
+        <option value="fixed">Fixed</option>
+        <option value="variable">Variable</option>
+      </select>
       <span class="lbl">Date</span><input id="fED" class="inp mb20" type="date">
       <span class="lbl">Payment Method</span><select id="fEP" class="inp mb20"><option value="cash">Cash</option><option value="credit">Credit</option></select>
-      <div class="mb20">
-        <button id="fER" class="pill-btn on" style="width:100%;" onclick="this.classList.toggle('on')">Recurring</button>
+      <div style="overflow: hidden; margin-bottom: var(--s4);">
+        <button id="fER" class="btn-rec" onclick="this.classList.toggle('off'); const i = this.querySelector('i'); if(this.classList.contains('off')) i.style.display='none'; else i.style.display='block';">
+          <i class="fas fa-check"></i> Recurring
+        </button>
       </div>
-      <button class="btn btn-p" onclick="addE()">Save Expense</button>
+      <button class="btn btn-p" style="width: 100%;" onclick="saveE()">Save Expense</button>
     </div>
     <button class="close-btn-full" onclick="closeM('mE')"><i class="fas fa-times"></i> Close Window</button>
   </div>
@@ -403,8 +588,10 @@
       <span class="lbl">Loan Title</span><input id="fLTi" class="inp mb20" placeholder="e.g. Car Loan">
       <span class="lbl">Total Amount</span><input id="fLAm" class="inp mb20" type="number" placeholder="0.00">
       <span class="lbl">Tenure (Months)</span><input id="fLTn" class="inp mb20" type="number" placeholder="e.g. 60">
-      <span class="lbl">Interest Rate (%)</span><input id="fLRt" class="inp mb20" type="number" step="0.1" placeholder="e.g. 3.5">
       <span class="lbl">Monthly Due Day</span><input id="fLDu" class="inp mb20" type="number" placeholder="1-31">
+      <p style="font-size: 0.7rem; color: var(--text3); line-height: 1.4; margin-top: -10px; margin-bottom: 20px;">
+        The rate is by default at 0% for this calculation. Please enter the full amount calculation that you have already completed and need to pay every month.
+      </p>
       <button class="btn btn-p" onclick="addLoan()">Create Loan Account</button>
     </div>
     <button class="close-btn-full" onclick="closeM('mLoan')"><i class="fas fa-times"></i> Close Window</button>
@@ -416,10 +603,20 @@
       <span class="lbl">Pot Title</span><input id="fPTi" class="inp mb20" placeholder="e.g. Travel Fund">
       <span class="lbl">Target Amount</span><input id="fPAm" class="inp mb20" type="number" placeholder="0.00">
       <span class="lbl">Target Month</span><input id="fPMo" class="inp mb20" type="month">
+      <span class="lbl">Pick Icon</span>
+      <div id="fPIco" class="fbc mb20" style="overflow-x:auto; gap:10px; padding-bottom:10px;">
+        <div class="pill-btn on" onclick="setPotIcon('🍯', this)">🍯</div>
+        <div class="pill-btn" onclick="setPotIcon('💰', this)">💰</div>
+        <div class="pill-btn" onclick="setPotIcon('🏠', this)">🏠</div>
+        <div class="pill-btn" onclick="setPotIcon('🚗', this)">🚗</div>
+        <div class="pill-btn" onclick="setPotIcon('✈️', this)">✈️</div>
+      </div>
+      <span class="lbl">Pick Color</span>
+      <input id="fPCol" type="color" class="mb20" style="width:100%; height:44px; border:none; background:none;" value="#6366f1">
       <span class="lbl">Strategy (Permanent)</span>
       <div style="display:flex; gap:12px;" class="mb20">
-        <button id="fPStratB" class="btn btn-o on" style="flex:1; font-size:0.7rem;" onclick="setPotStrat('before')">Before expenses</button>
-        <button id="fPStratA" class="btn btn-o" style="flex:1; font-size:0.7rem;" onclick="setPotStrat('after')">After expenses</button>
+        <button id="fPStratB" class="strat-btn on" onclick="setPotStrat('before')">Before expenses</button>
+        <button id="fPStratA" class="strat-btn" onclick="setPotStrat('after')">After expenses</button>
       </div>
       <button class="btn btn-p" onclick="addPot()">Create Pot</button>
     </div>
@@ -442,17 +639,25 @@
   <script>
     const K = 'bf4';
     let db = JSON.parse(localStorage.getItem(K) || '{"accounts":[],"prefs":{"theme":"light","accent":"indigo"}}');
-    let cur = null, viewMo = new Date();
+    let cur = null, viewMo = new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (3600000 * 8));
+    viewMo.setDate(1);
     let oData = { name: '', inc: [], exp: [], categories: { inc: [], exp: [] } };
-    let anaTab = 'inc', anaSelectedCats = [];
+    let anaTab = 'inc';
+    let anaSelectedCats = [];
     let potStrat = 'before';
 
     const $ = id => document.getElementById(id);
     const sv = () => localStorage.setItem(K, JSON.stringify(db));
     const ac = () => db.accounts.find(a => a.id === cur);
     const fm = n => 'RM ' + (+n).toFixed(2);
-    const td = () => new Date().toISOString().split('T')[0];
-    const moKey = (d) => d.toISOString().slice(0, 7);
+    const td = () => {
+      // Malaysia Timezone (UTC+8)
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const myTime = new Date(utc + (3600000 * 8));
+      return myTime.toISOString().split('T')[0];
+    };
+    const moKey = (d) => d.toISOString().split('T')[0].substring(0, 7);
 
     function init() {
       applyPrefs();
@@ -514,21 +719,25 @@
       oData.name = n; showPg('pgOB1');
     }
     function addOBInc() {
-      const n = $('oiN').value.trim(), a = parseFloat($('oiA').value), c = $('oiC').value, r = $('oiR').classList.contains('on');
+      const n = $('oiN').value.trim(), a = parseFloat($('oiA').value), c = $('oiC').value, r = !$('oiR').classList.contains('off');
       if (!n || isNaN(a)) return alert('Fill fields');
       oData.inc.push({ id: 'i_' + Math.random(), name: n, amount: a, category: c || 'No Category', date: td(), recurring: r });
       $('oiN').value = ''; $('oiA').value = ''; renderOBList('oIL', oData.inc, 'inc');
     }
     function addOBExp() {
-      const n = $('oeN').value.trim(), a = parseFloat($('oeA').value), c = $('oeC').value, p = $('oeP').value, r = $('oeR').classList.contains('on');
-      if (!n || isNaN(a)) return alert('Fill fields');
-      oData.exp.push({ id: 'e_' + Math.random(), name: n, amount: a, category: c || 'No Category', date: td(), recurring: r, payment: p, paid: false });
+      const n = $('oeN').value.trim(), a = parseFloat($('oeA').value), c = $('oeC').value, p = $('oeP').value, t = $('oeT').value, r = !$('oeR').classList.contains('off');
+      if (!n || isNaN(a) || a <= 0) return alert('Please enter a valid name and positive amount');
+      if (!c) return alert('Please select or add a category');
+      oData.exp.push({ id: 'e_' + Math.random(), name: n, amount: a, category: c, type: t, date: td(), recurring: r, payment: p, paid: false });
       $('oeN').value = ''; $('oeA').value = ''; renderOBList('oEL', oData.exp, 'exp');
     }
     function renderOBList(id, list, type) {
       $(id).innerHTML = list.map((item, idx) => `
-        <div class="item-card fbc">
-          <div><div style="font-weight:800;">${item.name}</div><div class="lbl" style="margin:0; font-size:0.6rem;">${item.category}</div></div>
+        <div class="item-card fbc" style="border-left: 4px solid ${item.type === 'fixed' ? 'var(--green)' : (item.type === 'variable' ? 'var(--blue)' : 'var(--border)')};">
+          <div>
+            <div style="font-weight:800;">${item.name}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem;">${item.category} • ${item.type ? item.type.toUpperCase() : ''}</div>
+          </div>
           <div style="display:flex; align-items:center; gap:12px;"><div class="am">${fm(item.amount)}</div><i class="fas fa-trash" style="font-size:18px !important; color:var(--red);" onclick="delOBItem('${type}', ${idx})"></i></div>
         </div>
       `).join('') || '<div class="empty">No entries</div>';
@@ -609,16 +818,49 @@
 
     /* DATA MANAGEMENT */
     function addI() {
-      const n = $('fIN').value.trim(), a = parseFloat($('fIA').value), c = $('fIC').value, d = $('fID').value || td(), r = $('fIR').classList.contains('on');
+      const n = $('fIN').value.trim(), a = parseFloat($('fIA').value), c = $('fIC').value, d = $('fID').value || td(), r = !$('fIR').classList.contains('off');
       if (!n || isNaN(a)) return alert('Fill fields');
       ac().incomes.push({ id: 'i_'+Math.random(), name: n, amount: a, category: c, date: d, recurring: r });
       sv(); closeM('mI'); render();
     }
     function addE() {
-      const n = $('fEN').value.trim(), a = parseFloat($('fEA').value), c = $('fEC').value, d = $('fED').value || td(), p = $('fEP').value, r = $('fER').classList.contains('on');
-      if (!n || isNaN(a)) return alert('Fill fields');
-      ac().expenses.push({ id: 'e_'+Math.random(), name: n, amount: a, category: c, date: d, recurring: r, payment: p, paid: false });
+      $('fEId').value = '';
+      $('fEN').value = '';
+      $('fEA').value = '';
+      $('fED').value = td();
+      $('fER').classList.remove('off');
+      $('fER').querySelector('i').style.display = 'block';
+      const catSel = $('fEC');
+      catSel.innerHTML = ac().categories.exp.map(c => `<option value="${c}">${c}</option>`).join('') || '<option value="">No Category</option>';
+      openM('mE');
+    }
+    function saveE() {
+      const id = $('fEId').value, n = $('fEN').value.trim(), a = parseFloat($('fEA').value), c = $('fEC').value, d = $('fED').value || td(), p = $('fEP').value, t = $('fET').value, r = !$('fER').classList.contains('off');
+      if (!n || isNaN(a) || a <= 0) return alert('Fill fields with valid data');
+      if (!c) return alert('Select a category');
+      
+      const acc = ac();
+      if (id) {
+        const e = acc.expenses.find(x => x.id === id);
+        if (e) Object.assign(e, { name: n, amount: a, category: c, date: d, recurring: r, payment: p, type: t });
+      } else {
+        acc.expenses.push({ id: 'e_'+Math.random(), name: n, amount: a, category: c, date: d, recurring: r, payment: p, type: t, paid: false });
+      }
       sv(); closeM('mE'); render();
+    }
+    function editE(id) {
+      const e = ac().expenses.find(x => x.id === id); if (!e) return;
+      $('fEId').value = e.id;
+      $('fEN').value = e.name;
+      $('fEA').value = e.amount;
+      $('fET').value = e.type || 'variable';
+      $('fED').value = e.date;
+      $('fEP').value = e.payment;
+      const catSel = $('fEC');
+      catSel.innerHTML = ac().categories.exp.map(c => `<option value="${c}" ${c===e.category?'selected':''}>${c}</option>`).join('');
+      if (e.recurring) { $('fER').classList.remove('off'); $('fER').querySelector('i').style.display='block'; }
+      else { $('fER').classList.add('off'); $('fER').querySelector('i').style.display='none'; }
+      openM('mE');
     }
     function addCat(type) {
       const name = prompt('New category:'); if (!name) return;
@@ -628,7 +870,15 @@
     }
     function togglePaid(id) {
       const e = ac().expenses.find(x => x.id === id); if (!e) return;
-      e.paid = !e.paid; sv(); render();
+      e.paid = !e.paid;
+      
+      // If it's an auto-generated saving item being marked as paid
+      if (e.potId && e.paid) {
+        const p = ac().savings.find(x => x.id === e.potId);
+        if (p) p.current += e.amount;
+      }
+      
+      sv(); render();
     }
     function toggleReceived(id) {
       const i = ac().incomes.find(x => x.id === id); if (!i) return;
@@ -653,51 +903,44 @@
 
     function render() {
       const acc = ac(); if (!acc) return;
+      const today = td();
       const mo = moKey(viewMo);
-      if (!acc.categories) acc.categories = { inc: [], exp: [] };
       
       const incMo = acc.incomes.filter(i => i.date.startsWith(mo));
       let expMo = acc.expenses.filter(e => e.date.startsWith(mo));
 
-      // Auto-pushed Loans
-      acc.loans.forEach(l => {
-        if (l.pushedMo) {
-          const start = new Date(l.pushedMo + '-01'), curr = new Date(mo + '-01');
-          const diff = (curr.getFullYear() - start.getFullYear()) * 12 + (curr.getMonth() - start.getMonth());
-          if (diff >= 0 && diff < l.tenure) {
-            const lid = `e_l_${l.id}_${mo}`;
-            if (!expMo.some(e => e.id === lid)) {
-              const inst = { id: lid, name: 'Loan: ' + l.title, amount: l.amount/l.tenure, category: 'Bills', date: mo+'-'+l.due, payment: 'cash', paid: false, auto: true, loanId: l.id };
-              acc.expenses.push(inst); // Persist auto-generated items
-              expMo.push(inst);
-            }
-          }
+      // Notification Logic
+      let notifs = [];
+      incMo.forEach(i => {
+        if (!i.paid) {
+          const diff = (new Date(i.date) - new Date(today)) / 86400000;
+          if (diff <= 2 && diff > 0) notifs.push(`💰 Almost pay day for ${i.name}, spend wisely!`);
+          else if (diff <= 0) notifs.push(`🔔 ${i.name} should be in by now, please check.`);
         }
       });
+      expMo.forEach(e => {
+        if (!e.paid) {
+          const diff = (new Date(e.date) - new Date(today)) / 86400000;
+          if (diff === 1) notifs.push(`⚠️ 1 day left to pay ${e.name}!`);
+          else if (diff <= 0) notifs.push(`🚨 ${e.name} is DUE! Please pay now.`);
+        }
+      });
+      $('notifArea').innerHTML = notifs.map(n => `<div class="card mb10" style="background:var(--red-bg); color:var(--red); font-size:0.75rem; font-weight:700; border:1px solid var(--red);">${n}</div>`).join('');
 
-      const ti = incMo.reduce((s, i) => s + i.amount, 0);
+      const ti_received = incMo.filter(i => i.paid).reduce((s, i) => s + i.amount, 0);
       const te_cash_paid = expMo.filter(e => e.payment === 'cash' && e.paid).reduce((s, e) => s + e.amount, 0);
       const te_credit_paid = expMo.filter(e => e.payment === 'credit' && e.paid).reduce((s, e) => s + e.amount, 0);
-      const te_cash_all = expMo.filter(e => e.payment === 'cash').reduce((s, e) => s + e.amount, 0);
-      const te_credit_all = expMo.filter(e => e.payment === 'credit').reduce((s, e) => s + e.amount, 0);
-
+      
       $('statCredit').textContent = fm(te_credit_paid);
-      $('statNet').textContent = fm(ti - te_cash_paid);
+      // Cash Balance is ONLY based on Received Income - Paid Cash Expenses
+      // If no income is received, Cash Balance stays at RM 0.00 (or negative if expenses are paid)
+      const cashBalance = ti_received - te_cash_paid;
+      $('statNet').textContent = fm(cashBalance);
 
-      $('hdrIncStat').textContent = `Received: ${fm(ti)}`;
-      $('hdrExpStat').textContent = `Cash: ${fm(te_cash_all)} | Credit: ${fm(te_credit_all)}`;
-
-      $('fIC').innerHTML = acc.categories.inc.map(c => `<option value="${c}">${c}</option>`).join('') + '<option value="">No Category</option>';
-      $('fEC').innerHTML = acc.categories.exp.map(c => `<option value="${c}">${c}</option>`).join('') + '<option value="">No Category</option>';
-      $('expFilterCat').innerHTML = '<option value="all">All Categories</option>' + acc.categories.exp.map(c => `<option value="${c}">${c}</option>`).join('') + '<option value="No Category">No Category</option>';
-
-      // Sorting & Filtering
-      const fCat = $('expFilterCat').value;
+      // Sorting
       const fSort = $('expSort').value;
-      if (fCat !== 'all') expMo = expMo.filter(e => e.category === fCat);
-      if (fSort === 'high') expMo.sort((a,b) => b.amount - a.amount);
-      else if (fSort === 'low') expMo.sort((a,b) => a.amount - b.amount);
-
+      if (fSort === 'due') expMo.sort((a,b) => new Date(a.date) - new Date(b.date));
+      
       $('iL').innerHTML = incMo.map(i => `
         <div class="item-card fbc" onclick="viewDetail('inc', '${i.id}')">
           <div class="paid-toggle ${i.paid ? 'on' : ''}" onclick="event.stopPropagation(); toggleReceived('${i.id}')">
@@ -706,33 +949,36 @@
           </div>
           <div style="flex:1; margin-left:12px;">
             <div style="font-weight:800;">${i.name}</div>
-            <div class="lbl" style="margin:0; font-size:0.6rem;">${i.category}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem;">Due: ${new Date(i.date).toLocaleDateString('en-GB')}</div>
           </div>
           <div class="am pos">+${fm(i.amount)}</div>
         </div>
-      `).join('') || '<div class="empty">No income</div>';
+      `).join('');
 
-      $('eL').innerHTML = expMo.map(e => `
-        <div class="item-card fbc" onclick="viewDetail('exp', '${e.id}')">
+      $('eL').innerHTML = expMo.map(e => {
+        const isDue = new Date(e.date) <= new Date(today) && !e.paid;
+        const typeColor = e.type === 'fixed' ? 'var(--green)' : (e.type === 'variable' ? 'var(--blue)' : 'var(--border)');
+        return `
+        <div class="item-card fbc" style="border-left: 4px solid ${typeColor}; ${isDue ? 'background: var(--red-bg);' : ''}" onclick="editE('${e.id}')">
           <div class="paid-toggle ${e.paid ? 'on' : ''}" onclick="event.stopPropagation(); togglePaid('${e.id}')">
             <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
             <span>${e.paid ? 'Paid' : 'Mark Paid'}</span>
           </div>
-          <div style="flex:1; margin-left:12px;">
-            <div style="font-weight:800;">${e.name}</div>
-            <div class="lbl" style="margin:0; font-size:0.6rem;">${e.category} | ${e.payment}</div>
+          <div style="flex:1; margin-left: var(--s3);">
+            <div style="font-weight:800;">${e.name} ${e.displayTag || ''}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem; color:${isDue ? 'var(--red)' : ''}">${e.category} • ${new Date(e.date).toLocaleDateString('en-GB')}</div>
           </div>
           <div class="am neg">-${fm(e.amount)}</div>
         </div>
-      `).join('') || '<div class="empty">No expenses</div>';
+      `}).join('');
 
-      renderLoans(acc, mo);
       renderPots(acc, mo);
-      renderDashPots(acc);
     }
 
     function renderDashPots(acc) {
-      $('dashPots').innerHTML = acc.savings.map(p => {
+      // Only show active pots (current < target)
+      const activePots = acc.savings.filter(p => p.current < p.target);
+      $('dashPots').innerHTML = activePots.map(p => {
         const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
         return `
           <div class="card fbc" style="padding:16px;">
@@ -763,37 +1009,97 @@
         const paidCount = relevantExps.filter(e => e.paid).length;
         const totalPaid = relevantExps.filter(e => e.paid).reduce((s, e) => s + e.amount, 0);
         const pct = Math.min(100, (paidCount/l.tenure)*100).toFixed(0);
+        
+        let remainingMonths = l.tenure - paidCount;
+        if (remainingMonths < 0) remainingMonths = 0;
+
+        // Calculate end date based on start date (pushedMo) and tenure
+        let endDateStr = 'Not started';
+        if (l.pushedMo) {
+          const start = new Date(l.pushedMo + '-01');
+          const end = new Date(start.setMonth(start.getMonth() + l.tenure));
+          endDateStr = `Ends: ${end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`;
+        }
+
         return `
-          <div class="card">
+          <div class="item-card" style="border-left: 4px solid var(--ac);">
             <div class="fbc mb10"><h3 style="font-weight:900;">${l.title}</h3><div class="am">${fm(l.amount)}</div></div>
-            <div style="font-size:0.85rem; color:var(--text2); font-weight:700; margin-bottom:8px;">
-              Progress: ${fm(totalPaid)} / ${fm(l.amount)} (${pct}%)
+            <div class="fbc" style="font-size:0.75rem; color:var(--text2); font-weight:700; margin-bottom:8px;">
+              <span>Progress: ${fm(totalPaid)} / ${fm(l.amount)}</span>
+              <span>${pct}%</span>
             </div>
-            <div class="neu-in" style="height:8px; border-radius:4px; overflow:hidden; margin-bottom:12px;">
+            <div class="neu-in" style="height:8px; border-radius:4px; overflow:hidden; margin-bottom:8px;">
               <div style="width:${pct}%; height:100%; background:var(--ac);"></div>
             </div>
-            <div class="fbc"><span class="lbl">${l.tenure} months</span>${!l.pushedMo ? `<button class="btn-p" style="width:auto; padding:8px 16px;" onclick="pushLoan('${l.id}')">Start Push</button>` : `<span class="pill-btn on">Active</span>`}</div>
+            <div class="fbc" style="font-size:0.75rem; font-weight:800;">
+              <span style="color:var(--ac);">${remainingMonths} months remaining</span>
+              <span style="color:var(--text3);">${endDateStr}</span>
+            </div>
+            ${!l.pushedMo ? `<button class="btn btn-p" style="width:100%; margin-top:12px; height:44px;" onclick="pushLoan('${l.id}')">Start Loan Push</button>` : ''}
           </div>
         `;
-      }).join('');
+      }).join('') || '<div class="empty">No loans added</div>';
+    }
+
+    function toggleSection(id) {
+      const content = $(id + 'Content');
+      const chevron = $(id + 'Chevron');
+      content.classList.toggle('collapsed');
+      chevron.classList.toggle('fa-chevron-down');
+      chevron.classList.toggle('fa-chevron-up');
+    }
+
+    function setAnaFilter(type) {
+      document.querySelectorAll('.ana-nav-item').forEach(i => i.classList.toggle('on', i.dataset.type === type));
+      // Filter logic for extraAnalytics content
+      renderExtraAnalytics(ac(), type);
     }
 
     function renderPots(acc, mo) {
-      $('potList').innerHTML = acc.savings.map(p => {
+      // Filter only active pots
+      const activePots = acc.savings.filter(p => p.active);
+      $('potList').innerHTML = activePots.map(p => {
         const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
         return `
-          <div class="card" onclick="viewPotDetail('${p.id}')">
-            <div class="fbc mb10"><h3>${p.title}</h3><b>${pct}%</b></div>
-            <div style="font-size:0.85rem; color:var(--text2); font-weight:700; margin-bottom:8px;">${fm(p.current)} / ${fm(p.target)}</div>
-            <div class="neu-in" style="height:8px; border-radius:4px; overflow:hidden;"><div style="width:${pct}%; height:100%; background:var(--ac);"></div></div>
+          <div class="item-card" style="border-left: 6px solid ${p.color || 'var(--ac)'}; background: linear-gradient(90deg, #fff 0%, ${p.color || 'var(--ac)'}05 100%);">
+            <div class="fbc mb10">
+              <h3 style="font-weight:900;">${p.icon || '🍯'} ${p.title}</h3>
+              <button class="pill-btn on" style="min-width:80px; min-height:32px; font-size:0.7rem;" onclick="togglePotActive('${p.id}')">Active</button>
+            </div>
+            <div style="font-size:1.1rem; color:var(--text); font-weight:900; margin-bottom:8px;">${fm(p.current)} / ${fm(p.target)}</div>
+            <div class="neu-in" style="height:12px; border-radius:6px; overflow:hidden;">
+              <div style="width:${pct}%; height:100%; background: linear-gradient(90deg, ${p.color || 'var(--ac)'} 0%, var(--green) 100%); transition: width 0.5s ease-out;"></div>
+            </div>
+            <div style="text-align:right; font-size:0.7rem; font-weight:800; margin-top:4px; color:var(--ac);">${pct}% Completed</div>
           </div>
         `;
-      }).join('');
+      }).join('') || '<div class="empty">No active saving pots</div>';
     }
 
-    function setPotStrat(s) { potStrat = s; $('fPStratB').classList.toggle('on', s==='before'); $('fPStratA').classList.toggle('on', s==='after'); }
+    function togglePotActive(id) {
+      const p = ac().savings.find(x => x.id === id); if (!p) return;
+      p.active = !p.active; sv(); render();
+    }
+
+    let potIcon = '🍯';
+    function setPotIcon(ico, el) {
+      potIcon = ico;
+      document.querySelectorAll('#fPIco .pill-btn').forEach(b => b.classList.remove('on'));
+      el.classList.add('on');
+    }
+
     function addPot() {
-      const p = { id: 'p_'+Date.now(), title: $('fPTi').value, target: parseFloat($('fPAm').value), current: 0, targetMo: $('fPMo').value, strat: potStrat };
+      const p = { 
+        id: 'p_'+Date.now(), 
+        title: $('fPTi').value, 
+        target: parseFloat($('fPAm').value), 
+        current: 0, 
+        targetMo: $('fPMo').value, 
+        strat: potStrat,
+        icon: potIcon,
+        color: $('fPCol').value,
+        active: true 
+      };
       ac().savings.push(p); sv(); closeM('mPot'); render();
     }
     function viewPotDetail(id) {
@@ -812,11 +1118,11 @@
       renderAnalytics(); 
     }
 
+    let extraCharts = { loan: null, pot: null, cred: null };
     function renderAnalytics() {
       const acc = ac(); if (!acc) return;
       const cats = acc.categories[anaTab];
       
-      // Filter unique categories used in current view month's data
       const mo = moKey(viewMo);
       const data = anaTab === 'inc' ? acc.incomes : acc.expenses;
       const moData = data.filter(d => d.date.startsWith(mo));
@@ -827,6 +1133,81 @@
       `).join('') || '<div class="empty">No categories found this month</div>';
       
       renderCharts(acc);
+      renderExtraAnalytics(acc);
+    }
+
+    function renderExtraAnalytics(acc) {
+      const container = $('extraAnalytics');
+      container.innerHTML = `
+        <div class="section-container" style="border-left: 4px solid var(--ac);">
+          <div class="section-header"><h3>Income Analytics</h3></div>
+          <div style="height: 200px;"><canvas id="incAnaChart"></canvas></div>
+        </div>
+        <div class="section-container" style="border-left: 4px solid var(--red);">
+          <div class="section-header"><h3>Expense Analytics</h3></div>
+          <div style="height: 200px;"><canvas id="expAnaChart"></canvas></div>
+        </div>
+        <div class="section-container" style="border-left: 4px solid var(--ac2);">
+          <div class="section-header"><h3>Credit Analytics</h3></div>
+          <div style="height: 200px;"><canvas id="credAnaChart"></canvas></div>
+        </div>
+        <div class="section-container" style="border-left: 4px solid var(--ac);">
+          <div class="section-header"><h3>Loan Analytics</h3></div>
+          <div style="height: 200px;"><canvas id="loanChart"></canvas></div>
+          <div id="loanStat" class="mt10" style="font-size:0.75rem; font-weight:700;"></div>
+        </div>
+        <div class="section-container" style="border-left: 4px solid var(--green);">
+          <div class="section-header"><h3>Saving Analytics</h3></div>
+          <div style="height: 200px;"><canvas id="potChart"></canvas></div>
+          <div id="potStat" class="mt10" style="font-size:0.75rem; font-weight:700;"></div>
+        </div>
+      `;
+
+      // Helper to clear/init charts
+      const renderSectionChart = (id, type, labels, data, color) => {
+        const ctx = $(id).getContext('2d');
+        return new Chart(ctx, {
+          type: type,
+          data: { labels, datasets: [{ data, backgroundColor: color, borderColor: color }] },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      };
+
+      // 1. Income
+      renderSectionChart('incAnaChart', 'line', ['1M', '3M', '6M'], [100, 120, 110], 'var(--green)');
+      // 2. Expenses
+      renderSectionChart('expAnaChart', 'bar', ['Food', 'Bills', 'Rent'], [300, 500, 1200], 'var(--red)');
+      // 3. Credit
+      const credExps = acc.expenses.filter(e => e.payment === 'credit' && e.paid);
+      renderSectionChart('credAnaChart', 'doughnut', ['Used', 'Limit'], [credExps.reduce((s,e)=>s+e.amount,0), 5000], ['var(--ac2)', 'var(--border2)']);
+
+      // 4. Loan Chart
+      const ctxL = $('loanChart').getContext('2d');
+      const totalLoan = acc.loans.reduce((s,l) => s+l.amount, 0);
+      const totalPaid = acc.expenses.filter(e => e.loanId && e.paid).reduce((s,e) => s+e.amount, 0);
+      
+      if (extraCharts.loan) extraCharts.loan.destroy();
+      extraCharts.loan = new Chart(ctxL, {
+        type: 'doughnut',
+        data: {
+          labels: ['Paid', 'Remaining'],
+          datasets: [{ data: [totalPaid, Math.max(0, totalLoan - totalPaid)], backgroundColor: ['var(--ac)', 'var(--border2)'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+      });
+      $('loanStat').innerHTML = `<div class="fbc"><span>Total Debt:</span><span>${fm(totalLoan)}</span></div><div class="fbc"><span>Total Paid:</span><span>${fm(totalPaid)}</span></div>`;
+
+      // 5. Pot Chart
+      const ctxP = $('potChart').getContext('2d');
+      if (extraCharts.pot) extraCharts.pot.destroy();
+      extraCharts.pot = new Chart(ctxP, {
+        type: 'bar',
+        data: {
+          labels: acc.savings.map(p => p.title),
+          datasets: [{ label: 'Progress %', data: acc.savings.map(p => (p.current/p.target)*100), backgroundColor: 'var(--green)' }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+      });
     }
 
     function toggleAnaCat(c) {
@@ -948,7 +1329,6 @@
       const totalOutstanding = credExps.reduce((s, e) => s + e.amount, 0);
       
       $('credTotal').textContent = fm(totalOutstanding);
-      // For progress bar, we assume a dynamic "limit" of 5000 or the max ever spent if higher
       const limit = Math.max(5000, totalOutstanding);
       $('credUsageFill').style.width = Math.min(100, (totalOutstanding/limit)*100) + '%';
 
@@ -963,7 +1343,7 @@
             <div class="lbl" style="margin:0; font-size:0.6rem;">${new Date(e.date).toLocaleDateString('en-GB')} | ${e.category}</div>
           </div>
           <div style="text-align:right;">
-            <div class="am neg" style="margin-bottom:8px;">-${fm(e.amount)}</div>
+            <div class="am pos" style="margin-bottom:8px; color: var(--green);">${fm(e.amount)}</div>
             <button class="pill-btn on" style="min-height:32px; padding:0 12px; font-size:0.7rem;" onclick="settleCreditItem('${e.id}')">Settle</button>
           </div>
         </div>
