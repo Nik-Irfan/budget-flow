@@ -82,14 +82,19 @@
     .month-item { flex: 0 0 auto; padding: 12px 20px; border-radius: 20px; text-align: center; cursor: pointer; transition: .2s; font-weight: 700; color: var(--text2); background: var(--card); border: 1px solid transparent; min-width: 100px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
     .month-item.active { background: var(--ac); color: #fff; box-shadow: 0 4px 12px var(--ac-sh); border-color: var(--ac); }
     
+    .filter-sort-bar { display: flex; gap: 12px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; }
+    .filter-sort-bar select { flex: 1; min-width: 120px; font-size: 0.75rem; padding: 8px 12px; height: 36px; }
+
     .month-picker-inline { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
     .month-picker-inline input[type="month"] { flex: 1; border: none; background: var(--card); box-shadow: var(--shadow); padding: 12px; border-radius: 15px; color: var(--text); font-family: var(--font); font-weight: 700; outline: none; }
 
     .close-btn-full { width: 100%; height: 56px; background: var(--red); color: #fff; border: none; border-radius: var(--r2); font-weight: 900; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); transition: 0.2s; margin-top: 24px; }
     .close-btn-full:active { transform: scale(0.98); opacity: 0.9; }
 
-    .paid-toggle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--text3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; color: transparent; }
-    .paid-toggle.on { background: var(--green); border-color: var(--green); color: #fff; }
+    .paid-toggle { min-width: 120px; height: 44px; border-radius: var(--r2); border: 2px solid var(--text3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; color: var(--text3); font-weight: 700; font-size: 0.8rem; gap: 8px; background: var(--card); box-shadow: var(--shadow); }
+    .paid-toggle.on { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 4px 12px var(--green-bg); }
+    .paid-toggle:hover { transform: translateY(-2px); }
+    .paid-toggle:active { transform: scale(0.95); box-shadow: var(--shadow-in); }
 
     .tab-btn { flex: 1; padding: 14px; border-radius: 15px; border: none; background: var(--card); color: var(--text3); font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); }
     .tab-btn.on { background: var(--ac); color: #fff; box-shadow: 0 4px 15px var(--ac-sh); }
@@ -152,6 +157,9 @@
       <input id="oiA" class="inp mb20" type="number" placeholder="0.00">
       <span class="lbl">Category</span>
       <select id="oiC" class="inp mb20"><option value="">No Category</option></select>
+      <div class="mb20">
+        <button id="oiR" class="pill-btn on" style="width:100%;" onclick="this.classList.toggle('on')">Recurring</button>
+      </div>
       <button class="btn btn-p" onclick="addOBInc()">+ Add to List</button>
     </div>
     <div style="padding: 20px 0;">
@@ -179,6 +187,9 @@
         <option value="cash">Cash</option>
         <option value="credit">Credit</option>
       </select>
+      <div class="mb20">
+        <button id="oeR" class="pill-btn on" style="width:100%;" onclick="this.classList.toggle('on')">Recurring</button>
+      </div>
       <button class="btn btn-p" onclick="addOBExp()">+ Add to List</button>
     </div>
     <div style="padding: 20px 0;">
@@ -209,17 +220,13 @@
       <div style="position: absolute; top: -20px; right: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div class="glass" style="padding: 16px; background: rgba(255,255,255,0.1); border: none;">
-          <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Total Cash Left</span>
-          <div id="statCash" style="font-weight: 900; font-size: 1.2rem;">RM 0.00</div>
+          <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Actual Cash Balance</span>
+          <div id="statNet" style="font-weight: 900; font-size: 1.2rem;">RM 0.00</div>
         </div>
         <div class="glass" style="padding: 16px; background: rgba(255,255,255,0.1); border: none;">
           <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Credit Utilisation</span>
           <div id="statCredit" style="font-weight: 900; font-size: 1.2rem;">RM 0.00</div>
         </div>
-      </div>
-      <div class="glass" style="margin-top: 16px; padding: 20px; background: rgba(255,255,255,0.15); border: none;">
-        <span class="lbl" style="color: rgba(255,255,255,0.9); font-size: 0.7rem;">Actual Cash Balance (After Credit)</span>
-        <div id="statNet" style="font-weight: 900; font-size: 1.5rem;">RM 0.00</div>
       </div>
     </div>
 
@@ -240,7 +247,19 @@
         </div>
         <button class="pill-btn dashed" style="min-height: 32px; padding: 6px 12px; font-size: 0.7rem;" onclick="openM('mE')">+ Expense</button>
       </div>
-      <div id="eL"></div>
+
+      <div class="filter-sort-bar">
+        <select id="expFilterCat" class="inp" onchange="render()"><option value="all">All Categories</option></select>
+        <select id="expSort" class="inp" onchange="render()">
+          <option value="none">Default Order</option>
+          <option value="high">Most Expensive</option>
+          <option value="low">Least Expensive</option>
+        </select>
+      </div>
+      
+      <div id="eL" class="mb20"></div>
+
+      <div id="dashPots" class="mb20"></div>
     </div>
   </div>
 
@@ -260,6 +279,36 @@
       <button class="btn btn-p" style="width:auto; padding:12px 20px;" onclick="openM('mPot')"><i class="fas fa-plus"></i></button>
     </div>
     <div id="potList"></div>
+  </div>
+
+  <!-- CREDIT MANAGEMENT PAGE -->
+  <div id="pgC" class="pg">
+    <h2 style="font-weight: 900; margin-bottom: 24px; color: var(--ac);">Credit Management</h2>
+    
+    <div class="card mb20" style="background: var(--ac); color: #fff; padding: 32px;">
+      <span class="lbl" style="color: rgba(255,255,255,0.8);">Total Credit Outstanding</span>
+      <div id="credTotal" style="font-weight: 900; font-size: 2rem;">RM 0.00</div>
+      <div id="credUsageBar" class="neu-in" style="height:10px; border-radius:5px; overflow:hidden; margin-top:16px; background:rgba(255,255,255,0.2);">
+        <div id="credUsageFill" style="width:0%; height:100%; background:#fff; transition:0.3s;"></div>
+      </div>
+    </div>
+
+    <div class="card mb20">
+      <span class="lbl">Quick Pay Credit</span>
+      <div class="fbc" style="gap:12px;">
+        <input id="payCredAmt" class="inp" type="number" placeholder="Enter amount to pay">
+        <button class="btn btn-p" style="min-width:100px;" onclick="payCreditManual()">Pay</button>
+      </div>
+    </div>
+
+    <div class="fbc mb10">
+      <h3 style="font-weight: 800;">Credit Expenses (Ranked)</h3>
+      <select id="credSort" class="inp" style="width:auto; min-height:36px; padding:8px 12px; font-size:0.75rem;" onchange="renderCreditPg()">
+        <option value="high">Highest First</option>
+        <option value="date">Latest First</option>
+      </select>
+    </div>
+    <div id="credList"></div>
   </div>
 
   <!-- ANALYTICS PAGE -->
@@ -310,6 +359,7 @@
   <nav id="nav" class="nav" style="display:none;">
     <button class="nb on" onclick="go('pgT', this)"><i class="fas fa-wallet"></i></button>
     <button class="nb" onclick="go('pgL', this)"><i class="fas fa-hand-holding-dollar"></i></button>
+    <button class="nb" onclick="go('pgC', this)"><i class="fas fa-credit-card"></i></button>
     <button class="nb" onclick="go('pgS', this)"><i class="fas fa-piggy-bank"></i></button>
     <button class="nb" onclick="go('pgD', this)"><i class="fas fa-chart-line"></i></button>
     <button class="nb" onclick="go('pgSe', this)"><i class="fas fa-cog"></i></button>
@@ -323,6 +373,9 @@
       <span class="lbl">Amount</span><input id="fIA" class="inp mb20" type="number" step="0.01" placeholder="0.00">
       <span class="lbl">Category</span><select id="fIC" class="inp mb20"></select>
       <span class="lbl">Date</span><input id="fID" class="inp mb20" type="date">
+      <div class="mb20">
+        <button id="fIR" class="pill-btn on" style="width:100%;" onclick="this.classList.toggle('on')">Recurring</button>
+      </div>
       <button class="btn btn-p" onclick="addI()">Save Income</button>
     </div>
     <button class="close-btn-full" onclick="closeM('mI')"><i class="fas fa-times"></i> Close Window</button>
@@ -336,6 +389,9 @@
       <span class="lbl">Category</span><select id="fEC" class="inp mb20"></select>
       <span class="lbl">Date</span><input id="fED" class="inp mb20" type="date">
       <span class="lbl">Payment Method</span><select id="fEP" class="inp mb20"><option value="cash">Cash</option><option value="credit">Credit</option></select>
+      <div class="mb20">
+        <button id="fER" class="pill-btn on" style="width:100%;" onclick="this.classList.toggle('on')">Recurring</button>
+      </div>
       <button class="btn btn-p" onclick="addE()">Save Expense</button>
     </div>
     <button class="close-btn-full" onclick="closeM('mE')"><i class="fas fa-times"></i> Close Window</button>
@@ -449,6 +505,7 @@
       render();
       if (id === 'pgD') renderAnalytics();
       if (id === 'pgSe') renderSettingsCats();
+      if (id === 'pgC') renderCreditPg();
     }
 
     /* ONBOARDING */
@@ -457,15 +514,15 @@
       oData.name = n; showPg('pgOB1');
     }
     function addOBInc() {
-      const n = $('oiN').value.trim(), a = parseFloat($('oiA').value), c = $('oiC').value;
+      const n = $('oiN').value.trim(), a = parseFloat($('oiA').value), c = $('oiC').value, r = $('oiR').classList.contains('on');
       if (!n || isNaN(a)) return alert('Fill fields');
-      oData.inc.push({ id: 'i_' + Math.random(), name: n, amount: a, category: c || 'No Category', date: td(), recurring: true });
+      oData.inc.push({ id: 'i_' + Math.random(), name: n, amount: a, category: c || 'No Category', date: td(), recurring: r });
       $('oiN').value = ''; $('oiA').value = ''; renderOBList('oIL', oData.inc, 'inc');
     }
     function addOBExp() {
-      const n = $('oeN').value.trim(), a = parseFloat($('oeA').value), c = $('oeC').value, p = $('oeP').value;
+      const n = $('oeN').value.trim(), a = parseFloat($('oeA').value), c = $('oeC').value, p = $('oeP').value, r = $('oeR').classList.contains('on');
       if (!n || isNaN(a)) return alert('Fill fields');
-      oData.exp.push({ id: 'e_' + Math.random(), name: n, amount: a, category: c || 'No Category', date: td(), recurring: true, payment: p, paid: false });
+      oData.exp.push({ id: 'e_' + Math.random(), name: n, amount: a, category: c || 'No Category', date: td(), recurring: r, payment: p, paid: false });
       $('oeN').value = ''; $('oeA').value = ''; renderOBList('oEL', oData.exp, 'exp');
     }
     function renderOBList(id, list, type) {
@@ -481,8 +538,68 @@
       renderOBList(type === 'inc' ? 'oIL' : 'oEL', type === 'inc' ? oData.inc : oData.exp, type);
     }
     function renderOBSummary() {
-      const ti = oData.inc.reduce((s, i) => s + i.amount, 0), te = oData.exp.reduce((s, e) => s + e.amount, 0);
-      $('obSummary').innerHTML = `<div class="card"><div class="fbc mb10"><span>Income</span><b>${fm(ti)}</b></div><div class="fbc"><span>Expenses</span><b>${fm(te)}</b></div></div>`;
+      const ti = oData.inc.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
+      const te_cash = oData.exp.filter(e => e.payment === 'cash').reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+      const te_credit = oData.exp.filter(e => e.payment === 'credit').reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+      const te = te_cash + te_credit;
+      
+      const incBal = ti - te;
+      const cashBal = ti - te_cash;
+
+      const getSty = (v) => {
+        if (v < 0) return 'color: #ff8080 !important; font-weight: 800;';
+        if (v > 1000) return 'color: #4ade80 !important; font-weight: 800;';
+        return 'color: #fff; font-weight: 800;';
+      };
+      const healthyMsg = incBal > 1000 ? '<div style="font-size:0.75rem; opacity:0.9; font-weight:600; margin-top:4px; color: #4ade80;">Excellent! Your financial is healthy.</div>' : '';
+
+      let html = `
+        <div class="card mb20">
+          <span class="lbl">Income Sources</span>
+          ${oData.inc.map(i => `<div class="fbc mb10"><span>${i.name}</span><b>${fm(i.amount)}</b></div>`).join('') || '<div class="empty">No income sources declared</div>'}
+          <div class="fbc" style="border-top:1px solid var(--border2); padding-top:10px; margin-top:10px; color:var(--green);">
+            <b>Total Income</b><b>${fm(ti)}</b>
+          </div>
+        </div>
+
+        <div class="card mb20">
+          <span class="lbl">Expense Breakdown</span>
+          ${oData.exp.map(e => `<div class="fbc mb10"><span>${e.name} <small>(${e.payment})</small></span><b>${fm(e.amount)}</b></div>`).join('') || '<div class="empty">No expenses declared</div>'}
+          <div class="fbc mb10" style="border-top:1px solid var(--border2); padding-top:10px; margin-top:10px; color: var(--orange); font-weight: 900;">
+            <span>Cash Subtotal</span><b>${fm(te_cash)}</b>
+          </div>
+          <div class="fbc" style="color: var(--orange); font-weight: 900;">
+            <span>Credit Subtotal</span><b>${fm(te_credit)}</b>
+          </div>
+        </div>
+
+        <div class="card mb20" style="background:var(--ac); color:#fff; box-shadow: 0 10px 25px var(--ac-sh);">
+          <span class="lbl" style="color:rgba(255,255,255,0.8);">Balance Summary</span>
+          
+          <div class="mb10">
+            <div class="fbc" style="${getSty(incBal)}">
+              <span>Income Balance</span>
+              <b style="font-size: 1.1rem;">${fm(incBal)}</b>
+            </div>
+            ${healthyMsg}
+          </div>
+
+          <div class="fbc mb10">
+            <span>Credit Utilisation</span>
+            <b>${fm(te_credit)}</b>
+          </div>
+
+          <div style="padding-top:10px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <div class="fbc" style="${getSty(cashBal)}">
+              <span>Cash Balance</span>
+              <b style="font-size: 1.1rem;">${fm(cashBal)}</b>
+            </div>
+          </div>
+          
+          ${(incBal < 0 || cashBal < 0) ? `<div style="font-size:0.65rem; margin-top:8px; opacity:0.9; text-align:right;">⚠️ Warning: Expenses exceed income</div>` : ''}
+        </div>
+      `;
+      $('obSummary').innerHTML = html;
     }
     function finOB() {
       const pn = $('regPN').value.trim() || (oData.name + "'s Budget");
@@ -492,15 +609,15 @@
 
     /* DATA MANAGEMENT */
     function addI() {
-      const n = $('fIN').value.trim(), a = parseFloat($('fIA').value), c = $('fIC').value, d = $('fID').value || td();
+      const n = $('fIN').value.trim(), a = parseFloat($('fIA').value), c = $('fIC').value, d = $('fID').value || td(), r = $('fIR').classList.contains('on');
       if (!n || isNaN(a)) return alert('Fill fields');
-      ac().incomes.push({ id: 'i_'+Math.random(), name: n, amount: a, category: c, date: d, recurring: true });
+      ac().incomes.push({ id: 'i_'+Math.random(), name: n, amount: a, category: c, date: d, recurring: r });
       sv(); closeM('mI'); render();
     }
     function addE() {
-      const n = $('fEN').value.trim(), a = parseFloat($('fEA').value), c = $('fEC').value, d = $('fED').value || td(), p = $('fEP').value;
+      const n = $('fEN').value.trim(), a = parseFloat($('fEA').value), c = $('fEC').value, d = $('fED').value || td(), p = $('fEP').value, r = $('fER').classList.contains('on');
       if (!n || isNaN(a)) return alert('Fill fields');
-      ac().expenses.push({ id: 'e_'+Math.random(), name: n, amount: a, category: c, date: d, recurring: true, payment: p, paid: false });
+      ac().expenses.push({ id: 'e_'+Math.random(), name: n, amount: a, category: c, date: d, recurring: r, payment: p, paid: false });
       sv(); closeM('mE'); render();
     }
     function addCat(type) {
@@ -512,6 +629,10 @@
     function togglePaid(id) {
       const e = ac().expenses.find(x => x.id === id); if (!e) return;
       e.paid = !e.paid; sv(); render();
+    }
+    function toggleReceived(id) {
+      const i = ac().incomes.find(x => x.id === id); if (!i) return;
+      i.paid = !i.paid; sv(); render();
     }
 
     function processRecurring() {
@@ -536,7 +657,7 @@
       if (!acc.categories) acc.categories = { inc: [], exp: [] };
       
       const incMo = acc.incomes.filter(i => i.date.startsWith(mo));
-      const expMo = acc.expenses.filter(e => e.date.startsWith(mo));
+      let expMo = acc.expenses.filter(e => e.date.startsWith(mo));
 
       // Auto-pushed Loans
       acc.loans.forEach(l => {
@@ -546,7 +667,8 @@
           if (diff >= 0 && diff < l.tenure) {
             const lid = `e_l_${l.id}_${mo}`;
             if (!expMo.some(e => e.id === lid)) {
-              const inst = { id: lid, name: 'Loan: ' + l.title, amount: l.amount/l.tenure, category: 'Bills', date: mo+'-'+l.due, payment: 'cash', paid: false, auto: true };
+              const inst = { id: lid, name: 'Loan: ' + l.title, amount: l.amount/l.tenure, category: 'Bills', date: mo+'-'+l.due, payment: 'cash', paid: false, auto: true, loanId: l.id };
+              acc.expenses.push(inst); // Persist auto-generated items
               expMo.push(inst);
             }
           }
@@ -559,7 +681,6 @@
       const te_cash_all = expMo.filter(e => e.payment === 'cash').reduce((s, e) => s + e.amount, 0);
       const te_credit_all = expMo.filter(e => e.payment === 'credit').reduce((s, e) => s + e.amount, 0);
 
-      $('statCash').textContent = fm(ti - te_cash_paid - te_credit_paid);
       $('statCredit').textContent = fm(te_credit_paid);
       $('statNet').textContent = fm(ti - te_cash_paid);
 
@@ -568,39 +689,105 @@
 
       $('fIC').innerHTML = acc.categories.inc.map(c => `<option value="${c}">${c}</option>`).join('') + '<option value="">No Category</option>';
       $('fEC').innerHTML = acc.categories.exp.map(c => `<option value="${c}">${c}</option>`).join('') + '<option value="">No Category</option>';
+      $('expFilterCat').innerHTML = '<option value="all">All Categories</option>' + acc.categories.exp.map(c => `<option value="${c}">${c}</option>`).join('') + '<option value="No Category">No Category</option>';
+
+      // Sorting & Filtering
+      const fCat = $('expFilterCat').value;
+      const fSort = $('expSort').value;
+      if (fCat !== 'all') expMo = expMo.filter(e => e.category === fCat);
+      if (fSort === 'high') expMo.sort((a,b) => b.amount - a.amount);
+      else if (fSort === 'low') expMo.sort((a,b) => a.amount - b.amount);
 
       $('iL').innerHTML = incMo.map(i => `
         <div class="item-card fbc" onclick="viewDetail('inc', '${i.id}')">
-          <div><div style="font-weight:800;">${i.name}</div><div class="lbl" style="margin:0; font-size:0.6rem;">${i.category}</div></div>
+          <div class="paid-toggle ${i.paid ? 'on' : ''}" onclick="event.stopPropagation(); toggleReceived('${i.id}')">
+            <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
+            <span>${i.paid ? 'Received' : 'Mark Received'}</span>
+          </div>
+          <div style="flex:1; margin-left:12px;">
+            <div style="font-weight:800;">${i.name}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem;">${i.category}</div>
+          </div>
           <div class="am pos">+${fm(i.amount)}</div>
         </div>
       `).join('') || '<div class="empty">No income</div>';
 
       $('eL').innerHTML = expMo.map(e => `
         <div class="item-card fbc" onclick="viewDetail('exp', '${e.id}')">
-          <div class="paid-toggle ${e.paid ? 'on' : ''}" onclick="event.stopPropagation(); togglePaid('${e.id}')"><i class="fas fa-check" style="font-size:14px !important;"></i></div>
-          <div style="flex:1; margin-left:12px;"><div style="font-weight:800;">${e.name}</div><div class="lbl" style="margin:0; font-size:0.6rem;">${e.category} | ${e.payment}</div></div>
+          <div class="paid-toggle ${e.paid ? 'on' : ''}" onclick="event.stopPropagation(); togglePaid('${e.id}')">
+            <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
+            <span>${e.paid ? 'Paid' : 'Mark Paid'}</span>
+          </div>
+          <div style="flex:1; margin-left:12px;">
+            <div style="font-weight:800;">${e.name}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem;">${e.category} | ${e.payment}</div>
+          </div>
           <div class="am neg">-${fm(e.amount)}</div>
         </div>
       `).join('') || '<div class="empty">No expenses</div>';
 
       renderLoans(acc, mo);
       renderPots(acc, mo);
+      renderDashPots(acc);
+    }
+
+    function renderDashPots(acc) {
+      $('dashPots').innerHTML = acc.savings.map(p => {
+        const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
+        return `
+          <div class="card fbc" style="padding:16px;">
+            <div style="flex:1;">
+              <div class="lbl" style="margin:0;">Saving Pot</div>
+              <h4 style="font-weight:900;">${p.title}</h4>
+              <div style="font-size:0.75rem; color:var(--text2); font-weight:700;">${fm(p.current)} / ${fm(p.target)} (${pct}%)</div>
+              <div class="neu-in" style="height:6px; border-radius:3px; overflow:hidden; margin-top:8px; width:80%;">
+                <div style="width:${pct}%; height:100%; background:var(--green);"></div>
+              </div>
+            </div>
+            <button class="pill-btn on" style="min-height:36px; padding:0 16px; font-size:0.75rem;" onclick="saveToPot('${p.id}')">Saved +</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function saveToPot(id) {
+      const p = ac().savings.find(x => x.id === id); if (!p) return;
+      const amt = parseFloat(prompt('Amount to save into ' + p.title + ':', '10.00'));
+      if (isNaN(amt) || amt <= 0) return;
+      p.current += amt; sv(); render();
     }
 
     function renderLoans(acc, mo) {
-      $('loanList').innerHTML = acc.loans.map(l => `
-        <div class="card">
-          <div class="fbc mb10"><h3 style="font-weight:900;">${l.title}</h3><div class="am">${fm(l.amount)}</div></div>
-          <div class="fbc"><span class="lbl">${l.tenure} months</span>${!l.pushedMo ? `<button class="btn-p" style="width:auto; padding:8px 16px;" onclick="pushLoan('${l.id}')">Start Push</button>` : `<span class="pill-btn on">Active</span>`}</div>
-        </div>
-      `).join('');
+      $('loanList').innerHTML = acc.loans.map(l => {
+        const relevantExps = acc.expenses.filter(e => e.loanId === l.id);
+        const paidCount = relevantExps.filter(e => e.paid).length;
+        const totalPaid = relevantExps.filter(e => e.paid).reduce((s, e) => s + e.amount, 0);
+        const pct = Math.min(100, (paidCount/l.tenure)*100).toFixed(0);
+        return `
+          <div class="card">
+            <div class="fbc mb10"><h3 style="font-weight:900;">${l.title}</h3><div class="am">${fm(l.amount)}</div></div>
+            <div style="font-size:0.85rem; color:var(--text2); font-weight:700; margin-bottom:8px;">
+              Progress: ${fm(totalPaid)} / ${fm(l.amount)} (${pct}%)
+            </div>
+            <div class="neu-in" style="height:8px; border-radius:4px; overflow:hidden; margin-bottom:12px;">
+              <div style="width:${pct}%; height:100%; background:var(--ac);"></div>
+            </div>
+            <div class="fbc"><span class="lbl">${l.tenure} months</span>${!l.pushedMo ? `<button class="btn-p" style="width:auto; padding:8px 16px;" onclick="pushLoan('${l.id}')">Start Push</button>` : `<span class="pill-btn on">Active</span>`}</div>
+          </div>
+        `;
+      }).join('');
     }
 
     function renderPots(acc, mo) {
       $('potList').innerHTML = acc.savings.map(p => {
         const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
-        return `<div class="card" onclick="viewPotDetail('${p.id}')"><div class="fbc mb10"><h3>${p.title}</h3><b>${pct}%</b></div><div class="neu-in" style="height:8px; border-radius:4px; overflow:hidden;"><div style="width:${pct}%; height:100%; background:var(--ac);"></div></div></div>`;
+        return `
+          <div class="card" onclick="viewPotDetail('${p.id}')">
+            <div class="fbc mb10"><h3>${p.title}</h3><b>${pct}%</b></div>
+            <div style="font-size:0.85rem; color:var(--text2); font-weight:700; margin-bottom:8px;">${fm(p.current)} / ${fm(p.target)}</div>
+            <div class="neu-in" style="height:8px; border-radius:4px; overflow:hidden;"><div style="width:${pct}%; height:100%; background:var(--ac);"></div></div>
+          </div>
+        `;
       }).join('');
     }
 
@@ -666,6 +853,7 @@
 
       const trendData = months.map(m => {
         return data.filter(d => d.date.startsWith(m))
+                   .filter(d => d.paid) // Only include 'paid' items in analytics
                    .filter(d => anaSelectedCats.length === 0 || anaSelectedCats.includes(d.category))
                    .reduce((s, d) => s + d.amount, 0);
       });
@@ -675,7 +863,7 @@
         data: {
           labels: months.map(m => new Date(m+'-01').toLocaleDateString('en-US', {month:'short'})),
           datasets: [{
-            label: anaTab.toUpperCase() + ' Trend',
+            label: anaTab.toUpperCase() + ' (Paid Only)',
             data: trendData,
             borderColor: color,
             backgroundColor: color + '22',
@@ -698,7 +886,7 @@
       });
 
       // 2. Bar Chart: Category Comparison for Selected Month
-      const moData = data.filter(d => d.date.startsWith(mo));
+      const moData = data.filter(d => d.date.startsWith(mo)).filter(d => d.paid); // Only include 'paid' items
       const catsToCompare = anaSelectedCats.length > 0 ? anaSelectedCats : [...new Set(moData.map(d => d.category))];
       
       const barData = catsToCompare.map(c => {
@@ -737,9 +925,87 @@
     function viewDetail(type, id) {
       const item = (type==='inc'?ac().incomes:ac().expenses).find(x=>x.id===id); if (!item) return;
       $('detTitle').textContent = item.name;
-      $('detContent').innerHTML = `<div class="card"><div class="fbc mb10"><span>Amount</span><b>${fm(item.amount)}</b></div><div class="fbc mb10"><span>Category</span><b>${item.category}</b></div><div class="fbc"><span>Date</span><b>${item.date}</b></div></div>`;
+      
+      let detailHtml = `
+        <div class="card">
+          <div class="fbc mb10"><span>Amount</span><b>${fm(item.amount)}</b></div>
+          <div class="fbc mb10"><span>Category</span><b>${item.category}</b></div>
+          <div class="fbc mb10"><span>Date</span><b>${item.date}</b></div>
+          <div class="fbc mb10"><span>Frequency</span><b>${item.recurring ? 'Recurring' : 'One-off'}</b></div>
+          <div class="fbc mb10"><span>Status</span><b style="color:${item.paid ? 'var(--green)' : 'var(--red)'}">${item.paid ? (type==='inc'?'Received':'Paid') : 'Unpaid'}</b></div>
+          ${type === 'exp' ? `<div class="fbc"><span>Payment Method</span><b>${item.payment}</b></div>` : ''}
+        </div>
+      `;
+      
+      $('detContent').innerHTML = detailHtml;
       $('detDelBtn').onclick = () => { if (confirm('Delete?')) { if (type==='inc') ac().incomes = ac().incomes.filter(x=>x.id!==id); else ac().expenses = ac().expenses.filter(x=>x.id!==id); sv(); closeM('mDetail'); render(); } };
       openM('mDetail');
+    }
+
+    function renderCreditPg() {
+      const acc = ac(); if (!acc) return;
+      const credExps = acc.expenses.filter(e => e.payment === 'credit' && e.paid);
+      const totalOutstanding = credExps.reduce((s, e) => s + e.amount, 0);
+      
+      $('credTotal').textContent = fm(totalOutstanding);
+      // For progress bar, we assume a dynamic "limit" of 5000 or the max ever spent if higher
+      const limit = Math.max(5000, totalOutstanding);
+      $('credUsageFill').style.width = Math.min(100, (totalOutstanding/limit)*100) + '%';
+
+      const sort = $('credSort').value;
+      if (sort === 'high') credExps.sort((a,b) => b.amount - a.amount);
+      else credExps.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+      $('credList').innerHTML = credExps.map(e => `
+        <div class="item-card fbc" style="border-left: 4px solid var(--ac);">
+          <div style="flex:1;">
+            <div style="font-weight:800;">${e.name}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem;">${new Date(e.date).toLocaleDateString('en-GB')} | ${e.category}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="am neg" style="margin-bottom:8px;">-${fm(e.amount)}</div>
+            <button class="pill-btn on" style="min-height:32px; padding:0 12px; font-size:0.7rem;" onclick="settleCreditItem('${e.id}')">Settle</button>
+          </div>
+        </div>
+      `).join('') || '<div class="empty">No outstanding credit expenses</div>';
+    }
+
+    function settleCreditItem(id) {
+      const e = ac().expenses.find(x => x.id === id); if (!e) return;
+      if (confirm('Settle this credit item with cash?')) {
+        e.payment = 'cash'; // Convert to cash to reduce credit usage
+        sv(); renderCreditPg(); render();
+      }
+    }
+
+    function payCreditManual() {
+      const amt = parseFloat($('payCredAmt').value);
+      if (isNaN(amt) || amt <= 0) return alert('Enter valid amount');
+      
+      const acc = ac();
+      const credExps = acc.expenses.filter(e => e.payment === 'credit' && e.paid).sort((a,b) => b.amount - a.amount);
+      const totalOutstanding = credExps.reduce((s, e) => s + e.amount, 0);
+      
+      if (amt > totalOutstanding) return alert('Payment exceeds outstanding credit');
+
+      let remainingToPay = amt;
+      for (let e of credExps) {
+        if (remainingToPay <= 0) break;
+        if (e.amount <= remainingToPay) {
+          remainingToPay -= e.amount;
+          e.payment = 'cash'; // Fully settled
+        } else {
+          // Partially settle if possible (split item)
+          const settledPart = { ...e, id: 'e_'+Math.random(), amount: remainingToPay, payment: 'cash' };
+          e.amount -= remainingToPay;
+          acc.expenses.push(settledPart);
+          remainingToPay = 0;
+        }
+      }
+      
+      $('payCredAmt').value = '';
+      sv(); renderCreditPg(); render();
+      alert('Credit payment successful');
     }
 
     init();
