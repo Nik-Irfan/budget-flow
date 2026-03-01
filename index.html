@@ -648,7 +648,28 @@
 
   <script>
     const K = 'bf4';
-    let db = JSON.parse(localStorage.getItem(K) || '{"accounts":[],"prefs":{"theme":"light","accent":"indigo"}}');
+    const DB_DEFAULTS = { accounts: [], prefs: { theme: 'light', accent: 'indigo' } };
+
+    function loadDb() {
+      const raw = localStorage.getItem(K);
+      if (!raw) return structuredClone(DB_DEFAULTS);
+
+      try {
+        const parsed = JSON.parse(raw) || {};
+        return {
+          ...structuredClone(DB_DEFAULTS),
+          ...parsed,
+          prefs: {
+            ...DB_DEFAULTS.prefs,
+            ...(parsed.prefs || {})
+          }
+        };
+      } catch {
+        return structuredClone(DB_DEFAULTS);
+      }
+    }
+
+    let db = loadDb();
     let cur = null, viewMo = new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (3600000 * 8));
     viewMo.setDate(1);
     let oData = { name: '', inc: [], exp: [], categories: { inc: [], exp: [] } };
