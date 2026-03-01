@@ -20,9 +20,18 @@
     /* === DESIGN SYSTEM === */
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     :root {
-      --r: 24px; --r2: 16px; --r-btn: 100px; --gap: 16px; --max: 520px;
+      --r: 24px; --r2: 16px; --r-btn: 100px; --max: 520px;
       --font: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
       --ease: cubic-bezier(.4, 0, .2, 1);
+      
+      /* Systematic Spacing Scale */
+      --s1: 4px;
+      --s2: 8px;
+      --s3: 16px;
+      --s4: 24px;
+      --s5: 32px;
+      --s6: 48px;
+      --gap: var(--s3);
     }
 
     /* === THEMES === */
@@ -53,21 +62,21 @@
 
     /* === BASE UI === */
     body { background: var(--bg); color: var(--text); font-family: var(--font); transition: background .3s var(--ease); overflow-x: hidden; }
-    .pg { display: none; min-height: 100vh; padding: 24px 20px 140px; max-width: var(--max); margin: 0 auto; }
+    .pg { display: none; min-height: 100vh; padding: var(--s4) var(--s4) 140px; max-width: var(--max); margin: 0 auto; }
     .pg.on { display: block; animation: fadeIn .4s var(--ease); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
     /* === COMPONENTS === */
-    .card { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 24px; margin-bottom: var(--gap); border: 1px solid var(--border); transition: all .2s var(--ease); }
+    .card { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: var(--s4); margin-bottom: var(--s3); border: 1px solid var(--border); transition: all .2s var(--ease); }
     .card.neu-in { box-shadow: var(--shadow-in); }
     .card.clickable { cursor: pointer; }
     .card.clickable:active { transform: translateY(-2px) scale(1.02); box-shadow: 12px 12px 24px var(--shadow), -12px -12px 24px rgba(255,255,255,0.6); }
-    .item-card { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px; margin-bottom: 12px; border: 1px solid var(--border); transition: all .2s ease; cursor: pointer; position: relative; overflow: hidden; }
+    .item-card { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: var(--s3); margin-bottom: var(--s2); border: 1px solid var(--border); transition: all .2s ease; cursor: pointer; position: relative; overflow: hidden; }
     .item-card:active { transform: translateY(-4px) scale(1.02); box-shadow: 12px 12px 24px var(--shadow); }
     
     .glass { background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,.2); border-radius: var(--r); }
 
-    .btn { min-width: 88px; min-height: 56px; padding: 16px 28px; border-radius: var(--r-btn); font-weight: 700; font-size: 1rem; border: 2px solid var(--ac); cursor: pointer; transition: all .25s var(--ease); display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px var(--ac-sh); background: #fff; color: var(--ac); }
+    .btn { min-width: 88px; min-height: 56px; padding: var(--s3) var(--s4); border-radius: var(--r-btn); font-weight: 700; font-size: 1rem; border: 2px solid var(--ac); cursor: pointer; transition: all .25s var(--ease); display: flex; align-items: center; justify-content: center; gap: var(--s2); box-shadow: 0 4px 12px var(--ac-sh); background: #fff; color: var(--ac); }
     .btn:active { transform: scale(0.96); background: var(--ac); color: #fff; box-shadow: 0 2px 6px var(--ac-sh); }
     
     .btn-p { 
@@ -85,30 +94,30 @@
     .btn-p:active { transform: translateY(1px); box-shadow: 0 4px 10px var(--ac-sh); }
 
     .btn-rec {
-      min-width: 88px; height: 44px; padding: 8px 20px; border-radius: 22px;
+      min-width: 88px; height: 44px; padding: var(--s2) var(--s4); border-radius: 22px;
       background: #28a745; color: #fff; border: 2px solid #28a745; font-weight: 700; font-size: 0.85rem;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      display: flex; align-items: center; justify-content: center; gap: var(--s2);
       transition: all 0.3s var(--ease); cursor: pointer; float: right;
       box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
     }
     .btn-rec.off { background: #fff; color: var(--text3); border-color: var(--border2); box-shadow: var(--shadow); }
     .btn-rec i { font-size: 14px !important; color: inherit; }
     
-    .cat-container { position: relative; display: flex; flex-direction: column; gap: 12px; }
-    .cat-row { display: flex; align-items: center; gap: 12px; }
+    .cat-container { position: relative; display: flex; flex-direction: column; gap: var(--s3); }
+    .cat-row { display: flex; align-items: center; gap: var(--s3); }
     .cat-sel-wrapper { flex: 1; position: relative; }
     .cat-sel-wrapper::after {
       content: '\f107'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
-      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      position: absolute; right: var(--s3); top: 50%; transform: translateY(-50%);
       width: 28px; height: 28px; background: var(--card); border: 1px solid var(--border2);
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
       font-size: 12px; color: var(--text3); pointer-events: none;
     }
     .btn-add-cat { 
-      min-width: 120px; min-height: 48px; padding: 12px 24px; border-radius: 24px;
+      min-width: 120px; min-height: 48px; padding: var(--s3) var(--s4); border-radius: 24px;
       border: 2px dashed var(--ac); background: #fff; color: var(--ac);
       font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.3s;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      display: flex; align-items: center; justify-content: center; gap: var(--s2);
     }
     .btn-add-cat:active { background: var(--ac-bg); }
 
@@ -117,15 +126,15 @@
 
     .cal-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--card); box-shadow: var(--shadow); border: none; color: var(--text); cursor: pointer; font-size: 14px; }
     
-    .close-btn { width: 48px; height: 48px; padding: 8px; border-radius: 12px; background: var(--card); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; border: none; color: var(--text); cursor: pointer; font-size: 24px; font-weight: bold; }
+    .close-btn { width: 48px; height: 48px; padding: var(--s2); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; border: none; color: var(--text); cursor: pointer; font-size: 24px; font-weight: bold; }
     .close-btn:active { box-shadow: var(--shadow-in); transform: scale(0.95); }
 
-    .pill-btn { min-width: 88px; min-height: 44px; padding: 12px 24px; border-radius: 30px; border: 1.5px solid var(--ac); background: transparent; color: var(--ac); font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+    .pill-btn { min-width: 88px; min-height: 44px; padding: var(--s2) var(--s4); border-radius: 30px; border: 1.5px solid var(--ac); background: transparent; color: var(--ac); font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
     .pill-btn.on { background: var(--ac); color: #fff; box-shadow: 0 5px 15px var(--ac-sh); }
     .pill-btn.dashed { border-style: dashed; border-width: 2px; opacity: 0.7; }
 
     .btn-inset { 
-      width: 100%; padding: 20px; 
+      width: 100%; padding: var(--s4); 
       background: var(--card); box-shadow: var(--shadow-in); 
       border-radius: 2rem; border: none; 
       font-weight: 700; font-size: 1.125rem; 
@@ -138,7 +147,7 @@
     }
     .btn-inset:active { transform: scale(0.98); }
 
-    .inp { width: 100%; min-height: 56px; padding: 20px; border-radius: 2rem; border: none; background: #f5f5f5; box-shadow: var(--shadow-in); font-size: 1.125rem; font-weight: 700; color: var(--text2); outline: none; transition: all 0.3s ease-in-out; }
+    .inp { width: 100%; min-height: 56px; padding: var(--s4); border-radius: 2rem; border: none; background: #f5f5f5; box-shadow: var(--shadow-in); font-size: 1.125rem; font-weight: 700; color: var(--text2); outline: none; transition: all 0.3s ease-in-out; }
     .inp:focus { box-shadow: var(--shadow-in), 0 0 0 4px var(--ac-sh); }
     .inp::placeholder { color: var(--text3); opacity: 0.6; }
     
@@ -147,17 +156,18 @@
     .add-btn-dash {
       width: 100%; height: 56px; border-radius: var(--r2);
       border: 2px dashed var(--text3); color: var(--text3);
-      display: flex; align-items: center; justify-content: center; gap: 10px;
+      display: flex; align-items: center; justify-content: center; gap: var(--s2);
       font-weight: 700; background: transparent; cursor: pointer; transition: 0.3s;
-      margin-top: 12px;
+      margin-top: var(--s3);
     }
     .add-btn-dash:active { background: var(--border); transform: scale(0.98); }
-    .section-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border2); }
+    .section-container { margin-bottom: var(--s5); border: 1px solid var(--border2); border-radius: var(--r); padding: var(--s3); background: var(--card); }
+    .section-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--s3); padding-bottom: var(--s2); border-bottom: 1px solid var(--border2); }
     .section-content { transition: max-height 0.3s ease-out; overflow: hidden; }
     .section-content.collapsed { max-height: 0; }
     
-    .ana-nav { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 8px; }
-    .ana-nav-item { padding: 8px 16px; border-radius: 20px; background: var(--card); border: 1px solid var(--border2); cursor: pointer; font-weight: 700; font-size: 0.8rem; white-space: nowrap; transition: 0.2s; }
+    .ana-nav { display: flex; gap: var(--s2); overflow-x: auto; margin-bottom: var(--s4); padding-bottom: var(--s2); }
+    .ana-nav-item { padding: var(--s2) var(--s3); border-radius: 20px; background: var(--card); border: 1px solid var(--border2); cursor: pointer; font-weight: 700; font-size: 0.8rem; white-space: nowrap; transition: 0.2s; }
     .ana-nav-item.on { background: var(--ac); color: #fff; border-color: var(--ac); }
     .section-header h3 { font-size: 1.125rem; font-weight: 800; }
     .section-stat { font-size: 0.875rem; font-weight: 600; }
@@ -171,32 +181,32 @@
     .strat-btn.on { border-color: var(--ac); background: var(--ac-bg); color: var(--ac); box-shadow: 0 4px 12px var(--ac-sh); transform: translateY(-2px); }
 
     /* === MONTH LIST === */
-    .month-list-container { display: flex; overflow-x: auto; padding: 12px 10px; border-radius: var(--r2); background: var(--shadow-in); margin-bottom: 24px; scroll-behavior: smooth; gap: 12px; -webkit-overflow-scrolling: touch; }
+    .month-list-container { display: flex; overflow-x: auto; padding: var(--s3) var(--s2); border-radius: var(--r2); background: var(--shadow-in); margin-bottom: var(--s4); scroll-behavior: smooth; gap: var(--s3); -webkit-overflow-scrolling: touch; }
     .month-list-container::-webkit-scrollbar { height: 4px; }
     .month-list-container::-webkit-scrollbar-thumb { background: var(--ac); border-radius: 10px; }
-    .month-item { flex: 0 0 auto; padding: 12px 20px; border-radius: 20px; text-align: center; cursor: pointer; transition: .2s; font-weight: 700; color: var(--text2); background: var(--card); border: 1px solid transparent; min-width: 100px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+    .month-item { flex: 0 0 auto; padding: var(--s3) var(--s4); border-radius: 20px; text-align: center; cursor: pointer; transition: .2s; font-weight: 700; color: var(--text2); background: var(--card); border: 1px solid transparent; min-width: 100px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
     .month-item.active { background: var(--ac); color: #fff; box-shadow: 0 4px 12px var(--ac-sh); border-color: var(--ac); }
     
-    .filter-sort-bar { display: flex; gap: 12px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; }
-    .filter-sort-bar select { flex: 1; min-width: 120px; font-size: 0.75rem; padding: 8px 12px; height: 36px; background: #f5f5f5; }
+    .filter-sort-bar { display: flex; gap: var(--s3); margin-bottom: var(--s3); overflow-x: auto; padding-bottom: var(--s2); }
+    .filter-sort-bar select { flex: 1; min-width: 120px; font-size: 0.75rem; padding: var(--s2) var(--s3); height: 36px; background: #f5f5f5; }
 
-    .month-picker-inline { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-    .month-picker-inline input[type="month"] { flex: 1; border: none; background: #f5f5f5; box-shadow: var(--shadow); padding: 12px; border-radius: 15px; color: var(--text); font-family: var(--font); font-weight: 700; outline: none; }
+    .month-picker-inline { display: flex; align-items: center; gap: var(--s3); margin-bottom: var(--s4); }
+    .month-picker-inline input[type="month"] { flex: 1; border: none; background: #f5f5f5; box-shadow: var(--shadow); padding: var(--s3); border-radius: 15px; color: var(--text); font-family: var(--font); font-weight: 700; outline: none; }
 
-    .close-btn-full { width: 100%; height: 56px; background: var(--red); color: #fff; border: none; border-radius: var(--r2); font-weight: 900; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); transition: 0.2s; margin-top: 24px; }
+    .close-btn-full { width: 100%; height: 56px; background: var(--red); color: #fff; border: none; border-radius: var(--r2); font-weight: 900; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--s3); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); transition: 0.2s; margin-top: var(--s4); }
     .close-btn-full:active { transform: scale(0.98); opacity: 0.9; }
 
-    .paid-toggle { min-width: 120px; height: 44px; border-radius: var(--r2); border: 2px solid var(--text3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; color: var(--text3); font-weight: 700; font-size: 0.8rem; gap: 8px; background: var(--card); box-shadow: var(--shadow); }
+    .paid-toggle { min-width: 120px; height: 44px; border-radius: var(--r2); border: 2px solid var(--text3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; color: var(--text3); font-weight: 700; font-size: 0.8rem; gap: var(--s2); background: var(--card); box-shadow: var(--shadow); }
     .paid-toggle.on { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 4px 12px var(--green-bg); }
     .paid-toggle:hover { transform: translateY(-2px); }
     .paid-toggle:active { transform: scale(0.95); box-shadow: var(--shadow-in); }
 
-    .tab-btn { flex: 1; padding: 14px; border-radius: 15px; border: none; background: var(--card); color: var(--text3); font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); }
+    .tab-btn { flex: 1; padding: var(--s3); border-radius: 15px; border: none; background: var(--card); color: var(--text3); font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); }
     .tab-btn.on { background: var(--ac); color: #fff; box-shadow: 0 4px 15px var(--ac-sh); }
 
     /* === NAVIGATION === */
     .nav { 
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); 
+      position: fixed; bottom: var(--s4); left: 50%; transform: translateX(-50%); 
       width: calc(100% - 40px); max-width: 480px; height: 80px; 
       background: var(--glass-nav); 
       backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
@@ -236,15 +246,15 @@
     .nb i { font-size: 1.5rem; }
     .nb span { display: none; }
 
-    .lbl { font-size: .75rem; font-weight: 800; color: var(--ac); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; display: block; }
+    .lbl { font-size: .75rem; font-weight: 800; color: var(--ac); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: var(--s3); display: block; }
     .fbc { display: flex; justify-content: space-between; align-items: center; }
-    .mb20 { margin-bottom: 24px; }
-    .mb10 { margin-bottom: 12px; }
+    .mb20 { margin-bottom: var(--s4); }
+    .mb10 { margin-bottom: var(--s2); }
     .am { font-weight: 900; color: var(--text); }
     .am.pos { color: var(--green); }
     .am.neg { color: var(--red); }
-    .empty { text-align: center; padding: 40px; color: var(--text3); font-size: 0.9rem; }
-    select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; }
+    .empty { text-align: center; padding: var(--s6) var(--s4); color: var(--text3); font-size: 0.9rem; }
+    select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right var(--s3) center; background-size: 16px; }
     
     /* LOADING SCREEN */
     .loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity .8s var(--ease); }
@@ -267,9 +277,9 @@
   <!-- REGISTRATION: STEP 1 (NAME) -->
   <div id="pgW" class="pg">
     <div style="height: 80vh; display: flex; flex-direction: column; justify-content: center; text-align: center;">
-      <div class="bf-coin" style="margin: 0 auto 32px;">BF</div>
-      <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 8px; color: var(--ac);">Budget Flow</h1>
-      <p style="color: var(--text2); margin-bottom: 40px; font-weight: 500;">Beautifully simple finance tracking.</p>
+      <div class="bf-coin" style="margin: 0 auto var(--s5);">BF</div>
+      <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: var(--s2); color: var(--ac);">Budget Flow</h1>
+      <p style="color: var(--text2); margin-bottom: var(--s5); font-weight: 500;">Beautifully simple finance tracking.</p>
       <div class="card" style="padding: 0; background: transparent; box-shadow: none; border: none;">
         <input id="inpN" class="inp mb20" placeholder="Your Name">
         <button class="btn btn-p" style="width: 100%;" onclick="startOB()">Next <i class="fas fa-arrow-right" style="color: #fff !important;"></i></button>
@@ -377,14 +387,14 @@
     </div>
     <div id="monthList" class="month-list-container"></div>
 
-    <div class="card mb20" style="background: var(--ac); color: #fff; position: relative; overflow: hidden; padding: 32px;">
+    <div class="card mb20" style="background: var(--ac); color: #fff; position: relative; overflow: hidden; padding: var(--s5);">
       <div style="position: absolute; top: -20px; right: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-        <div class="glass" style="padding: 16px; background: rgba(255,255,255,0.1); border: none;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4);">
+        <div class="glass" style="padding: var(--s3); background: rgba(255,255,255,0.1); border: none;">
           <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Cash Balance</span>
           <div id="statNet" style="font-weight: 900; font-size: 1.2rem;">RM 0.00</div>
         </div>
-        <div class="glass" style="padding: 16px; background: rgba(255,255,255,0.1); border: none; cursor: pointer;" onclick="go('pgC')">
+        <div class="glass" style="padding: var(--s3); background: rgba(255,255,255,0.1); border: none; cursor: pointer;" onclick="go('pgC')">
           <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Credit Utilisation</span>
           <div id="statCredit" style="font-weight: 900; font-size: 1.2rem;">RM 0.00</div>
         </div>
@@ -465,17 +475,17 @@
   <div id="pgC" class="pg">
     <h2 style="font-weight: 900; margin-bottom: 24px; color: var(--ac);">Credit Management</h2>
     
-    <div class="card mb20" style="background: var(--ac); color: #fff; padding: 32px;">
+    <div class="card mb20" style="background: var(--ac); color: #fff; padding: var(--s5);">
       <span class="lbl" style="color: rgba(255,255,255,0.8);">Total Credit Outstanding</span>
       <div id="credTotal" style="font-weight: 900; font-size: 2rem;">RM 0.00</div>
-      <div id="credUsageBar" class="neu-in" style="height:10px; border-radius:5px; overflow:hidden; margin-top:16px; background:rgba(255,255,255,0.2);">
+      <div id="credUsageBar" class="neu-in" style="height:10px; border-radius:5px; overflow:hidden; margin-top: var(--s3); background:rgba(255,255,255,0.2);">
         <div id="credUsageFill" style="width:0%; height:100%; background:#fff; transition:0.3s;"></div>
       </div>
     </div>
 
     <div class="card mb20">
       <span class="lbl">Quick Pay Credit</span>
-      <div class="fbc" style="gap:12px;">
+      <div class="fbc" style="gap: var(--s3);">
         <input id="payCredAmt" class="inp" type="number" placeholder="Enter amount to pay">
         <button class="btn btn-p" style="min-width:100px;" onclick="payCreditManual()">Pay</button>
       </div>
@@ -512,7 +522,7 @@
     <h2 style="font-weight: 900; margin-bottom: 24px; color: var(--ac);">Settings</h2>
     <div class="card">
       <span class="lbl">Theme Mode</span>
-      <div style="display: flex; gap: 12px;">
+      <div style="display: flex; gap: var(--s3);">
         <button class="btn" style="flex:1;" onclick="setTheme('light')">Light</button>
         <button class="btn" style="flex:1;" onclick="setTheme('dark')">Dark</button>
       </div>
@@ -760,13 +770,13 @@
         if (v > 1000) return 'color: #4ade80 !important; font-weight: 800;';
         return 'color: #fff; font-weight: 800;';
       };
-      const healthyMsg = incBal > 1000 ? '<div style="font-size:0.75rem; opacity:0.9; font-weight:600; margin-top:4px; color: #4ade80;">Excellent! Your financial is healthy.</div>' : '';
+      const healthyMsg = incBal > 1000 ? `<div style="font-size:0.75rem; opacity:0.9; font-weight:600; margin-top: var(--s1); color: #4ade80;">Excellent! Your financial is healthy.</div>` : '';
 
       let html = `
         <div class="card mb20">
           <span class="lbl">Income Sources</span>
           ${oData.inc.map(i => `<div class="fbc mb10"><span>${i.name}</span><b>${fm(i.amount)}</b></div>`).join('') || '<div class="empty">No income sources declared</div>'}
-          <div class="fbc" style="border-top:1px solid var(--border2); padding-top:10px; margin-top:10px; color:var(--green);">
+          <div class="fbc" style="border-top:1px solid var(--border2); padding-top: var(--s2); margin-top: var(--s2); color:var(--green);">
             <b>Total Income</b><b>${fm(ti)}</b>
           </div>
         </div>
@@ -774,7 +784,7 @@
         <div class="card mb20">
           <span class="lbl">Expense Breakdown</span>
           ${oData.exp.map(e => `<div class="fbc mb10"><span>${e.name} <small>(${e.payment})</small></span><b>${fm(e.amount)}</b></div>`).join('') || '<div class="empty">No expenses declared</div>'}
-          <div class="fbc mb10" style="border-top:1px solid var(--border2); padding-top:10px; margin-top:10px; color: var(--orange); font-weight: 900;">
+          <div class="fbc mb10" style="border-top:1px solid var(--border2); padding-top: var(--s2); margin-top: var(--s2); color: var(--orange); font-weight: 900;">
             <span>Cash Subtotal</span><b>${fm(te_cash)}</b>
           </div>
           <div class="fbc" style="color: var(--orange); font-weight: 900;">
@@ -798,14 +808,14 @@
             <b>${fm(te_credit)}</b>
           </div>
 
-          <div style="padding-top:10px; border-top: 1px solid rgba(255,255,255,0.2);">
+          <div style="padding-top: var(--s2); border-top: 1px solid rgba(255,255,255,0.2);">
             <div class="fbc" style="${getSty(cashBal)}">
               <span>Cash Balance</span>
               <b style="font-size: 1.1rem;">${fm(cashBal)}</b>
             </div>
           </div>
           
-          ${(incBal < 0 || cashBal < 0) ? `<div style="font-size:0.65rem; margin-top:8px; opacity:0.9; text-align:right;">⚠️ Warning: Expenses exceed income</div>` : ''}
+          ${(incBal < 0 || cashBal < 0) ? `<div style="font-size:0.65rem; margin-top: var(--s2); opacity:0.9; text-align:right;">⚠️ Warning: Expenses exceed income</div>` : ''}
         </div>
       `;
       $('obSummary').innerHTML = html;
@@ -981,16 +991,16 @@
       $('dashPots').innerHTML = activePots.map(p => {
         const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
         return `
-          <div class="card fbc" style="padding:16px;">
+          <div class="card fbc" style="padding: var(--s3);">
             <div style="flex:1;">
               <div class="lbl" style="margin:0;">Saving Pot</div>
               <h4 style="font-weight:900;">${p.title}</h4>
               <div style="font-size:0.75rem; color:var(--text2); font-weight:700;">${fm(p.current)} / ${fm(p.target)} (${pct}%)</div>
-              <div class="neu-in" style="height:6px; border-radius:3px; overflow:hidden; margin-top:8px; width:80%;">
+              <div class="neu-in" style="height:6px; border-radius:3px; overflow:hidden; margin-top: var(--s2); width:80%;">
                 <div style="width:${pct}%; height:100%; background:var(--green);"></div>
               </div>
             </div>
-            <button class="pill-btn on" style="min-height:36px; padding:0 16px; font-size:0.75rem;" onclick="saveToPot('${p.id}')">Saved +</button>
+            <button class="pill-btn on" style="min-height:36px; padding:0 var(--s3); font-size:0.75rem;" onclick="saveToPot('${p.id}')">Saved +</button>
           </div>
         `;
       }).join('');
@@ -1023,19 +1033,19 @@
 
         return `
           <div class="item-card" style="border-left: 4px solid var(--ac);">
-            <div class="fbc mb10"><h3 style="font-weight:900;">${l.title}</h3><div class="am">${fm(l.amount)}</div></div>
-            <div class="fbc" style="font-size:0.75rem; color:var(--text2); font-weight:700; margin-bottom:8px;">
+            <div class="fbc" style="margin-bottom: var(--s2);"><h3 style="font-weight:900;">${l.title}</h3><div class="am">${fm(l.amount)}</div></div>
+            <div class="fbc" style="font-size:0.75rem; color:var(--text2); font-weight:700; margin-bottom: var(--s2);">
               <span>Progress: ${fm(totalPaid)} / ${fm(l.amount)}</span>
               <span>${pct}%</span>
             </div>
-            <div class="neu-in" style="height:8px; border-radius:4px; overflow:hidden; margin-bottom:8px;">
+            <div class="neu-in" style="height:8px; border-radius:4px; overflow:hidden; margin-bottom: var(--s2);">
               <div style="width:${pct}%; height:100%; background:var(--ac);"></div>
             </div>
             <div class="fbc" style="font-size:0.75rem; font-weight:800;">
               <span style="color:var(--ac);">${remainingMonths} months remaining</span>
               <span style="color:var(--text3);">${endDateStr}</span>
             </div>
-            ${!l.pushedMo ? `<button class="btn btn-p" style="width:100%; margin-top:12px; height:44px;" onclick="pushLoan('${l.id}')">Start Loan Push</button>` : ''}
+            ${!l.pushedMo ? `<button class="btn btn-p" style="width:100%; margin-top: var(--s3); height:44px;" onclick="pushLoan('${l.id}')">Start Loan Push</button>` : ''}
           </div>
         `;
       }).join('') || '<div class="empty">No loans added</div>';
@@ -1062,15 +1072,15 @@
         const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
         return `
           <div class="item-card" style="border-left: 6px solid ${p.color || 'var(--ac)'}; background: linear-gradient(90deg, #fff 0%, ${p.color || 'var(--ac)'}05 100%);">
-            <div class="fbc mb10">
+            <div class="fbc" style="margin-bottom: var(--s3);">
               <h3 style="font-weight:900;">${p.icon || '🍯'} ${p.title}</h3>
               <button class="pill-btn on" style="min-width:80px; min-height:32px; font-size:0.7rem;" onclick="togglePotActive('${p.id}')">Active</button>
             </div>
-            <div style="font-size:1.1rem; color:var(--text); font-weight:900; margin-bottom:8px;">${fm(p.current)} / ${fm(p.target)}</div>
+            <div style="font-size:1.1rem; color:var(--text); font-weight:900; margin-bottom: var(--s2);">${fm(p.current)} / ${fm(p.target)}</div>
             <div class="neu-in" style="height:12px; border-radius:6px; overflow:hidden;">
               <div style="width:${pct}%; height:100%; background: linear-gradient(90deg, ${p.color || 'var(--ac)'} 0%, var(--green) 100%); transition: width 0.5s ease-out;"></div>
             </div>
-            <div style="text-align:right; font-size:0.7rem; font-weight:800; margin-top:4px; color:var(--ac);">${pct}% Completed</div>
+            <div style="text-align:right; font-size:0.7rem; font-weight:800; margin-top: var(--s1); color:var(--ac);">${pct}% Completed</div>
           </div>
         `;
       }).join('') || '<div class="empty">No active saving pots</div>';
@@ -1154,12 +1164,12 @@
         <div class="section-container" style="border-left: 4px solid var(--ac);">
           <div class="section-header"><h3>Loan Analytics</h3></div>
           <div style="height: 200px;"><canvas id="loanChart"></canvas></div>
-          <div id="loanStat" class="mt10" style="font-size:0.75rem; font-weight:700;"></div>
+          <div id="loanStat" class="mt10" style="font-size:0.75rem; font-weight:700; margin-top: var(--s2);"></div>
         </div>
         <div class="section-container" style="border-left: 4px solid var(--green);">
           <div class="section-header"><h3>Saving Analytics</h3></div>
           <div style="height: 200px;"><canvas id="potChart"></canvas></div>
-          <div id="potStat" class="mt10" style="font-size:0.75rem; font-weight:700;"></div>
+          <div id="potStat" class="mt10" style="font-size:0.75rem; font-weight:700; margin-top: var(--s2);"></div>
         </div>
       `;
 
@@ -1343,8 +1353,8 @@
             <div class="lbl" style="margin:0; font-size:0.6rem;">${new Date(e.date).toLocaleDateString('en-GB')} | ${e.category}</div>
           </div>
           <div style="text-align:right;">
-            <div class="am pos" style="margin-bottom:8px; color: var(--green);">${fm(e.amount)}</div>
-            <button class="pill-btn on" style="min-height:32px; padding:0 12px; font-size:0.7rem;" onclick="settleCreditItem('${e.id}')">Settle</button>
+            <div class="am pos" style="margin-bottom: var(--s2); color: var(--green);">${fm(e.amount)}</div>
+            <button class="pill-btn on" style="min-height:32px; padding:0 var(--s3); font-size:0.7rem;" onclick="settleCreditItem('${e.id}')">Settle</button>
           </div>
         </div>
       `).join('') || '<div class="empty">No outstanding credit expenses</div>';
