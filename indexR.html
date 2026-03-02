@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-accent="indigo">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Budget Flow</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    @font-face { 
+        font-family: 'Outfit'; 
+        font-style: normal; 
+        font-weight: 300; 
+        font-display: swap; 
+        src: url('https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJuktqQ4E.woff2') format('woff2'); 
+        unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; 
+    }
+    /* === DESIGN SYSTEM === */
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --r: 24px; --r2: 16px; --r-btn: 100px; --max: 520px;
+      --font: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --ease: cubic-bezier(.4, 0, .2, 1);
+      
+      /* Systematic Spacing Scale */
+      --s1: 4px;
+      --s2: 8px;
+      --s3: 16px;
+      --s4: 24px;
+      --s5: 32px;
+      --s6: 48px;
+      --gap: var(--s3);
+    }
+
+    /* === THEMES === */
+    [data-theme="light"] {
+      --bg: #FFFFFF; --bg2: #F8F9FA; --card: #FFFFFF; --card2: #F8F9FA;
+      --border: rgba(0,0,0,0.05); --border2: #EEEEEE; --text: #1A1A1A; --text2: #4A4A4A; --text3: #888888;
+      --shadow: 4px 4px 12px rgba(0,0,0,0.03), -4px -4px 12px rgba(0,0,0,0.01);
+      --shadow-in: inset 2px 2px 5px rgba(0,0,0,0.05), inset -2px -2px 5px rgba(255,255,255,0.8);
+      --glass: rgba(255,255,255,0.7); --glass-nav: rgba(255,255,255,0.2);
+      --green: #10b981; --green-bg: #dcfce7; --red: #ef4444; --red-bg: #fee2e2; --orange: #f59e0b;
+      --blue: #3b82f6; --blue-bg: #dbeafe;
+    }
+    [data-theme="dark"] {
+      --bg: #0A0A0A; --bg2: #141414; --card: #141414; --card2: #1A1A1A;
+      --border: rgba(255,255,255,0.05); --border2: #2A2A2A; --text: #F0F0F0; --text2: #A0A0A0; --text3: #666666;
+      --shadow: 4px 4px 12px rgba(0,0,0,0.5), -4px -4px 12px rgba(255,255,255,0.02);
+      --shadow-in: inset 2px 2px 5px rgba(0,0,0,0.6), inset -2px -2px 5px rgba(255,255,255,0.02);
+      --glass: rgba(10,10,10,0.7); --glass-nav: rgba(255,255,255,0.1);
+      --green: #34d399; --green-bg: rgba(52,211,153,0.15); --red: #f87171; --red-bg: rgba(248,113,113,0.15); --orange: #fbbf24;
+      --blue: #60a5fa; --blue-bg: rgba(96,165,250,0.15);
+    }
+
+    /* === ACCENTS === */
+    [data-accent="indigo"] { --ac: #6366f1; --ac2: #818cf8; --ac-bg: rgba(99,102,241,0.15); --ac-sh: rgba(99,102,241,0.3); }
+    [data-accent="emerald"] { --ac: #10b981; --ac2: #34d399; --ac-bg: rgba(16,185,129,0.15); --ac-sh: rgba(16,185,129,0.3); }
+    [data-accent="rose"] { --ac: #f43f5e; --ac2: #fb7185; --ac-bg: rgba(244,63,94,0.15); --ac-sh: rgba(244,63,94,0.3); }
+    [data-accent="amber"] { --ac: #f59e0b; --ac2: #fbbf24; --ac-bg: rgba(245,158,11,0.15); --ac-sh: rgba(245,158,11,0.3); }
+
+    /* === BASE UI === */
+    body { background: var(--bg); color: var(--text); font-family: var(--font); transition: background .3s var(--ease); overflow-x: hidden; }
+    .pg { display: none; min-height: 100vh; padding: var(--s4) var(--s4) 140px; max-width: var(--max); margin: 0 auto; }
+    .pg.on { display: block; animation: fadeIn .4s var(--ease); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    /* === COMPONENTS === */
+    .card { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: var(--s4); margin-bottom: var(--s3); border: 1px solid var(--border); transition: all .2s var(--ease); }
+    .card.neu-in { box-shadow: var(--shadow-in); }
+    .card.clickable { cursor: pointer; }
+    .card.clickable:active { transform: translateY(-2px) scale(1.02); box-shadow: 12px 12px 24px var(--shadow), -12px -12px 24px rgba(255,255,255,0.6); }
+    .item-card { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: var(--s3); margin-bottom: var(--s2); border: 1px solid var(--border); transition: all .2s ease; cursor: pointer; position: relative; overflow: hidden; }
+    .item-card:active { transform: translateY(-4px) scale(1.02); box-shadow: 12px 12px 24px var(--shadow); }
+    
+    .glass { background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,.2); border-radius: var(--r); }
+
+    .btn { min-width: 88px; min-height: 56px; padding: var(--s3) var(--s4); border-radius: var(--r-btn); font-weight: 700; font-size: 1rem; border: 2px solid var(--ac); cursor: pointer; transition: all .25s var(--ease); display: flex; align-items: center; justify-content: center; gap: var(--s2); box-shadow: 0 4px 12px var(--ac-sh); background: #fff; color: var(--ac); }
+    .btn:active { transform: scale(0.96); background: var(--ac); color: #fff; box-shadow: 0 2px 6px var(--ac-sh); }
+    
+    .btn-p { 
+      background: linear-gradient(135deg, var(--ac), var(--ac2)); 
+      color: #fff; 
+      border: none; 
+      box-shadow: 0 8px 20px var(--ac-sh); 
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-p::after {
+      content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.1); opacity: 0; transition: 0.3s;
+    }
+    .btn-p:hover::after { opacity: 1; }
+    .btn-p:active { transform: translateY(1px); box-shadow: 0 4px 10px var(--ac-sh); }
+
+    .btn-rec {
+      min-width: 88px; height: 44px; padding: var(--s2) var(--s4); border-radius: 22px;
+      background: #28a745; color: #fff; border: 2px solid #28a745; font-weight: 700; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center; gap: var(--s2);
+      transition: all 0.3s var(--ease); cursor: pointer; float: right;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+    }
+    .btn-rec.off { background: #fff; color: var(--text3); border-color: var(--border2); box-shadow: var(--shadow); }
+    .btn-rec i { font-size: 14px !important; color: inherit; }
+    
+    .cat-container { position: relative; display: flex; flex-direction: column; gap: var(--s3); }
+    .cat-row { display: flex; align-items: center; gap: var(--s3); }
+    .cat-sel-wrapper { flex: 1; position: relative; }
+    .cat-sel-wrapper::after {
+      content: '\f107'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+      position: absolute; right: var(--s3); top: 50%; transform: translateY(-50%);
+      width: 28px; height: 28px; background: var(--card); border: 1px solid var(--border2);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--text3); pointer-events: none;
+    }
+    .btn-add-cat { 
+      min-width: 120px; min-height: 48px; padding: var(--s3) var(--s4); border-radius: 24px;
+      border: 2px dashed var(--ac); background: #fff; color: var(--ac);
+      font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: var(--s2);
+    }
+    .btn-add-cat:active { background: var(--ac-bg); }
+
+    .btn-o { background: #fff; color: var(--text); border: 2px solid var(--border2); box-shadow: var(--shadow); }
+    .btn-o:active { background: var(--bg2); border-color: var(--text3); }
+
+    .cal-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--card); box-shadow: var(--shadow); border: none; color: var(--text); cursor: pointer; font-size: 14px; }
+    
+    .close-btn { width: 48px; height: 48px; padding: var(--s2); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; border: none; color: var(--text); cursor: pointer; font-size: 24px; font-weight: bold; }
+    .close-btn:active { box-shadow: var(--shadow-in); transform: scale(0.95); }
+
+    .pill-btn { min-width: 88px; min-height: 44px; padding: var(--s2) var(--s4); border-radius: 30px; border: 1.5px solid var(--ac); background: transparent; color: var(--ac); font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+    .pill-btn.on { background: var(--ac); color: #fff; box-shadow: 0 5px 15px var(--ac-sh); }
+    .pill-btn.dashed { border-style: dashed; border-width: 2px; opacity: 0.7; }
+
+    .btn-inset { 
+      width: 100%; padding: var(--s4); 
+      background: var(--card); box-shadow: var(--shadow-in); 
+      border-radius: 2rem; border: none; 
+      font-weight: 700; font-size: 1.125rem; 
+      color: var(--text); cursor: pointer; 
+      transition: all 0.3s ease-in-out; 
+      outline: none;
+    }
+    .btn-inset:focus { 
+      box-shadow: var(--shadow-in), 0 0 0 4px var(--ac-sh); 
+    }
+    .btn-inset:active { transform: scale(0.98); }
+
+    .inp { width: 100%; min-height: 56px; padding: var(--s4); border-radius: 2rem; border: none; background: #f5f5f5; box-shadow: var(--shadow-in); font-size: 1.125rem; font-weight: 700; color: var(--text2); outline: none; transition: all 0.3s ease-in-out; }
+    .inp:focus { box-shadow: var(--shadow-in), 0 0 0 4px var(--ac-sh); }
+    .inp::placeholder { color: var(--text3); opacity: 0.6; }
+    
+    .btn i, .btn-p i, .close-btn-full i, .btn-rec i, .pill-btn i { color: #FFFFFF !important; }
+    
+    .add-btn-dash {
+      width: 100%; height: 56px; border-radius: var(--r2);
+      border: 2px dashed var(--text3); color: var(--text3);
+      display: flex; align-items: center; justify-content: center; gap: var(--s2);
+      font-weight: 700; background: transparent; cursor: pointer; transition: 0.3s;
+      margin-top: var(--s3);
+    }
+    .add-btn-dash:active { background: var(--border); transform: scale(0.98); }
+    .section-container { margin-bottom: var(--s5); border: 1px solid var(--border2); border-radius: var(--r); padding: var(--s3); background: var(--card); }
+    .section-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--s3); padding-bottom: var(--s2); border-bottom: 1px solid var(--border2); }
+    .section-content { transition: max-height 0.3s ease-out; overflow: hidden; }
+    .section-content.collapsed { max-height: 0; }
+    
+    .ana-nav { display: flex; gap: var(--s2); overflow-x: auto; margin-bottom: var(--s4); padding-bottom: var(--s2); }
+    .ana-nav-item { padding: var(--s2) var(--s3); border-radius: 20px; background: var(--card); border: 1px solid var(--border2); cursor: pointer; font-weight: 700; font-size: 0.8rem; white-space: nowrap; transition: 0.2s; }
+    .ana-nav-item.on { background: var(--ac); color: #fff; border-color: var(--ac); }
+    .section-header h3 { font-size: 1.125rem; font-weight: 800; }
+    .section-stat { font-size: 0.875rem; font-weight: 600; }
+    
+    .income-section { border-left: 4px solid var(--green); }
+    .income-section .section-header h3 { color: var(--green); }
+    .expense-section { border-left: 4px solid var(--red); }
+    .expense-section .section-header h3 { color: var(--red); }
+
+    .strat-btn { flex: 1; min-height: 48px; border-radius: 24px; border: 2px solid var(--border2); background: #fff; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease; }
+    .strat-btn.on { border-color: var(--ac); background: var(--ac-bg); color: var(--ac); box-shadow: 0 4px 12px var(--ac-sh); transform: translateY(-2px); }
+
+    /* === MONTH LIST === */
+    .month-list-container { display: flex; overflow-x: auto; padding: var(--s3) var(--s2); border-radius: var(--r2); background: var(--shadow-in); margin-bottom: var(--s4); scroll-behavior: smooth; gap: var(--s3); -webkit-overflow-scrolling: touch; }
+    .month-list-container::-webkit-scrollbar { height: 4px; }
+    .month-list-container::-webkit-scrollbar-thumb { background: var(--ac); border-radius: 10px; }
+    .month-item { flex: 0 0 auto; padding: var(--s3) var(--s4); border-radius: 20px; text-align: center; cursor: pointer; transition: .2s; font-weight: 700; color: var(--text2); background: var(--card); border: 1px solid transparent; min-width: 100px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+    .month-item.active { background: var(--ac); color: #fff; box-shadow: 0 4px 12px var(--ac-sh); border-color: var(--ac); }
+    
+    .filter-sort-bar { display: flex; gap: var(--s3); margin-bottom: var(--s3); overflow-x: auto; padding-bottom: var(--s2); }
+    .filter-sort-bar select { flex: 1; min-width: 120px; font-size: 0.75rem; padding: var(--s2) var(--s3); height: 36px; background: #f5f5f5; }
+
+    .month-picker-inline { display: flex; align-items: center; gap: var(--s3); margin-bottom: var(--s4); }
+    .month-picker-inline input[type="month"] { flex: 1; border: none; background: #f5f5f5; box-shadow: var(--shadow); padding: var(--s3); border-radius: 15px; color: var(--text); font-family: var(--font); font-weight: 700; outline: none; }
+
+    .close-btn-full { width: 100%; height: 56px; background: var(--red); color: #fff; border: none; border-radius: var(--r2); font-weight: 900; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--s3); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); transition: 0.2s; margin-top: var(--s4); }
+    .close-btn-full:active { transform: scale(0.98); opacity: 0.9; }
+
+    .paid-toggle { min-width: 120px; height: 44px; border-radius: var(--r2); border: 2px solid var(--text3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; color: var(--text3); font-weight: 700; font-size: 0.8rem; gap: var(--s2); background: var(--card); box-shadow: var(--shadow); }
+    .paid-toggle.on { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 4px 12px var(--green-bg); }
+    .paid-toggle:hover { transform: translateY(-2px); }
+    .paid-toggle:active { transform: scale(0.95); box-shadow: var(--shadow-in); }
+
+    .tab-btn { flex: 1; padding: var(--s3); border-radius: 15px; border: none; background: var(--card); color: var(--text3); font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); }
+    .tab-btn.on { background: var(--ac); color: #fff; box-shadow: 0 4px 15px var(--ac-sh); }
+
+    /* === NAVIGATION === */
+    .nav { 
+      position: fixed; bottom: var(--s4); left: 50%; transform: translateX(-50%); 
+      width: calc(100% - 40px); max-width: 480px; height: 80px; 
+      background: var(--glass-nav); 
+      backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
+      border-radius: 40px; display: flex; justify-content: space-around; align-items: center; 
+      border: 1px solid rgba(255,255,255,0.2); 
+      box-shadow: 0 8px 32px rgba(0,0,0,0.05); 
+      z-index: 1000;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav::before {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      transform: skewX(-15deg) scaleX(1.2);
+      filter: url(#glassDistortion);
+      pointer-events: none;
+    }
+    .nb { 
+      background: none; border: none; color: var(--text3); 
+      display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      transition: all 0.3s ease; width: 56px; height: 56px; border-radius: 50%;
+      position: relative; z-index: 2;
+    }
+    .nb.on { 
+      color: var(--ac); 
+      text-shadow: 0 0 15px rgba(255,255,255,0.8);
+      transform: translateY(-2px);
+    }
+    .nb.on::after {
+      content: ""; position: absolute; inset: 0;
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.1);
+      animation: glowPulse 2s infinite alternate;
+    }
+    @keyframes glowPulse { from { opacity: 0.5; transform: scale(0.95); } to { opacity: 1; transform: scale(1.05); } }
+    .nb i { font-size: 1.5rem; }
+    .nb span { display: none; }
+
+    .lbl { font-size: .75rem; font-weight: 800; color: var(--ac); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: var(--s3); display: block; }
+    .fbc { display: flex; justify-content: space-between; align-items: center; }
+    .mb20 { margin-bottom: var(--s4); }
+    .mb10 { margin-bottom: var(--s2); }
+    .am { font-weight: 900; color: var(--text); }
+    .am.pos { color: var(--green); }
+    .am.neg { color: var(--red); }
+    .empty { text-align: center; padding: var(--s6) var(--s4); color: var(--text3); font-size: 0.9rem; }
+    select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right var(--s3) center; background-size: 16px; }
+    
+    /* LOADING SCREEN */
+    .loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity .8s var(--ease); }
+    .loading-screen.fade-out { opacity: 0; pointer-events: none; }
+    .bf-coin { width: 100px; height: 100px; background: linear-gradient(145deg, var(--ac), var(--ac2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 40px; font-weight: 900; box-shadow: 0 10px 30px var(--ac-sh); animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+  </style>
+</head>
+<body>
+  <svg style="display: none;">
+    <filter id="glassDistortion">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01 0.05" numOctaves="2" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+  <div id="loadingScreen" class="loading-screen">
+    <div class="bf-coin">BF</div>
+  </div>
+
+  <!-- REGISTRATION: STEP 1 (NAME) -->
+  <div id="pgW" class="pg">
+    <div style="height: 80vh; display: flex; flex-direction: column; justify-content: center; text-align: center;">
+      <div class="bf-coin" style="margin: 0 auto var(--s5);">BF</div>
+      <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: var(--s2); color: var(--ac);">Budget Flow</h1>
+      <p style="color: var(--text2); margin-bottom: var(--s5); font-weight: 500;">Beautifully simple finance tracking.</p>
+      <div class="card" style="padding: 0; background: transparent; box-shadow: none; border: none;">
+        <input id="inpN" class="inp mb20" placeholder="Your Name">
+        <button class="btn btn-p" style="width: 100%;" onclick="startOB()">Next <i class="fas fa-arrow-right" style="color: #fff !important;"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTRATION: STEP 2 (INCOME) -->
+  <div id="pgOB1" class="pg">
+    <div class="fbc mb20">
+      <h2 style="color: var(--ac); font-weight: 900;">Step 2: Income</h2>
+    </div>
+    <p class="mb20" style="color: var(--text2);">Add your monthly income sources (Recurring by default).</p>
+    <div id="oIL" class="mb20"></div>
+    <div class="card">
+      <span class="lbl">Income Name</span>
+      <input id="oiN" class="inp mb20" placeholder="e.g. Salary">
+      <span class="lbl">Amount</span>
+      <input id="oiA" class="inp mb20" type="number" placeholder="0.00">
+      
+      <div class="cat-container mb20">
+        <span class="lbl">Category</span>
+        <div class="cat-row">
+          <div class="cat-sel-wrapper">
+            <select id="oiC" class="inp" style="padding-right: 50px;"><option value="">No Category</option></select>
+          </div>
+          <button class="btn-add-cat" onclick="addCat('inc')">+ Add Category</button>
+        </div>
+      </div>
+
+      <div style="overflow: hidden; margin-bottom: 20px;">
+        <button id="oiR" class="btn-rec" onclick="this.classList.toggle('off'); const i = this.querySelector('i'); if(this.classList.contains('off')) i.style.display='none'; else i.style.display='block';">
+          <i class="fas fa-check"></i> Recurring
+        </button>
+      </div>
+      <button class="btn btn-o" style="width: 100%; border-color: var(--ac); color: var(--ac);" onclick="addOBInc()">+ Add to List</button>
+    </div>
+    <div style="padding: 20px 0;">
+      <button class="btn btn-p" style="width: 100%;" onclick="showPg('pgOB2')">Next: Expenses <i class="fas fa-arrow-right" style="color: #fff !important;"></i></button>
+    </div>
+  </div>
+
+  <!-- REGISTRATION: STEP 3 (EXPENSES) -->
+  <div id="pgOB2" class="pg">
+    <div class="fbc mb20">
+      <h2 style="color: var(--ac); font-weight: 900;">Step 3: Expenses</h2>
+    </div>
+    <p class="mb20" style="color: var(--text2);">Add your monthly expenses. Categorize them into Fixed (Rent, Utilities) and Variable (Groceries, Dining).</p>
+    <div id="oEL" class="mb20"></div>
+    <div class="card">
+      <span class="lbl">Expense Name</span>
+      <input id="oeN" class="inp mb20" placeholder="e.g. Rent or Groceries">
+      <span class="lbl">Amount</span>
+      <input id="oeA" class="inp mb20" type="number" min="0.01" step="0.01" placeholder="0.00">
+      
+      <div class="cat-container mb20">
+        <span class="lbl">Category</span>
+        <div class="cat-row">
+          <div class="cat-sel-wrapper">
+            <select id="oeC" class="inp" style="padding-right: 50px;"><option value="">No Category</option></select>
+          </div>
+          <button class="btn-add-cat" onclick="addCat('exp')">+ Add Category</button>
+        </div>
+      </div>
+
+      <span class="lbl">Expense Type</span>
+      <select id="oeT" class="inp mb20">
+        <option value="fixed">Fixed (e.g. Rent, Bills, Subs)</option>
+        <option value="variable">Variable (e.g. Food, Fun, Shopping)</option>
+      </select>
+
+      <span class="lbl">Payment Method</span>
+      <select id="oeP" class="inp mb20">
+        <option value="cash">Cash</option>
+        <option value="credit">Credit</option>
+      </select>
+      <div style="overflow: hidden; margin-bottom: 20px;">
+        <button id="oeR" class="btn-rec" onclick="this.classList.toggle('off'); const i = this.querySelector('i'); if(this.classList.contains('off')) i.style.display='none'; else i.style.display='block';">
+          <i class="fas fa-check"></i> Recurring
+        </button>
+      </div>
+      <button class="btn btn-o" style="width: 100%; border-color: var(--ac); color: var(--ac);" onclick="addOBExp()">+ Add to List</button>
+    </div>
+    <div style="padding: 20px 0;">
+      <button class="btn btn-p" style="width: 100%;" onclick="showPg('pgOB3')">Next: Balance <i class="fas fa-arrow-right" style="color: #fff !important;"></i></button>
+    </div>
+  </div>
+
+  <!-- REGISTRATION: STEP 4 (SUMMARY) -->
+  <div id="pgOB3" class="pg">
+    <h2 class="mb20" style="color: var(--ac); font-weight: 900;">Step 4: Initial Balance</h2>
+    <div id="obSummary"></div>
+    <div class="card mb20">
+      <span class="lbl">Profile Nickname</span>
+      <input id="regPN" class="inp mb20" placeholder="e.g. My 2024 Budget">
+      <button class="btn btn-p" onclick="finOB()">Complete Setup <i class="fas fa-check" style="color: #fff !important;"></i></button>
+    </div>
+  </div>
+
+  <!-- MAIN TRACKER -->
+  <div id="pgT" class="pg">
+    <div class="month-picker-inline">
+      <span class="lbl" style="margin:0;">Jump to:</span>
+      <input type="month" id="inlineMoPicker" onchange="setMo(this.value)">
+    </div>
+    <div id="monthList" class="month-list-container"></div>
+
+    <div class="card mb20" style="background: var(--ac); color: #fff; position: relative; overflow: hidden; padding: var(--s5);">
+      <div style="position: absolute; top: -20px; right: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4);">
+        <div class="glass" style="padding: var(--s3); background: rgba(255,255,255,0.1); border: none;">
+          <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Cash Balance</span>
+          <div id="statNet" style="font-weight: 900; font-size: 1.2rem;">RM 0.00</div>
+        </div>
+        <div class="glass" style="padding: var(--s3); background: rgba(255,255,255,0.1); border: none; cursor: pointer;" onclick="go('pgC')">
+          <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Credit Utilisation</span>
+          <div id="statCredit" style="font-weight: 900; font-size: 1.2rem;">RM 0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="notifArea" class="mb20"></div>
+
+    <div id="trackerContent">
+      <div class="section-container income-section">
+        <div class="section-header" onclick="toggleSection('inc')">
+          <div>
+            <h3>Income</h3>           
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <i id="incChevron" class="fas fa-chevron-up"></i>
+          </div>
+        </div>
+        <div id="incContent" class="section-content">
+          <div id="iL"></div>
+          <button class="add-btn-dash" onclick="openM('mI')"><i class="fas fa-plus"></i> Add Income</button>
+        </div>
+      </div>
+
+      <div class="section-container expense-section">
+        <div class="section-header" onclick="toggleSection('exp')">
+          <div>
+            <h3>Expenses</h3>            
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <i id="expChevron" class="fas fa-chevron-up"></i>
+          </div>
+        </div>
+        
+        <div id="expContent" class="section-content">
+          <div class="filter-sort-bar">
+            <select id="expFilterCat" class="inp" onchange="render()"><option value="all">All Categories</option></select>
+            <select id="expFilterType" class="inp" onchange="render()">
+              <option value="all">All Types</option>
+              <option value="fixed">Fixed Only</option>
+              <option value="variable">Variable Only</option>
+            </select>
+            <select id="expSort" class="inp" onchange="render()">
+              <option value="none">Default Order</option>
+              <option value="due">Due Date</option>
+              <option value="high">Most Expensive</option>
+              <option value="low">Least Expensive</option>
+            </select>
+          </div>
+          <div id="eL"></div>
+          <button class="add-btn-dash" onclick="addE()"><i class="fas fa-plus"></i> Add Expense</button>
+        </div>
+      </div>
+
+      <div id="dashPots" class="mb20"></div>
+    </div>
+  </div>
+
+  <!-- LOANS PAGE -->
+  <div id="pgL" class="pg">
+    <div class="fbc mb20">
+      <h2 style="font-weight: 900; color: var(--ac);">Loans</h2>
+      <button class="btn btn-p" style="width:auto; padding:12px 20px;" onclick="openM('mLoan')"><i class="fas fa-plus"></i></button>
+    </div>
+    <div id="loanList"></div>
+  </div>
+
+  <!-- POTS PAGE -->
+  <div id="pgS" class="pg">
+    <div class="fbc mb20">
+      <h2 style="font-weight: 900; color: var(--ac);">Saving Pots</h2>
+      <button class="btn btn-p" style="width:auto; padding:12px 20px;" onclick="openM('mPot')"><i class="fas fa-plus"></i></button>
+    </div>
+    <div id="potList"></div>
+  </div>
+
+  <!-- CREDIT MANAGEMENT PAGE -->
+  <div id="pgC" class="pg">
+    <h2 style="font-weight: 900; margin-bottom: 24px; color: var(--ac);">Credit Management</h2>
+    
+    <div class="card mb20" style="background: var(--ac); color: #fff; padding: var(--s5);">
+      <span class="lbl" style="color: rgba(255,255,255,0.8);">Total Credit Outstanding</span>
+      <div id="credTotal" style="font-weight: 900; font-size: 2rem;">RM 0.00</div>
+      <div id="credUsageBar" class="neu-in" style="height:10px; border-radius:5px; overflow:hidden; margin-top: var(--s3); background:rgba(255,255,255,0.2);">
+        <div id="credUsageFill" style="width:0%; height:100%; background:#fff; transition:0.3s;"></div>
+      </div>
+    </div>
+
+    <div class="card mb20">
+      <span class="lbl">Quick Pay Credit</span>
+      <div class="fbc" style="gap: var(--s3);">
+        <input id="payCredAmt" class="inp" type="number" placeholder="Enter amount to pay">
+        <button class="btn btn-p" style="min-width:100px;" onclick="payCreditManual()">Pay</button>
+      </div>
+    </div>
+
+    <div class="fbc mb10">
+      <h3 style="font-weight: 800;">Credit Expenses (Ranked)</h3>
+      <select id="credSort" class="inp" style="width:auto; min-height:36px; padding:8px 12px; font-size:0.75rem;" onchange="renderCreditPg()">
+        <option value="high">Highest First</option>
+        <option value="date">Latest First</option>
+      </select>
+    </div>
+    <div id="credList"></div>
+  </div>
+
+  <!-- ANALYTICS PAGE -->
+  <div id="pgD" class="pg">
+    <h2 style="font-weight: 900; margin-bottom: 24px; color: var(--ac);">Analytics</h2>
+    
+    <div class="ana-nav">
+      <div class="ana-nav-item on" data-type="all" onclick="setAnaFilter('all')">Overview</div>
+      <div class="ana-nav-item" data-type="inc" onclick="setAnaFilter('inc')">Income</div>
+      <div class="ana-nav-item" data-type="exp" onclick="setAnaFilter('exp')">Expenses</div>
+      <div class="ana-nav-item" data-type="cred" onclick="setAnaFilter('cred')">Credit</div>
+      <div class="ana-nav-item" data-type="loan" onclick="setAnaFilter('loan')">Loans</div>
+      <div class="ana-nav-item" data-type="pot" onclick="setAnaFilter('pot')">Savings</div>
+    </div>
+
+    <div id="anaContent"></div>
+  </div>
+
+  <!-- SETTINGS PAGE -->
+  <div id="pgSe" class="pg">
+    <h2 style="font-weight: 900; margin-bottom: 24px; color: var(--ac);">Settings</h2>
+    <div class="card">
+      <span class="lbl">Theme Mode</span>
+      <div style="display: flex; gap: var(--s3);">
+        <button class="btn" style="flex:1;" onclick="setTheme('light')">Light</button>
+        <button class="btn" style="flex:1;" onclick="setTheme('dark')">Dark</button>
+      </div>
+    </div>
+    <div class="card">
+      <span class="lbl">Income Categories</span>
+      <div id="setCatInc" class="mb10" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+      <button class="pill-btn dashed" style="width:100%;" onclick="addCat('inc')">+ Add Category</button>
+    </div>
+    <div class="card">
+      <span class="lbl">Expense Categories</span>
+      <div id="setCatExp" class="mb10" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+      <button class="pill-btn dashed" style="width:100%;" onclick="addCat('exp')">+ Add Category</button>
+    </div>
+    <button class="btn btn-o" style="color: var(--red); margin-top: 40px;" onclick="resetData()">Reset All Data</button>
+  </div>
+
+  <!-- NAV -->
+  <nav id="nav" class="nav" style="display:none;">
+    <button class="nb on" onclick="go('pgT', this)"><i class="fas fa-wallet"></i></button>
+    <button class="nb" onclick="go('pgL', this)"><i class="fas fa-hand-holding-dollar"></i></button>
+    <button class="nb" onclick="go('pgC', this)"><i class="fas fa-credit-card"></i></button>
+    <button class="nb" onclick="go('pgS', this)"><i class="fas fa-jar"></i></button>
+    <button class="nb" onclick="go('pgD', this)"><i class="fas fa-chart-line"></i></button>
+    <button class="nb" onclick="go('pgSe', this)"><i class="fas fa-cog"></i></button>
+  </nav>
+
+  <!-- MODALS -->
+  <div id="mI" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
+    <h2 style="font-weight: 900; padding: 24px 20px 0;">Add Income</h2>
+    <div class="card">
+      <span class="lbl">Name</span><input id="fIN" class="inp mb20" placeholder="e.g. Salary">
+      <span class="lbl">Amount</span><input id="fIA" class="inp mb20" type="number" step="0.01" placeholder="0.00">
+      <span class="lbl">Category</span><select id="fIC" class="inp mb20"></select>
+      <span class="lbl">Date</span><input id="fID" class="inp mb20" type="date">
+      <div style="overflow: hidden; margin-bottom: 20px;">
+        <button id="fIR" class="btn-rec" onclick="this.classList.toggle('off'); const i = this.querySelector('i'); if(this.classList.contains('off')) i.style.display='none'; else i.style.display='block';">
+          <i class="fas fa-check"></i> Recurring
+        </button>
+      </div>
+      <button class="btn btn-p" style="width: 100%;" onclick="addI()">Save Income</button>
+    </div>
+    <button class="close-btn-full" onclick="closeM('mI')"><i class="fas fa-times"></i> Close Window</button>
+  </div>
+
+  <div id="mE" class="pg glass-modal">
+    <h2 style="font-weight: 900; padding: var(--s4) var(--s4) 0;">Edit/Add Expense</h2>
+    <div class="card">
+      <input id="fEId" type="hidden">
+      <span class="lbl">Name</span><input id="fEN" class="inp mb20" placeholder="e.g. Rent">
+      <span class="lbl">Amount</span><input id="fEA" class="inp mb20" type="number" step="0.01" placeholder="0.00">
+      <span class="lbl">Category</span><select id="fEC" class="inp mb20"></select>
+      <span class="lbl">Expense Type</span>
+      <select id="fET" class="inp mb20">
+        <option value="fixed">Fixed</option>
+        <option value="variable">Variable</option>
+      </select>
+      <span class="lbl">Date</span><input id="fED" class="inp mb20" type="date">
+      <span class="lbl">Payment Method</span><select id="fEP" class="inp mb20"><option value="cash">Cash</option><option value="credit">Credit</option></select>
+      <div style="overflow: hidden; margin-bottom: var(--s4);">
+        <button id="fER" class="btn-rec" onclick="this.classList.toggle('off'); const i = this.querySelector('i'); if(this.classList.contains('off')) i.style.display='none'; else i.style.display='block';">
+          <i class="fas fa-check"></i> Recurring
+        </button>
+      </div>
+      <button class="btn btn-p" style="width: 100%;" onclick="saveE()">Save Expense</button>
+    </div>
+    <button class="close-btn-full" onclick="closeM('mE')"><i class="fas fa-times"></i> Close Window</button>
+  </div>
+
+  <div id="mLoan" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
+    <h2 style="font-weight: 900; padding: 24px 20px 0;">Add Loan</h2>
+    <div class="card">
+      <span class="lbl">Loan Title</span><input id="fLTi" class="inp mb20" placeholder="e.g. Car Loan">
+      <span class="lbl">Total Amount</span><input id="fLAm" class="inp mb20" type="number" placeholder="0.00">
+      <span class="lbl">Tenure (Months)</span><input id="fLTn" class="inp mb20" type="number" placeholder="e.g. 60">
+      <span class="lbl">Monthly Due Day</span><input id="fLDu" class="inp mb20" type="number" placeholder="1-31">
+      <p style="font-size: 0.7rem; color: var(--text3); line-height: 1.4; margin-top: -10px; margin-bottom: 20px;">
+        The rate is by default at 0% for this calculation. Please enter the full amount calculation that you have already completed and need to pay every month.
+      </p>
+      <button class="btn btn-p" onclick="addLoan()">Create Loan Account</button>
+    </div>
+    <button class="close-btn-full" onclick="closeM('mLoan')"><i class="fas fa-times"></i> Close Window</button>
+  </div>
+
+  <div id="mPot" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
+    <h2 style="font-weight: 900; padding: 24px 20px 0;">New Saving Pot</h2>
+    <div class="card">
+      <span class="lbl">Pot Title</span><input id="fPTi" class="inp mb20" placeholder="e.g. Travel Fund">
+      <span class="lbl">Target Amount</span><input id="fPAm" class="inp mb20" type="number" placeholder="0.00">
+      <span class="lbl">Target Month</span><input id="fPMo" class="inp mb20" type="month">
+      <span class="lbl">Pick Icon</span>
+      <div id="fPIco" class="fbc mb20" style="overflow-x:auto; gap:10px; padding-bottom:10px;">
+        <div class="pill-btn on" onclick="setPotIcon('🍯', this)">🍯</div>
+        <div class="pill-btn" onclick="setPotIcon('💰', this)">💰</div>
+        <div class="pill-btn" onclick="setPotIcon('🏠', this)">🏠</div>
+        <div class="pill-btn" onclick="setPotIcon('🚗', this)">🚗</div>
+        <div class="pill-btn" onclick="setPotIcon('✈️', this)">✈️</div>
+      </div>
+      <span class="lbl">Pick Color</span>
+      <input id="fPCol" type="color" class="mb20" style="width:100%; height:44px; border:none; background:none;" value="#6366f1">
+      <span class="lbl">Strategy (Permanent)</span>
+      <div style="display:flex; gap:12px;" class="mb20">
+        <button id="fPStratB" class="strat-btn on" onclick="setPotStrat('before')">Before expenses</button>
+        <button id="fPStratA" class="strat-btn" onclick="setPotStrat('after')">After expenses</button>
+      </div>
+      <button class="btn btn-p" onclick="addPot()">Create Pot</button>
+    </div>
+    <button class="close-btn-full" onclick="closeM('mPot')"><i class="fas fa-times"></i> Close Window</button>
+  </div>
+
+  <div id="mPotDetail" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
+    <h2 id="pDetTitle" style="font-weight: 900; padding: 24px 20px 0;">Pot Detail</h2>
+    <div id="pDetContent" style="padding: 20px;"></div>
+    <button class="close-btn-full" onclick="closeM('mPotDetail')"><i class="fas fa-times"></i> Close Window</button>
+  </div>
+
+  <div id="mDetail" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
+    <h2 id="detTitle" style="font-weight: 900; padding: 24px 20px 0;">Detail</h2>
+    <div id="detContent" style="padding: 20px;"></div>
+    <div style="padding: 0 20px;"><button class="btn btn-o" style="color:var(--red); width:100%;" id="detDelBtn">Delete Item</button></div>
+    <button class="close-btn-full" onclick="closeM('mDetail')"><i class="fas fa-times"></i> Close Window</button>
+  </div>
+
+  <script>
+    const K = 'bf4';
+    const DB_DEFAULTS = { accounts: [], prefs: { theme: 'light', accent: 'indigo' } };
+
+    function loadDb() {
+      const raw = localStorage.getItem(K);
+      if (!raw) return structuredClone(DB_DEFAULTS);
+
+      try {
+        const parsed = JSON.parse(raw) || {};
+        return {
+          ...structuredClone(DB_DEFAULTS),
+          ...parsed,
+          prefs: {
+            ...DB_DEFAULTS.prefs,
+            ...(parsed.prefs || {})
+          }
+        };
+      } catch {
+        return structuredClone(DB_DEFAULTS);
+      }
+    }
+
+    let db = loadDb();
+    let cur = null, viewMo = new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (3600000 * 8));
+    viewMo.setDate(1);
+    let oData = { name: '', inc: [], exp: [], categories: { inc: [], exp: [] } };
+    let anaTab = 'inc';
+    let anaSelectedCats = [];
+    let potStrat = 'before';
+
+    const $ = id => document.getElementById(id);
+    const sv = () => localStorage.setItem(K, JSON.stringify(db));
+    const ac = () => db.accounts.find(a => a.id === cur);
+    const fm = n => 'RM ' + (+n).toFixed(2);
+    const td = () => {
+      // Malaysia Timezone (UTC+8)
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const myTime = new Date(utc + (3600000 * 8));
+      return myTime.toISOString().split('T')[0];
+    };
+    const moKey = (d) => d.toISOString().split('T')[0].substring(0, 7);
+
+    function init() {
+      applyPrefs();
+      setTimeout(() => {
+        if (db.accounts.length > 0) { cur = db.accounts[0].id; go('pgT'); }
+        else { showPg('pgW'); }
+        $('loadingScreen').classList.add('fade-out');
+      }, 1500);
+    }
+
+    function applyPrefs() {
+      document.documentElement.dataset.theme = db.prefs.theme;
+      document.documentElement.dataset.accent = db.prefs.accent;
+    }
+
+    function showPg(id) {
+      document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+      const el = $(id); if (el) el.classList.add('on');
+      const noNav = ['pgW', 'pgOB1', 'pgOB2', 'pgOB3'].includes(id) || id.startsWith('m');
+      $('nav').style.display = noNav ? 'none' : 'flex';
+      if (id === 'pgOB3') renderOBSummary();
+      if (id === 'pgT') renderMonthList();
+    }
+
+    function renderMonthList() {
+      const list = $('monthList'); if (!list) return;
+      const currentMo = moKey(viewMo);
+      let html = '';
+      for (let i = -12; i <= 12; i++) {
+        const d = new Date(new Date().getFullYear(), new Date().getMonth() + i, 1);
+        const key = moKey(d);
+        const active = key === currentMo ? 'active' : '';
+        html += `<div class="month-item ${active}" id="mo_${key}" onclick="setMo('${key}')">${d.toLocaleDateString('en-US', { month: 'short' })}</div>`;
+      }
+      list.innerHTML = html;
+      const activeEl = $(`mo_${currentMo}`);
+      if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    }
+
+    function setMo(key) {
+      viewMo = new Date(key + '-01');
+      processRecurring(); render(); renderMonthList();
+    }
+
+    function go(id, btn) {
+      if (id === 'pgT') processRecurring();
+      showPg(id);
+      document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+      if (btn) btn.classList.add('on');
+      render();
+      if (id === 'pgD') renderAnalytics();
+      if (id === 'pgSe') renderSettingsCats();
+      if (id === 'pgC') renderCreditPg();
+    }
+
+    /* ONBOARDING */
+    function startOB() {
+      const n = $('inpN').value.trim(); if (!n) return alert('Enter name');
+      oData.name = n; showPg('pgOB1');
+    }
+    function addOBInc() {
+      const n = $('oiN').value.trim(), a = parseFloat($('oiA').value), c = $('oiC').value, r = !$('oiR').classList.contains('off');
+      if (!n || isNaN(a)) return alert('Fill fields');
+      oData.inc.push({ id: 'i_' + Math.random(), name: n, amount: a, category: c || 'No Category', date: td(), recurring: r });
+      $('oiN').value = ''; $('oiA').value = ''; renderOBList('oIL', oData.inc, 'inc');
+    }
+    function addOBExp() {
+      const n = $('oeN').value.trim(), a = parseFloat($('oeA').value), c = $('oeC').value, p = $('oeP').value, t = $('oeT').value, r = !$('oeR').classList.contains('off');
+      if (!n || isNaN(a) || a <= 0) return alert('Please enter a valid name and positive amount');
+      if (!c) return alert('Please select or add a category');
+      oData.exp.push({ id: 'e_' + Math.random(), name: n, amount: a, category: c, type: t, date: td(), recurring: r, payment: p, paid: false });
+      $('oeN').value = ''; $('oeA').value = ''; renderOBList('oEL', oData.exp, 'exp');
+    }
+    function renderOBList(id, list, type) {
+      $(id).innerHTML = list.map((item, idx) => `
+        <div class="item-card fbc" style="border-left: 4px solid ${item.type === 'fixed' ? 'var(--green)' : (item.type === 'variable' ? 'var(--blue)' : 'var(--border)')};">
+          <div>
+            <div style="font-weight:800;">${item.name}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem;">${item.category} • ${item.type ? item.type.toUpperCase() : ''}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;"><div class="am">${fm(item.amount)}</div><i class="fas fa-trash" style="font-size:18px !important; color:var(--red);" onclick="delOBItem('${type}', ${idx})"></i></div>
+        </div>
+      `).join('') || '<div class="empty">No entries</div>';
+    }
+    function delOBItem(type, idx) {
+      if (type === 'inc') oData.inc.splice(idx, 1); else oData.exp.splice(idx, 1);
+      renderOBList(type === 'inc' ? 'oIL' : 'oEL', type === 'inc' ? oData.inc : oData.exp, type);
+    }
+    function renderOBSummary() {
+      const ti = oData.inc.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
+      const te_cash = oData.exp.filter(e => e.payment === 'cash').reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+      const te_credit = oData.exp.filter(e => e.payment === 'credit').reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+      const te = te_cash + te_credit;
+      
+      const incBal = ti - te;
+      const cashBal = ti - te_cash;
+
+      const getSty = (v) => {
+        if (v < 0) return 'color: #ff8080 !important; font-weight: 800;';
+        if (v > 1000) return 'color: #4ade80 !important; font-weight: 800;';
+        return 'color: #fff; font-weight: 800;';
+      };
+      const healthyMsg = incBal > 1000 ? `<div style="font-size:0.75rem; opacity:0.9; font-weight:600; margin-top: var(--s1); color: #4ade80;">Excellent! Your financial is healthy.</div>` : '';
+
+      let html = `
+        <div class="card mb20">
+          <span class="lbl">Income Sources</span>
+          ${oData.inc.map(i => `<div class="fbc mb10"><span>${i.name}</span><b>${fm(i.amount)}</b></div>`).join('') || '<div class="empty">No income sources declared</div>'}
+          <div class="fbc" style="border-top:1px solid var(--border2); padding-top: var(--s2); margin-top: var(--s2); color:var(--green);">
+            <b>Total Income</b><b>${fm(ti)}</b>
+          </div>
+        </div>
+
+        <div class="card mb20">
+          <span class="lbl">Expense Breakdown</span>
+          ${oData.exp.map(e => `<div class="fbc mb10"><span>${e.name} <small>(${e.payment})</small></span><b>${fm(e.amount)}</b></div>`).join('') || '<div class="empty">No expenses declared</div>'}
+          <div class="fbc mb10" style="border-top:1px solid var(--border2); padding-top: var(--s2); margin-top: var(--s2); color: var(--orange); font-weight: 900;">
+            <span>Cash Subtotal</span><b>${fm(te_cash)}</b>
+          </div>
+          <div class="fbc" style="color: var(--orange); font-weight: 900;">
+            <span>Credit Subtotal</span><b>${fm(te_credit)}</b>
+          </div>
+        </div>
+
+        <div class="card mb20" style="background:var(--ac); color:#fff; box-shadow: 0 10px 25px var(--ac-sh);">
+          <span class="lbl" style="color:rgba(255,255,255,0.8);">Balance Summary</span>
+          
+          <div class="mb10">
+            <div class="fbc" style="${getSty(incBal)}">
+              <span>Income Balance</span>
+              <b style="font-size: 1.1rem;">${fm(incBal)}</b>
+            </div>
+            ${healthyMsg}
+          </div>
+
+          <div class="fbc mb10">
+            <span>Credit Utilisation</span>
+            <b>${fm(te_credit)}</b>
+          </div>
+
+          <div style="padding-top: var(--s2); border-top: 1px solid rgba(255,255,255,0.2);">
+            <div class="fbc" style="${getSty(cashBal)}">
+              <span>Cash Balance</span>
+              <b style="font-size: 1.1rem;">${fm(cashBal)}</b>
+            </div>
+          </div>
+          
+          ${(incBal < 0 || cashBal < 0) ? `<div style="font-size:0.65rem; margin-top: var(--s2); opacity:0.9; text-align:right;">⚠️ Warning: Expenses exceed income</div>` : ''}
+        </div>
+      `;
+      $('obSummary').innerHTML = html;
+    }
+    function finOB() {
+      const pn = $('regPN').value.trim() || (oData.name + "'s Budget");
+      const a = { id: 'ac_' + Date.now(), uName: oData.name, name: pn, incomes: oData.inc, expenses: oData.exp, savings: [], loans: [], categories: oData.categories };
+      db.accounts.push(a); cur = a.id; sv(); go('pgT');
+    }
+
+    /* DATA MANAGEMENT */
+    function addI() {
+      const n = $('fIN').value.trim(), a = parseFloat($('fIA').value), c = $('fIC').value, d = $('fID').value || td(), r = !$('fIR').classList.contains('off');
+      if (!n || isNaN(a)) return alert('Fill fields');
+      ac().incomes.push({ id: 'i_'+Math.random(), name: n, amount: a, category: c, date: d, recurring: r });
+      sv(); closeM('mI'); render();
+    }
+    function addE() {
+      $('fEId').value = '';
+      $('fEN').value = '';
+      $('fEA').value = '';
+      $('fED').value = td();
+      $('fER').classList.remove('off');
+      $('fER').querySelector('i').style.display = 'block';
+      const catSel = $('fEC');
+      catSel.innerHTML = ac().categories.exp.map(c => `<option value="${c}">${c}</option>`).join('') || '<option value="">No Category</option>';
+      openM('mE');
+    }
+    function saveE() {
+      const id = $('fEId').value, n = $('fEN').value.trim(), a = parseFloat($('fEA').value), c = $('fEC').value, d = $('fED').value || td(), p = $('fEP').value, t = $('fET').value, r = !$('fER').classList.contains('off');
+      if (!n || isNaN(a) || a <= 0) return alert('Fill fields with valid data');
+      if (!c) return alert('Select a category');
+      
+      const acc = ac();
+      if (id) {
+        const e = acc.expenses.find(x => x.id === id);
+        if (e) Object.assign(e, { name: n, amount: a, category: c, date: d, recurring: r, payment: p, type: t });
+      } else {
+        acc.expenses.push({ id: 'e_'+Math.random(), name: n, amount: a, category: c, date: d, recurring: r, payment: p, type: t, paid: false });
+      }
+      sv(); closeM('mE'); render();
+    }
+    function editE(id) {
+      const e = ac().expenses.find(x => x.id === id); if (!e) return;
+      $('fEId').value = e.id;
+      $('fEN').value = e.name;
+      $('fEA').value = e.amount;
+      $('fET').value = e.type || 'variable';
+      $('fED').value = e.date;
+      $('fEP').value = e.payment;
+      const catSel = $('fEC');
+      catSel.innerHTML = ac().categories.exp.map(c => `<option value="${c}" ${c===e.category?'selected':''}>${c}</option>`).join('');
+      if (e.recurring) { $('fER').classList.remove('off'); $('fER').querySelector('i').style.display='block'; }
+      else { $('fER').classList.add('off'); $('fER').querySelector('i').style.display='none'; }
+      openM('mE');
+    }
+    function addCat(type) {
+      const name = prompt('New category:'); if (!name) return;
+      const cat = name.trim();
+      if (ac()) { ac().categories[type].push(cat); sv(); render(); if ($('pgSe').classList.contains('on')) renderSettingsCats(); }
+      else { oData.categories[type].push(cat); const selId = type === 'inc' ? 'oiC' : 'oeC'; $(selId).innerHTML += `<option value="${cat}">${cat}</option>`; }
+    }
+    function togglePaid(id) {
+      const e = ac().expenses.find(x => x.id === id); if (!e) return;
+      e.paid = !e.paid;
+      
+      // If it's an auto-generated saving item being marked as paid
+      if (e.potId && e.paid) {
+        const p = ac().savings.find(x => x.id === e.potId);
+        if (p) p.current += e.amount;
+      }
+      
+      sv(); render();
+    }
+    function toggleReceived(id) {
+      const i = ac().incomes.find(x => x.id === id); if (!i) return;
+      i.paid = !i.paid; sv(); render();
+    }
+
+    function processRecurring() {
+      const acc = ac(); if (!acc) return;
+      const mo = moKey(viewMo);
+      acc.incomes.forEach(inc => {
+        if (inc.recurring && !acc.incomes.some(e => e.name === inc.name && e.date.startsWith(mo))) {
+          acc.incomes.push({ ...inc, id: 'i_'+Math.random(), date: mo + '-01' });
+        }
+      });
+      acc.expenses.forEach(exp => {
+        if (exp.recurring && !acc.expenses.some(e => e.name === exp.name && e.date.startsWith(mo))) {
+          acc.expenses.push({ ...exp, id: 'e_'+Math.random(), date: mo + '-01', paid: false });
+        }
+      });
+      sv();
+    }
+
+    function render() {
+      const acc = ac(); if (!acc) return;
+      const today = td();
+      const mo = moKey(viewMo);
+      
+      const incMo = acc.incomes.filter(i => i.date.startsWith(mo));
+      let expMo = acc.expenses.filter(e => e.date.startsWith(mo));
+
+      // Notification Logic
+      let notifs = [];
+      incMo.forEach(i => {
+        if (!i.paid) {
+          const diff = (new Date(i.date) - new Date(today)) / 86400000;
+          if (diff <= 2 && diff > 0) notifs.push(`💰 Almost pay day for ${i.name}, spend wisely!`);
+          else if (diff <= 0) notifs.push(`🔔 ${i.name} should be in by now, please check.`);
+        }
+      });
+      expMo.forEach(e => {
+        if (!e.paid) {
+          const diff = (new Date(e.date) - new Date(today)) / 86400000;
+          if (diff === 1) notifs.push(`⚠️ 1 day left to pay ${e.name}!`);
+          else if (diff <= 0) notifs.push(`🚨 ${e.name} is DUE! Please pay now.`);
+        }
+      });
+      $('notifArea').innerHTML = notifs.map(n => `<div class="card mb10" style="background:var(--red-bg); color:var(--red); font-size:0.75rem; font-weight:700; border:1px solid var(--red);">${n}</div>`).join('');
+
+      const ti_received = incMo.filter(i => i.paid).reduce((s, i) => s + i.amount, 0);
+      const te_cash_paid = expMo.filter(e => e.payment === 'cash' && e.paid).reduce((s, e) => s + e.amount, 0);
+      const te_credit_paid = expMo.filter(e => e.payment === 'credit' && e.paid).reduce((s, e) => s + e.amount, 0);
+      
+      $('statCredit').textContent = fm(te_credit_paid);
+      // Cash Balance is ONLY based on Received Income - Paid Cash Expenses
+      // If no income is received, Cash Balance stays at RM 0.00 (or negative if expenses are paid)
+      const cashBalance = ti_received - te_cash_paid;
+      $('statNet').textContent = fm(cashBalance);
+
+      // Sorting
+      const fSort = $('expSort').value;
+      if (fSort === 'due') expMo.sort((a,b) => new Date(a.date) - new Date(b.date));
+      
+      $('iL').innerHTML = incMo.map(i => `
+        <div class="item-card fbc" onclick="viewDetail('inc', '${i.id}')">
+          <div class="paid-toggle ${i.paid ? 'on' : ''}" onclick="event.stopPropagation(); toggleReceived('${i.id}')">
+            <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
+            <span>${i.paid ? 'Received' : 'Mark Received'}</span>
+          </div>
+          <div style="flex:1; margin-left:12px;">
+            <div style="font-weight:800;">${i.name}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem;">Due: ${new Date(i.date).toLocaleDateString('en-GB')}</div>
+          </div>
+          <div class="am pos">+${fm(i.amount)}</div>
+        </div>
+      `).join('');
+
+      $('eL').innerHTML = expMo.map(e => {
+        const isDue = new Date(e.date) <= new Date(today) && !e.paid;
+        const typeColor = e.type === 'fixed' ? 'var(--green)' : (e.type === 'variable' ? 'var(--blue)' : 'var(--border)');
+        return `
+        <div class="item-card fbc" style="border-left: 4px solid ${typeColor}; ${isDue ? 'background: var(--red-bg);' : ''}" onclick="editE('${e.id}')">
+          <div class="paid-toggle ${e.paid ? 'on' : ''}" onclick="event.stopPropagation(); togglePaid('${e.id}')">
+            <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
+            <span>${e.paid ? 'Paid' : 'Mark Paid'}</span>
+          </div>
+          <div style="flex:1; margin-left: var(--s3);">
+            <div style="font-weight:800;">${e.name} ${e.displayTag || ''}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem; color:${isDue ? 'var(--red)' : ''}">${e.category} • ${new Date(e.date).toLocaleDateString('en-GB')}</div>
+          </div>
+          <div class="am neg">-${fm(e.amount)}</div>
+        </div>
+      `}).join('');
+
+      renderPots(acc, mo);
+    }
+
+    function renderDashPots(acc) {
+      // Only show active pots (current < target)
+      const activePots = acc.savings.filter(p => p.current < p.target);
+      $('dashPots').innerHTML = activePots.map(p => {
+        const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
+        return `
+          <div class="card fbc" style="padding: var(--s3);">
+            <div style="flex:1;">
+              <div class="lbl" style="margin:0;">Saving Pot</div>
+              <h4 style="font-weight:900;">${p.title}</h4>
+              <div style="font-size:0.75rem; color:var(--text2); font-weight:700;">${fm(p.current)} / ${fm(p.target)} (${pct}%)</div>
+              <div class="neu-in" style="height:6px; border-radius:3px; overflow:hidden; margin-top: var(--s2); width:80%;">
+                <div style="width:${pct}%; height:100%; background:var(--green);"></div>
+              </div>
+            </div>
+            <button class="pill-btn on" style="min-height:36px; padding:0 var(--s3); font-size:0.75rem;" onclick="saveToPot('${p.id}')">Saved +</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function saveToPot(id) {
+      const p = ac().savings.find(x => x.id === id); if (!p) return;
+      const amt = parseFloat(prompt('Amount to save into ' + p.title + ':', '10.00'));
+      if (isNaN(amt) || amt <= 0) return;
+      p.current += amt; sv(); render();
+    }
+
+    function renderLoans(acc, mo) {
+      $('loanList').innerHTML = acc.loans.map(l => {
+        const relevantExps = acc.expenses.filter(e => e.loanId === l.id);
+        const paidCount = relevantExps.filter(e => e.paid).length;
+        const totalPaid = relevantExps.filter(e => e.paid).reduce((s, e) => s + e.amount, 0);
+        const pct = Math.min(100, (paidCount/l.tenure)*100).toFixed(0);
+        
+        let remainingMonths = l.tenure - paidCount;
+        if (remainingMonths < 0) remainingMonths = 0;
+
+        // Calculate end date based on start date (pushedMo) and tenure
+        let endDateStr = 'Not started';
+        if (l.pushedMo) {
+          const start = new Date(l.pushedMo + '-01');
+          const end = new Date(start.setMonth(start.getMonth() + l.tenure));
+          endDateStr = `Ends: ${end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`;
+        }
+
+        return `
+          <div class="item-card" style="border-left: 4px solid var(--ac);">
+            <div class="fbc" style="margin-bottom: var(--s2);"><h3 style="font-weight:900;">${l.title}</h3><div class="am">${fm(l.amount)}</div></div>
+            <div class="fbc" style="font-size:0.75rem; color:var(--text2); font-weight:700; margin-bottom: var(--s2);">
+              <span>Progress: ${fm(totalPaid)} / ${fm(l.amount)}</span>
+              <span>${pct}%</span>
+            </div>
+            <div class="neu-in" style="height:8px; border-radius:4px; overflow:hidden; margin-bottom: var(--s2);">
+              <div style="width:${pct}%; height:100%; background:var(--ac);"></div>
+            </div>
+            <div class="fbc" style="font-size:0.75rem; font-weight:800;">
+              <span style="color:var(--ac);">${remainingMonths} months remaining</span>
+              <span style="color:var(--text3);">${endDateStr}</span>
+            </div>
+            ${!l.pushedMo ? `<button class="btn btn-p" style="width:100%; margin-top: var(--s3); height:44px;" onclick="pushLoan('${l.id}')">Start Loan Push</button>` : ''}
+          </div>
+        `;
+      }).join('') || '<div class="empty">No loans added</div>';
+    }
+
+    function toggleSection(id) {
+      const content = $(id + 'Content');
+      const chevron = $(id + 'Chevron');
+      content.classList.toggle('collapsed');
+      chevron.classList.toggle('fa-chevron-down');
+      chevron.classList.toggle('fa-chevron-up');
+    }
+
+    function setAnaFilter(type) {
+      document.querySelectorAll('.ana-nav-item').forEach(i => i.classList.toggle('on', i.dataset.type === type));
+      // Filter logic for extraAnalytics content
+      renderExtraAnalytics(ac(), type);
+    }
+
+    function renderPots(acc, mo) {
+      const pots = acc.savings || [];
+      $('potList').innerHTML = pots.map(p => {
+        const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
+        const isActive = p.active !== false;
+        return `
+          <div class="item-card" onclick="viewPotDetail('${p.id}')" style="cursor:pointer; border-left: 6px solid ${p.color || 'var(--ac)'}; background: ${isActive ? `linear-gradient(90deg, #fff 0%, ${(p.color || 'var(--ac)')}05 100%)` : 'linear-gradient(90deg, #f8fafc 0%, #eef2f7 100%)'}; opacity:${isActive ? '1' : '0.7'};">
+            <div class="fbc" style="margin-bottom: var(--s3);">
+              <h3 style="font-weight:900;">${p.icon || '🍯'} ${p.title}</h3>
+              <button class="pill-btn ${isActive ? 'on' : ''}" style="min-width:90px; min-height:32px; font-size:0.7rem;" onclick="event.stopPropagation(); togglePotActive('${p.id}')">${isActive ? 'Active' : 'Inactive'}</button>
+            </div>
+            <div style="font-size:1.1rem; color:var(--text); font-weight:900; margin-bottom: var(--s2);">${fm(p.current)} / ${fm(p.target)}</div>
+            <div class="neu-in" style="height:12px; border-radius:6px; overflow:hidden;">
+              <div style="width:${pct}%; height:100%; background: linear-gradient(90deg, ${p.color || 'var(--ac)'} 0%, var(--green) 100%); transition: width 0.5s ease-out;"></div>
+            </div>
+            <div style="text-align:right; font-size:0.7rem; font-weight:800; margin-top: var(--s1); color:var(--ac);">${pct}% Completed</div>
+          </div>
+        `;
+      }).join('') || '<div class="empty">No saving pots yet</div>';
+    }
+
+    function togglePotActive(id) {
+      const p = ac().savings.find(x => x.id === id); if (!p) return;
+      p.active = !p.active; sv(); render();
+    }
+
+    let potIcon = '🍯';
+    function setPotIcon(ico, el) {
+      potIcon = ico;
+      document.querySelectorAll('#fPIco .pill-btn').forEach(b => b.classList.remove('on'));
+      el.classList.add('on');
+    }
+
+    function addPot() {
+      const p = { 
+        id: 'p_'+Date.now(), 
+        title: $('fPTi').value, 
+        target: parseFloat($('fPAm').value), 
+        current: 0, 
+        targetMo: $('fPMo').value, 
+        strat: potStrat,
+        icon: potIcon,
+        color: $('fPCol').value,
+        active: true 
+      };
+      ac().savings.push(p); sv(); closeM('mPot'); render();
+    }
+    function viewPotDetail(id) {
+      const p = ac().savings.find(x => x.id === id); if (!p) return;
+      const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
+      const targetMonth = p.targetMonth || p.targetMo || '-';
+      const isActive = p.active !== false;
+      $('pDetContent').innerHTML = `
+        <div class="card" style="border-left: 6px solid ${p.color || 'var(--ac)'};">
+          <div style="font-size:1.2rem; font-weight:900; margin-bottom: var(--s2);">${p.icon || '🍯'} ${p.title}</div>
+          <div class="lbl" style="margin-bottom: var(--s3);">Detailed savings overview</div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--s3); margin-bottom: var(--s3);">
+            <div class="card" style="margin:0; padding:12px;">
+              <div class="lbl">Current Amount</div>
+              <div style="font-size:1.1rem; font-weight:900; color:var(--green);">${fm(p.current)}</div>
+            </div>
+            <div class="card" style="margin:0; padding:12px;">
+              <div class="lbl">Target Amount</div>
+              <div style="font-size:1.1rem; font-weight:900;">${fm(p.target)}</div>
+            </div>
+          </div>
+
+          <div class="fbc mb10"><span>Target Month</span><b>${targetMonth}</b></div>
+          <div class="fbc mb10"><span>Strategy</span><b>${p.strat || p.strategy || '-'}</b></div>
+          <div class="fbc mb20"><span>Status</span><b style="color:${isActive ? 'var(--green)' : 'var(--text2)'};">${isActive ? 'Active' : 'Inactive'}</b></div>
+
+          <div class="neu-in" style="height:12px; border-radius:8px; overflow:hidden;">
+            <div style="width:${pct}%; height:100%; background: linear-gradient(90deg, ${p.color || 'var(--ac)'} 0%, var(--green) 100%);"></div>
+          </div>
+          <div style="text-align:right; font-size:0.75rem; font-weight:800; margin-top: var(--s1); color:var(--ac);">${pct}% completed</div>
+        </div>`;
+      openM('mPotDetail');
+    }
+
+    let anaCharts = { line: null, bar: null };
+
+    function setAnaTab(t) { 
+      anaTab = t; 
+      anaSelectedCats = []; // Reset filters when switching tabs
+      $('anaTabInc').classList.toggle('on', t==='inc'); 
+      $('anaTabExp').classList.toggle('on', t==='exp'); 
+      renderAnalytics(); 
+    }
+
+    let extraCharts = { loan: null, pot: null, cred: null };
+    function renderAnalytics() {
+      const acc = ac(); if (!acc) return;
+      const cats = acc.categories[anaTab];
+      
+      const mo = moKey(viewMo);
+      const data = anaTab === 'inc' ? acc.incomes : acc.expenses;
+      const moData = data.filter(d => d.date.startsWith(mo));
+      const activeCats = [...new Set(moData.map(d => d.category))];
+
+      $('anaCatList').innerHTML = activeCats.map(c => `
+        <div class="pill-btn ${anaSelectedCats.includes(c)?'on':''}" style="font-size:0.7rem; padding:8px 12px; min-height:36px;" onclick="toggleAnaCat('${c}')">${c}</div>
+      `).join('') || '<div class="empty">No categories found this month</div>';
+      
+      renderCharts(acc);
+      renderExtraAnalytics(acc);
+    }
+
+    function renderExtraAnalytics(acc) {
+      const container = $('extraAnalytics');
+      container.innerHTML = `
+        <div class="section-container" style="border-left: 4px solid var(--ac);">
+          <div class="section-header"><h3>Income Analytics</h3></div>
+          <div style="height: 200px;"><canvas id="incAnaChart"></canvas></div>
+        </div>
+        <div class="section-container" style="border-left: 4px solid var(--red);">
+          <div class="section-header"><h3>Expense Analytics</h3></div>
+          <div style="height: 200px;"><canvas id="expAnaChart"></canvas></div>
+        </div>
+        <div class="section-container" style="border-left: 4px solid var(--ac2);">
+          <div class="section-header"><h3>Credit Analytics</h3></div>
+          <div style="height: 200px;"><canvas id="credAnaChart"></canvas></div>
+        </div>
+        <div class="section-container" style="border-left: 4px solid var(--ac);">
+          <div class="section-header"><h3>Loan Analytics</h3></div>
+          <div style="height: 200px;"><canvas id="loanChart"></canvas></div>
+          <div id="loanStat" class="mt10" style="font-size:0.75rem; font-weight:700; margin-top: var(--s2);"></div>
+        </div>
+        <div class="section-container" style="border-left: 4px solid var(--green);">
+          <div class="section-header"><h3>Saving Analytics</h3></div>
+          <div style="height: 200px;"><canvas id="potChart"></canvas></div>
+          <div id="potStat" class="mt10" style="font-size:0.75rem; font-weight:700; margin-top: var(--s2);"></div>
+        </div>
+      `;
+
+      // Helper to clear/init charts
+      const renderSectionChart = (id, type, labels, data, color) => {
+        const ctx = $(id).getContext('2d');
+        return new Chart(ctx, {
+          type: type,
+          data: { labels, datasets: [{ data, backgroundColor: color, borderColor: color }] },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      };
+
+      // 1. Income
+      renderSectionChart('incAnaChart', 'line', ['1M', '3M', '6M'], [100, 120, 110], 'var(--green)');
+      // 2. Expenses
+      renderSectionChart('expAnaChart', 'bar', ['Food', 'Bills', 'Rent'], [300, 500, 1200], 'var(--red)');
+      // 3. Credit
+      const credExps = acc.expenses.filter(e => e.payment === 'credit' && e.paid);
+      renderSectionChart('credAnaChart', 'doughnut', ['Used', 'Limit'], [credExps.reduce((s,e)=>s+e.amount,0), 5000], ['var(--ac2)', 'var(--border2)']);
+
+      // 4. Loan Chart
+      const ctxL = $('loanChart').getContext('2d');
+      const totalLoan = acc.loans.reduce((s,l) => s+l.amount, 0);
+      const totalPaid = acc.expenses.filter(e => e.loanId && e.paid).reduce((s,e) => s+e.amount, 0);
+      
+      if (extraCharts.loan) extraCharts.loan.destroy();
+      extraCharts.loan = new Chart(ctxL, {
+        type: 'doughnut',
+        data: {
+          labels: ['Paid', 'Remaining'],
+          datasets: [{ data: [totalPaid, Math.max(0, totalLoan - totalPaid)], backgroundColor: ['var(--ac)', 'var(--border2)'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+      });
+      $('loanStat').innerHTML = `<div class="fbc"><span>Total Debt:</span><span>${fm(totalLoan)}</span></div><div class="fbc"><span>Total Paid:</span><span>${fm(totalPaid)}</span></div>`;
+
+      // 5. Pot Chart
+      const ctxP = $('potChart').getContext('2d');
+      if (extraCharts.pot) extraCharts.pot.destroy();
+      extraCharts.pot = new Chart(ctxP, {
+        type: 'bar',
+        data: {
+          labels: acc.savings.map(p => p.title),
+          datasets: [{ label: 'Progress %', data: acc.savings.map(p => (p.current/p.target)*100), backgroundColor: 'var(--green)' }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+      });
+    }
+
+    function toggleAnaCat(c) {
+      if (anaSelectedCats.includes(c)) anaSelectedCats = anaSelectedCats.filter(x => x!==c);
+      else anaSelectedCats.push(c);
+      renderAnalytics();
+    }
+
+    function renderCharts(acc) {
+      const ctxL = $('lineChart').getContext('2d'), ctxB = $('barChart').getContext('2d');
+      if (anaCharts.line) anaCharts.line.destroy(); 
+      if (anaCharts.bar) anaCharts.bar.destroy();
+
+      const mo = moKey(viewMo);
+      const data = anaTab === 'inc' ? acc.incomes : acc.expenses;
+      const color = anaTab === 'inc' ? 'var(--green)' : 'var(--red)';
+
+      // 1. Line Chart: Last 6 Months Trend
+      const months = [];
+      for(let i=5; i>=0; i--) {
+        const d = new Date(viewMo.getFullYear(), viewMo.getMonth() - i, 1);
+        months.push(moKey(d));
+      }
+
+      const trendData = months.map(m => {
+        return data.filter(d => d.date.startsWith(m))
+                   .filter(d => d.paid) // Only include 'paid' items in analytics
+                   .filter(d => anaSelectedCats.length === 0 || anaSelectedCats.includes(d.category))
+                   .reduce((s, d) => s + d.amount, 0);
+      });
+
+      anaCharts.line = new Chart(ctxL, {
+        type: 'line',
+        data: {
+          labels: months.map(m => new Date(m+'-01').toLocaleDateString('en-US', {month:'short'})),
+          datasets: [{
+            label: anaTab.toUpperCase() + ' (Paid Only)',
+            data: trendData,
+            borderColor: color,
+            backgroundColor: color + '22',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 4,
+            pointBackgroundColor: color
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { 
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // 2. Bar Chart: Category Comparison for Selected Month
+      const moData = data.filter(d => d.date.startsWith(mo)).filter(d => d.paid); // Only include 'paid' items
+      const catsToCompare = anaSelectedCats.length > 0 ? anaSelectedCats : [...new Set(moData.map(d => d.category))];
+      
+      const barData = catsToCompare.map(c => {
+        return moData.filter(d => d.category === c).reduce((s, d) => s + d.amount, 0);
+      });
+
+      anaCharts.bar = new Chart(ctxB, {
+        type: 'bar',
+        data: {
+          labels: catsToCompare,
+          datasets: [{
+            label: 'Amount (RM)',
+            data: barData,
+            backgroundColor: color,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { 
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function setTheme(t) { db.prefs.theme = t; sv(); applyPrefs(); }
+    function resetData() { if (confirm('Reset all?')) { localStorage.removeItem(K); location.reload(); } }
+    function openM(id) { $(id).style.display = 'block'; setTimeout(()=>$(id).classList.add('on'), 10); }
+    function closeM(id) { $(id).classList.remove('on'); setTimeout(()=>$(id).style.display = 'none', 300); }
+    function addLoan() { const l = { id: 'l_'+Date.now(), title: $('fLTi').value, amount: parseFloat($('fLAm').value), tenure: parseInt($('fLTn').value), rate: parseFloat($('fLRt').value), due: $('fLDu').value, pushedMo: null }; ac().loans.push(l); sv(); closeM('mLoan'); render(); }
+    function pushLoan(id) { const l = ac().loans.find(x => x.id === id); l.pushedMo = moKey(viewMo); sv(); render(); }
+    function viewDetail(type, id) {
+      const item = (type==='inc'?ac().incomes:ac().expenses).find(x=>x.id===id); if (!item) return;
+      $('detTitle').textContent = item.name;
+      
+      let detailHtml = `
+        <div class="card">
+          <div class="fbc mb10"><span>Amount</span><b>${fm(item.amount)}</b></div>
+          <div class="fbc mb10"><span>Category</span><b>${item.category}</b></div>
+          <div class="fbc mb10"><span>Date</span><b>${item.date}</b></div>
+          <div class="fbc mb10"><span>Frequency</span><b>${item.recurring ? 'Recurring' : 'One-off'}</b></div>
+          <div class="fbc mb10"><span>Status</span><b style="color:${item.paid ? 'var(--green)' : 'var(--red)'}">${item.paid ? (type==='inc'?'Received':'Paid') : 'Unpaid'}</b></div>
+          ${type === 'exp' ? `<div class="fbc"><span>Payment Method</span><b>${item.payment}</b></div>` : ''}
+        </div>
+      `;
+      
+      $('detContent').innerHTML = detailHtml;
+      $('detDelBtn').onclick = () => { if (confirm('Delete?')) { if (type==='inc') ac().incomes = ac().incomes.filter(x=>x.id!==id); else ac().expenses = ac().expenses.filter(x=>x.id!==id); sv(); closeM('mDetail'); render(); } };
+      openM('mDetail');
+    }
+
+    function renderCreditPg() {
+      const acc = ac(); if (!acc) return;
+      const credExps = acc.expenses.filter(e => e.payment === 'credit');
+      const totalOutstanding = credExps.reduce((s, e) => s + e.amount, 0);
+      
+      $('credTotal').textContent = fm(totalOutstanding);
+      const limit = Math.max(5000, totalOutstanding);
+      $('credUsageFill').style.width = Math.min(100, (totalOutstanding/limit)*100) + '%';
+
+      const sort = $('credSort').value;
+      if (sort === 'high') credExps.sort((a,b) => b.amount - a.amount);
+      else credExps.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+      $('credList').innerHTML = credExps.map(e => `
+        <div class="item-card fbc" style="border-left: 4px solid ${e.paid ? 'var(--green)' : 'var(--red)'}; background:${e.paid ? 'var(--green-bg)' : 'var(--red-bg)'};">
+          <div style="flex:1;">
+            <div style="font-weight:800;">${e.name}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem;">${new Date(e.date).toLocaleDateString('en-GB')} | ${e.category} | ${e.paid ? 'Paid' : 'Unpaid'}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="am pos" style="margin-bottom: var(--s2); color: ${e.paid ? 'var(--green)' : 'var(--red)'};">${fm(e.amount)}</div>
+            <button class="pill-btn on" style="min-height:32px; padding:0 var(--s3); font-size:0.7rem;" onclick="settleCreditItem('${e.id}')">Settle</button>
+          </div>
+        </div>
+      `).join('') || '<div class="empty">No credit expenses</div>';
+    }
+
+    function settleCreditItem(id) {
+      const e = ac().expenses.find(x => x.id === id); if (!e) return;
+      if (confirm('Settle this credit item with cash?')) {
+        e.payment = 'cash'; // Convert to cash to reduce credit usage
+        sv(); renderCreditPg(); render();
+      }
+    }
+
+    function payCreditManual() {
+      const amt = parseFloat($('payCredAmt').value);
+      if (isNaN(amt) || amt <= 0) return alert('Enter valid amount');
+      
+      const acc = ac();
+      const credExps = acc.expenses.filter(e => e.payment === 'credit').sort((a,b) => b.amount - a.amount);
+      const totalOutstanding = credExps.reduce((s, e) => s + e.amount, 0);
+      
+      if (amt > totalOutstanding) return alert('Payment exceeds outstanding credit');
+
+      let remainingToPay = amt;
+      for (let e of credExps) {
+        if (remainingToPay <= 0) break;
+        if (e.amount <= remainingToPay) {
+          remainingToPay -= e.amount;
+          e.payment = 'cash'; // Fully settled
+        } else {
+          // Partially settle if possible (split item)
+          const settledPart = { ...e, id: 'e_'+Math.random(), amount: remainingToPay, payment: 'cash' };
+          e.amount -= remainingToPay;
+          acc.expenses.push(settledPart);
+          remainingToPay = 0;
+        }
+      }
+      
+      $('payCredAmt').value = '';
+      sv(); renderCreditPg(); render();
+      alert('Credit payment successful');
+    }
+
+    init();
+  </script>
+</body>
+</html>
