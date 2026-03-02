@@ -8,7 +8,247 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <style>
+ 
+ <style>
+    .completed-pot {
+      background: linear-gradient(90deg, #f0fdf4 0%, #dcfce7 100%) !important;
+      border-color: var(--green) !important;
+    }
+
+    .completed-pot h3 {
+      color: var(--green) !important;
+    }
+    .pot-pay-btn {
+      min-width: 120px !important;
+      min-height: 44px !important;
+      font-size: 1rem !important;
+      font-weight: 700 !important;
+    }
+    #fPIco .pill-btn i {
+      color: var(--text) !important;
+    }
+
+    #fPIco .pill-btn.on i {
+      color: #fff !important;
+    }
+  /* Modal responsiveness */
+    .pg {
+      max-height: 100vh;
+      overflow-y: auto;
+    }
+
+    .pg .card {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .pg > div {
+        margin: 10px;
+        padding: 15px;
+      }
+      
+      .color-palette {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      
+      .color-option {
+        width: 40px;
+        height: 40px;
+        margin: 0;
+      }
+      #fPIco .pill-btn {
+        color: var(--text) !important;
+      }
+
+      #fPIco .pill-btn.on {
+        color: #fff !important;
+      }
+      
+      #fPIco {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      
+      #fPIco .pill-btn {
+        width: 45px;
+        height: 45px;
+      }
+    }
+
+    /* Desktop responsiveness */
+    @media (min-width: 769px) {
+      .pg > div {
+        max-width: 500px;
+        margin: 20px auto;
+        padding: 20px;
+      }
+    }  
+
+    .pot-pay-btn:hover {
+      border-color: var(--pot-color);
+      box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+      transform: scale(1.02);
+    }
+      .pot-pay-btn.filling {
+      border-color: var(--ac);
+      transform: scale(1.02);
+    }
+
+    .pot-pay-btn.filling::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: inherit;
+      z-index: -1;
+    }
+      .pot-card {
+      border-radius: var(--r);
+      background: var(--card-bg);
+      position: relative;
+      overflow: hidden;
+    }
+   .pot-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px var(--ac)50, 0 0 40px var(--ac)25, inset 0 0 20px var(--ac)12;
+    }
+    .pot-pay-btn {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--text3);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-radius: var(--r-btn);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }  
+    .pot-pay-btn:hover {
+      border-color: var(--ac);
+      transform: scale(1.02);
+    }
+    .pot-card:active {
+      transform: translateY(0);
+    }
+    .pot-pay-btn.filling {
+      background: linear-gradient(135deg, var(--ac) 0%, var(--ac-sh) 100%);
+      color: #fff;
+      border-color: var(--ac);
+      animation: fillAnimation 0.5s ease-out;
+    }
+    
+    @keyframes fillAnimation {
+      0% {
+        background: #fff;
+        color: var(--text);
+      }
+      50% {
+        background: linear-gradient(135deg, var(--ac) 0%, var(--ac-sh) 100%);
+        color: #fff;
+        transform: scale(1.05);
+      }
+      100% {
+        background: linear-gradient(135deg, var(--ac) 0%, var(--ac-sh) 100%);
+        color: #fff;
+        transform: scale(1);
+      }
+    }
+    .inactive-pot {
+      opacity: 0.6;
+      filter: grayscale(50%);
+    }
+    .inactive-pot h3 {
+      color: var(--text2) !important;
+    }
+    .inactive-pot .neu-in div {
+      background: var(--text3) !important;
+    }
+    /* Color Palette Styling */
+    .color-palette {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .color-option {
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    .color-option:hover {
+      transform: scale(1.1);
+      border-color: var(--ac);
+      box-shadow: 0 4px 12px var(--ac-sh);
+    }
+    .color-option.on {
+      border-color: var(--ac);
+      transform: scale(1.05);
+    }
+    /* Icon Button Styling */
+    #fPIco .pill-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--card-bg);
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    #fPIco .pill-btn i {
+      font-size: 20px;
+      color: var(--text);
+      transition: color 0.3s ease;
+    }
+    #fPIco .pill-btn:hover {
+      border-color: var(--ac);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--ac-sh);
+    }
+    #fPIco .pill-btn:hover i {
+      color: #fff;
+    }
+    #fPIco .pill-btn.on {
+      background: var(--ac);
+      border-color: var(--ac);
+    }
+    #fPIco .pill-btn.on i {
+      color: #fff;
+    }
+
+    #fPCol .color-option {
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    #fPCol .color-option:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    #fPCol .color-option.on {
+      border-color: var(--ac);
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px var(--ac-sh);
+    }
+    #fPCol .color-option.on::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 20px;
+      font-weight: bold;
+      text-shadow: 0 0 4px rgba(0,0,0,0.5);
+    }
+
     @font-face { 
         font-family: 'Outfit'; 
         font-style: normal; 
@@ -41,7 +281,7 @@
       --shadow: 4px 4px 12px rgba(0,0,0,0.03), -4px -4px 12px rgba(0,0,0,0.01);
       --shadow-in: inset 2px 2px 5px rgba(0,0,0,0.05), inset -2px -2px 5px rgba(255,255,255,0.8);
       --glass: rgba(255,255,255,0.7); --glass-nav: rgba(255,255,255,0.2);
-      --green: #10b981; --green-bg: #dcfce7; --red: #ef4444; --red-bg: #fee2e2; --orange: #f59e0b;
+      --green: #a855f7; --green-bg: #f3e8ff; --red: #8B0000; --red-bg: #fce7f3; --orange: #f59e0b;
       --blue: #3b82f6; --blue-bg: #dbeafe;
     }
     [data-theme="dark"] {
@@ -50,7 +290,7 @@
       --shadow: 4px 4px 12px rgba(0,0,0,0.5), -4px -4px 12px rgba(255,255,255,0.02);
       --shadow-in: inset 2px 2px 5px rgba(0,0,0,0.6), inset -2px -2px 5px rgba(255,255,255,0.02);
       --glass: rgba(10,10,10,0.7); --glass-nav: rgba(255,255,255,0.1);
-      --green: #34d399; --green-bg: rgba(52,211,153,0.15); --red: #f87171; --red-bg: rgba(248,113,113,0.15); --orange: #fbbf24;
+      --green: #c084fc; --green-bg: rgba(192,132,252,0.15); --red: #8B0000; --red-bg: rgba(139,0,0,0.15); --orange: #fbbf24;
       --blue: #60a5fa; --blue-bg: rgba(96,165,250,0.15);
     }
 
@@ -60,8 +300,13 @@
     [data-accent="rose"] { --ac: #f43f5e; --ac2: #fb7185; --ac-bg: rgba(244,63,94,0.15); --ac-sh: rgba(244,63,94,0.3); }
     [data-accent="amber"] { --ac: #f59e0b; --ac2: #fbbf24; --ac-bg: rgba(245,158,11,0.15); --ac-sh: rgba(245,158,11,0.3); }
 
+    /* === GLOBAL ICON COLOR === */
+    :root {
+      --icon-color: #666666;
+    }
+
     /* === BASE UI === */
-    body { background: var(--bg); color: var(--text); font-family: var(--font); transition: background .3s var(--ease); overflow-x: hidden; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); transition: background .3s var(--ease); }
     .pg { display: none; min-height: 100vh; padding: var(--s4) var(--s4) 140px; max-width: var(--max); margin: 0 auto; }
     .pg.on { display: block; animation: fadeIn .4s var(--ease); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
@@ -192,17 +437,42 @@
 
     .month-picker-inline { display: flex; align-items: center; gap: var(--s3); margin-bottom: var(--s4); }
     .month-picker-inline input[type="month"] { flex: 1; border: none; background: #f5f5f5; box-shadow: var(--shadow); padding: var(--s3); border-radius: 15px; color: var(--text); font-family: var(--font); font-weight: 700; outline: none; }
+    
+    .btn-large {
+      min-width: 140px;
+      min-height: 48px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-notification {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--text2);
+    }
 
-    .close-btn-full { width: 100%; height: 56px; background: var(--red); color: #fff; border: none; border-radius: var(--r2); font-weight: 900; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--s3); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); transition: 0.2s; margin-top: var(--s4); }
-    .close-btn-full:active { transform: scale(0.98); opacity: 0.9; }
+    /* Icon hover effects */
+    .btn-calendar:hover i {
+      color: #8b5cf6 !important;
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+    }
 
-    .paid-toggle { min-width: 120px; height: 44px; border-radius: var(--r2); border: 2px solid var(--text3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; color: var(--text3); font-weight: 700; font-size: 0.8rem; gap: var(--s2); background: var(--card); box-shadow: var(--shadow); }
-    .paid-toggle.on { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 4px 12px var(--green-bg); }
-    .paid-toggle:hover { transform: translateY(-2px); }
-    .paid-toggle:active { transform: scale(0.95); box-shadow: var(--shadow-in); }
+    .btn-notification:hover i {
+      color: #10b981 !important;
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.4));
+    }
 
-    .tab-btn { flex: 1; padding: var(--s3); border-radius: 15px; border: none; background: var(--card); color: var(--text3); font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); }
-    .tab-btn.on { background: var(--ac); color: #fff; box-shadow: 0 4px 15px var(--ac-sh); }
+.close-btn-full { width: 100%; height: 56px; background: var(--red); color: #fff; border: none; border-radius: var(--r2); font-weight: 900; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--s3); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); transition: 0.2s; margin-top: var(--s4); }
+.close-btn-full:active { transform: scale(0.98); opacity: 0.9; }
 
     /* === NAVIGATION === */
     .nav { 
@@ -214,7 +484,6 @@
       border: 1px solid rgba(255,255,255,0.2); 
       box-shadow: 0 8px 32px rgba(0,0,0,0.05); 
       z-index: 1000;
-      overflow: hidden;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .nav::before {
@@ -245,23 +514,72 @@
     @keyframes glowPulse { from { opacity: 0.5; transform: scale(0.95); } to { opacity: 1; transform: scale(1.05); } }
     .nb i { font-size: 1.5rem; }
     .nb span { display: none; }
+.paid-toggle { min-width: 120px; height: 44px; border-radius: var(--r2); border: 2px solid var(--text3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; color: var(--text3); font-weight: 700; font-size: 0.8rem; gap: var(--s2); background: var(--card); box-shadow: var(--shadow); }
+.paid-toggle.on { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 4px 12px var(--green-bg); }
+.paid-toggle:hover { transform: translateY(-2px); }
+.paid-toggle:active { transform: scale(0.95); box-shadow: var(--shadow-in); }
+    .paid-toggle { min-width: 120px; height: 44px; border-radius: var(--r2); border: 2px solid var(--text3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; color: var(--text3); font-weight: 700; font-size: 0.8rem; gap: var(--s2); background: var(--card); box-shadow: var(--shadow); }
+    .paid-toggle.on { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 4px 12px var(--green-bg); }
+    .paid-toggle:hover { transform: translateY(-2px); }
+    .paid-toggle:active { transform: scale(0.95); box-shadow: var(--shadow-in); }
 
-    .lbl { font-size: .75rem; font-weight: 800; color: var(--ac); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: var(--s3); display: block; }
-    .fbc { display: flex; justify-content: space-between; align-items: center; }
-    .mb20 { margin-bottom: var(--s4); }
-    .mb10 { margin-bottom: var(--s2); }
-    .am { font-weight: 900; color: var(--text); }
-    .am.pos { color: var(--green); }
-    .am.neg { color: var(--red); }
-    .empty { text-align: center; padding: var(--s6) var(--s4); color: var(--text3); font-size: 0.9rem; }
-    select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right var(--s3) center; background-size: 16px; }
-    
-    /* LOADING SCREEN */
-    .loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity .8s var(--ease); }
-    .loading-screen.fade-out { opacity: 0; pointer-events: none; }
-    .bf-coin { width: 100px; height: 100px; background: linear-gradient(145deg, var(--ac), var(--ac2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 40px; font-weight: 900; box-shadow: 0 10px 30px var(--ac-sh); animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-  </style>
+/* === NAVIGATION === */
+.nav { 
+  position: fixed; bottom: var(--s4); left: 50%; transform: translateX(-50%); 
+  width: calc(100% - 40px); max-width: 480px; height: 80px; 
+  background: var(--glass-nav); 
+  backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border-radius: 40px; display: flex; justify-content: space-around; align-items: center; 
+  border: 1px solid rgba(255,255,255,0.2); 
+  box-shadow: 0 8px 32px rgba(0,0,0,0.05); 
+  z-index: 1000;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.nav::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  transform: skewX(-15deg) scaleX(1.2);
+  filter: url(#glassDistortion);
+  pointer-events: none;
+}
+.nb { 
+  background: none; border: none; color: var(--text3); 
+  display: flex; flex-direction: column; align-items: center; justify-content: center; 
+  transition: all 0.3s ease; width: 56px; height: 56px; border-radius: 50%;
+  position: relative; z-index: 2;
+}
+.nb.on { 
+  color: var(--ac); 
+  text-shadow: 0 0 15px rgba(255,255,255,0.8);
+  transform: translateY(-2px);
+}
+.nb.on::after {
+  content: ""; position: absolute; inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.1);
+  animation: glowPulse 2s infinite alternate;
+}
+@keyframes glowPulse { from { opacity: 0.5; transform: scale(0.95); } to { opacity: 1; transform: scale(1.05); } }
+.nb i { font-size: 1.5rem; }
+.nb span { display: none; }
+
+.lbl { font-size: .75rem; font-weight: 800; color: var(--ac); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: var(--s3); display: block; }
+.fbc { display: flex; justify-content: space-between; align-items: center; }
+.mb20 { margin-bottom: var(--s4); }
+.mb10 { margin-bottom: var(--s2); }
+.am { font-weight: 900; color: var(--text); }
+.am.pos { color: var(--green); }
+.am.neg { color: var(--red); }
+.empty { text-align: center; padding: var(--s6) var(--s4); color: var(--text3); font-size: 0.9rem; }
+select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right var(--s3) center; background-size: 16px; }
+  
+/* LOADING SCREEN */
+.loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity .8s var(--ease); }
+.loading-screen.fade-out { opacity: 0; pointer-events: none; }
+.bf-coin { width: 100px; height: 100px; background: linear-gradient(145deg, var(--ac), var(--ac2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 40px; font-weight: 900; box-shadow: 0 10px 30px var(--ac-sh); animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+</style>
 </head>
 <body>
   <svg style="display: none;">
@@ -280,9 +598,14 @@
       <div class="bf-coin" style="margin: 0 auto var(--s5);">BF</div>
       <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: var(--s2); color: var(--ac);">Budget Flow</h1>
       <p style="color: var(--text2); margin-bottom: var(--s5); font-weight: 500;">Beautifully simple finance tracking.</p>
+      
+      <!-- Account Selection -->
+      <div id="welcomeAccountList" class="card" style="padding: 0; background: transparent; box-shadow: none; border: none; margin-bottom: var(--s4);"></div>
+      
+      <!-- Create New Account -->
       <div class="card" style="padding: 0; background: transparent; box-shadow: none; border: none;">
         <input id="inpN" class="inp mb20" placeholder="Your Name">
-        <button class="btn btn-p" style="width: 100%;" onclick="startOB()">Next <i class="fas fa-arrow-right" style="color: #fff !important;"></i></button>
+        <button class="btn btn-p" style="width: 100%;" onclick="startOB()">Create New Account <i class="fas fa-arrow-right" style="color: #fff !important;"></i></button>
       </div>
     </div>
   </div>
@@ -309,6 +632,9 @@
           <button class="btn-add-cat" onclick="addCat('inc')">+ Add Category</button>
         </div>
       </div>
+
+      <span class="lbl">Expected Date</span>
+      <input id="oiD" class="inp mb20" type="date" placeholder="Expected date">
 
       <div style="overflow: hidden; margin-bottom: 20px;">
         <button id="oiR" class="btn-rec" onclick="this.classList.toggle('off'); const i = this.querySelector('i'); if(this.classList.contains('off')) i.style.display='none'; else i.style.display='block';">
@@ -356,6 +682,10 @@
         <option value="cash">Cash</option>
         <option value="credit">Credit</option>
       </select>
+
+      <span class="lbl">Due Date</span>
+      <input id="oeDue" class="inp mb20" type="date" placeholder="Due date">
+
       <div style="overflow: hidden; margin-bottom: 20px;">
         <button id="oeR" class="btn-rec" onclick="this.classList.toggle('off'); const i = this.querySelector('i'); if(this.classList.contains('off')) i.style.display='none'; else i.style.display='block';">
           <i class="fas fa-check"></i> Recurring
@@ -382,17 +712,18 @@
   <!-- MAIN TRACKER -->
   <div id="pgT" class="pg">
     <div class="month-picker-inline">
-      <span class="lbl" style="margin:0;">Jump to:</span>
-      <input type="month" id="inlineMoPicker" onchange="setMo(this.value)">
+      <button class="btn btn-o btn-large btn-notification" id="notificationBtn" style="margin-left: var(--s2); padding: 16px 32px; background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%); display: flex; align-items: center; justify-content: center; border: 2px solid transparent;" onclick="showNotifications()">
+        <i class="fas fa-bell" style="color: var(--icon-color); font-size: 1.2rem; transition: all 0.3s ease;"></i>
+      </button>
+      <input type="month" id="monthPicker" class="inp" style="flex: 1; margin-left: var(--s2);" onchange="setMoFromPicker()">
     </div>
-    <div id="monthList" class="month-list-container"></div>
 
     <div class="card mb20" style="background: var(--ac); color: #fff; position: relative; overflow: hidden; padding: var(--s5);">
       <div style="position: absolute; top: -20px; right: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4);">
-        <div class="glass" style="padding: var(--s3); background: rgba(255,255,255,0.1); border: none;">
+        <div class="glass" style="padding: var(--s3); background: rgba(255,255,255,0.1); border: none; cursor: pointer;" onclick="showCashExpenses()">
           <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Cash Balance</span>
-          <div id="statNet" style="font-weight: 900; font-size: 1.2rem;">RM 0.00</div>
+          <div id="statNet" style="font-weight: 900; font-size: 1.2rem; cursor: pointer; color: var(--text);"></div>
         </div>
         <div class="glass" style="padding: var(--s3); background: rgba(255,255,255,0.1); border: none; cursor: pointer;" onclick="go('pgC')">
           <span class="lbl" style="color: rgba(255,255,255,0.8); font-size: 0.65rem;">Credit Utilisation</span>
@@ -400,8 +731,6 @@
         </div>
       </div>
     </div>
-
-    <div id="notifArea" class="mb20"></div>
 
     <div id="trackerContent">
       <div class="section-container income-section">
@@ -418,7 +747,7 @@
           <button class="add-btn-dash" onclick="openM('mI')"><i class="fas fa-plus"></i> Add Income</button>
         </div>
       </div>
-
+      <div id="beforeExpensesPots" class="mb20"></div>
       <div class="section-container expense-section">
         <div class="section-header" onclick="toggleSection('exp')">
           <div>
@@ -427,29 +756,16 @@
           <div style="display: flex; gap: 8px; align-items: center;">
             <i id="expChevron" class="fas fa-chevron-up"></i>
           </div>
-        </div>
-        
+        </div>        
         <div id="expContent" class="section-content">
-          <div class="filter-sort-bar">
-            <select id="expFilterCat" class="inp" onchange="render()"><option value="all">All Categories</option></select>
-            <select id="expFilterType" class="inp" onchange="render()">
-              <option value="all">All Types</option>
-              <option value="fixed">Fixed Only</option>
-              <option value="variable">Variable Only</option>
-            </select>
-            <select id="expSort" class="inp" onchange="render()">
-              <option value="none">Default Order</option>
-              <option value="due">Due Date</option>
-              <option value="high">Most Expensive</option>
-              <option value="low">Least Expensive</option>
-            </select>
-          </div>
           <div id="eL"></div>
           <button class="add-btn-dash" onclick="addE()"><i class="fas fa-plus"></i> Add Expense</button>
         </div>
       </div>
-
+      <div id="afterExpensesPots" class="mb20"></div>
       <div id="dashPots" class="mb20"></div>
+    </div>
+    </div>
     </div>
   </div>
 
@@ -468,7 +784,26 @@
       <h2 style="font-weight: 900; color: var(--ac);">Saving Pots</h2>
       <button class="btn btn-p" style="width:auto; padding:12px 20px;" onclick="openM('mPot')"><i class="fas fa-plus"></i></button>
     </div>
-    <div id="potList"></div>
+    <div class="fbc mb20" style="gap: var(--s3);">
+    <select class="inp" onchange="sortPots(this.value)">
+      <option value="created-desc">Latest Created</option>
+      <option value="created-asc">Oldest Created</option>
+      <option value="title-asc">Title (A-Z)</option>
+      <option value="title-desc">Title (Z-A)</option>
+      <option value="date-asc">Target Date (Earliest)</option>
+      <option value="date-desc">Target Date (Latest)</option>
+      <option value="progress-desc">Most Progress</option>
+      <option value="progress-asc">Least Progress</option>
+    </select>
+      <select class="inp" onchange="filterPots(this.value)">
+        <option value="all">All Pots</option>
+        <option value="active">Active Only</option>
+        <option value="inactive">Inactive Only</option>
+        <option value="completed">Completed Only</option>
+        <option value="incomplete">Incomplete Only</option>
+      </select>
+    </div>
+    <div id="potList"></div>    
   </div>
 
   <!-- CREDIT MANAGEMENT PAGE -->
@@ -514,12 +849,22 @@
       <div class="ana-nav-item" data-type="pot" onclick="setAnaFilter('pot')">Savings</div>
     </div>
 
+    <div id="anaCatList" class="mb20" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
     <div id="anaContent"></div>
+    <div id="extraAnalytics"></div>
   </div>
 
   <!-- SETTINGS PAGE -->
   <div id="pgSe" class="pg">
     <h2 style="font-weight: 900; margin-bottom: 24px; color: var(--ac);">Settings</h2>
+    
+    <!-- Account Management -->
+    <div class="card mb20">
+      <span class="lbl">Account Management</span>
+      <div id="accountList" class="mb10" style="display:flex; flex-direction: column; gap: 8px;"></div>
+      <button class="pill-btn dashed" style="width:100%;" onclick="createNewAccount()">+ Create New Account</button>
+    </div>
+    
     <div class="card">
       <span class="lbl">Theme Mode</span>
       <div style="display: flex; gap: var(--s3);">
@@ -533,21 +878,17 @@
       <button class="pill-btn dashed" style="width:100%;" onclick="addCat('inc')">+ Add Category</button>
     </div>
     <div class="card">
-      <span class="lbl">Expense Categories</span>
-      <div id="setCatExp" class="mb10" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
-      <button class="pill-btn dashed" style="width:100%;" onclick="addCat('exp')">+ Add Category</button>
     </div>
-    <button class="btn btn-o" style="color: var(--red); margin-top: 40px;" onclick="resetData()">Reset All Data</button>
   </div>
 
   <!-- NAV -->
-  <nav id="nav" class="nav" style="display:none;">
-    <button class="nb on" onclick="go('pgT', this)"><i class="fas fa-wallet"></i></button>
-    <button class="nb" onclick="go('pgL', this)"><i class="fas fa-hand-holding-dollar"></i></button>
-    <button class="nb" onclick="go('pgC', this)"><i class="fas fa-credit-card"></i></button>
-    <button class="nb" onclick="go('pgS', this)"><i class="fas fa-jar"></i></button>
-    <button class="nb" onclick="go('pgD', this)"><i class="fas fa-chart-line"></i></button>
-    <button class="nb" onclick="go('pgSe', this)"><i class="fas fa-cog"></i></button>
+  <nav id="nav" class="nav" style="display:flex;">
+    <button class="nb on" onclick="go('pgT', this)"><i class="fas fa-wallet" style="color: var(--icon-color);"></i></button>
+    <button class="nb" onclick="go('pgL', this)"><i class="fas fa-hand-holding-dollar" style="color: var(--icon-color);"></i></button>
+    <button class="nb" onclick="go('pgC', this)"><i class="fas fa-credit-card" style="color: var(--icon-color);"></i></button>
+    <button class="nb" onclick="go('pgS', this)"><i class="fas fa-coins" style="color: var(--icon-color);"></i></button>
+    <button class="nb" onclick="go('pgD', this)"><i class="fas fa-chart-line" style="color: var(--icon-color);"></i></button>
+    <button class="nb" onclick="go('pgSe', this)"><i class="fas fa-cog" style="color: var(--icon-color);"></i></button>
   </nav>
 
   <!-- MODALS -->
@@ -565,10 +906,10 @@
       </div>
       <button class="btn btn-p" style="width: 100%;" onclick="addI()">Save Income</button>
     </div>
-    <button class="close-btn-full" onclick="closeM('mI')"><i class="fas fa-times"></i> Close Window</button>
+    <button class="close-btn-full" onclick="closeM('mI')" style="background: #fff; color: var(--text2); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"><i class="fas fa-arrow-left"></i> Go Back</button>
   </div>
 
-  <div id="mE" class="pg glass-modal">
+  <div id="pgE" class="pg">
     <h2 style="font-weight: 900; padding: var(--s4) var(--s4) 0;">Edit/Add Expense</h2>
     <div class="card">
       <input id="fEId" type="hidden">
@@ -589,7 +930,7 @@
       </div>
       <button class="btn btn-p" style="width: 100%;" onclick="saveE()">Save Expense</button>
     </div>
-    <button class="close-btn-full" onclick="closeM('mE')"><i class="fas fa-times"></i> Close Window</button>
+    <button class="close-btn-full" onclick="go('pgT')"><i class="fas fa-arrow-left"></i> Go Back</button>
   </div>
 
   <div id="mLoan" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
@@ -604,46 +945,101 @@
       </p>
       <button class="btn btn-p" onclick="addLoan()">Create Loan Account</button>
     </div>
-    <button class="close-btn-full" onclick="closeM('mLoan')"><i class="fas fa-times"></i> Close Window</button>
+    <button class="close-btn-full" onclick="closeM('mLoan')" style="background: #fff; color: var(--text2); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"><i class="fas fa-arrow-left"></i> Go Back</button>
   </div>
 
-  <div id="mPot" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
-    <h2 style="font-weight: 900; padding: 24px 20px 0;">New Saving Pot</h2>
-    <div class="card">
-      <span class="lbl">Pot Title</span><input id="fPTi" class="inp mb20" placeholder="e.g. Travel Fund">
-      <span class="lbl">Target Amount</span><input id="fPAm" class="inp mb20" type="number" placeholder="0.00">
-      <span class="lbl">Target Month</span><input id="fPMo" class="inp mb20" type="month">
-      <span class="lbl">Pick Icon</span>
-      <div id="fPIco" class="fbc mb20" style="overflow-x:auto; gap:10px; padding-bottom:10px;">
-        <div class="pill-btn on" onclick="setPotIcon('🍯', this)">🍯</div>
-        <div class="pill-btn" onclick="setPotIcon('💰', this)">💰</div>
-        <div class="pill-btn" onclick="setPotIcon('🏠', this)">🏠</div>
-        <div class="pill-btn" onclick="setPotIcon('🚗', this)">🚗</div>
-        <div class="pill-btn" onclick="setPotIcon('✈️', this)">✈️</div>
+  <div id="mPot" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none; overflow-y: auto;">
+    <div style="max-width: 500px; margin: 20px auto; padding: 20px;">
+      <h2 style="font-weight: 900; padding: 0 0 20px 0;">New Saving Pot</h2>
+      <div class="card">
+        <span class="lbl">Pot Title</span><input id="fPTi" class="inp mb20" placeholder="e.g. Travel Fund">
+        <span class="lbl">Target Amount</span><input id="fPAm" class="inp mb20" type="number" placeholder="0.00">
+        <span class="lbl">Target Month</span><input id="fPMo" class="inp mb20" type="month">
+        <span class="lbl">Pick Icon</span>
+        <div id="fPIco" class="fbc mb20" style="overflow-x:auto; gap:10px; padding-bottom:10px;">
+          <div class="pill-btn on" onclick="setPotIcon('fa-baby', this)" data-icon="fa-baby" style="color: var(--text);">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="pill-btn" onclick="setPotIcon('fa-home', this)" data-icon="fa-home" style="color: var(--text);">
+            <i class="fas fa-home"></i>
+          </div>
+          <div class="pill-btn" onclick="setPotIcon('fa-laptop', this)" data-icon="fa-laptop" style="color: var(--text);">
+            <i class="fas fa-laptop"></i>
+          </div>
+          <div class="pill-btn" onclick="setPotIcon('fa-plane', this)" data-icon="fa-plane" style="color: var(--text);">
+            <i class="fas fa-plane"></i>
+          </div>
+        </div>
+        <span class="lbl">Pick Color</span>
+        <div id="fPCol" class="color-palette mb20">
+          <div class="color-option on" data-color="#8B4513" style="background: #8B4513; width: 44px; height: 44px; border-radius: 8px; cursor: pointer; border: 2px solid var(--ac);"></div>
+          <div class="color-option" data-color="#a855f7" style="background: #a855f7; width: 44px; height: 44px; border-radius: 8px; cursor: pointer; margin-left: 8px; border: 2px solid transparent;"></div>
+          <div class="color-option" data-color="#f59e0b" style="background: #f59e0b; width: 44px; height: 44px; border-radius: 8px; cursor: pointer; margin-left: 8px; border: 2px solid transparent;"></div>
+          <div class="color-option" data-color="#ec4899" style="background: #ec4899; width: 44px; height: 44px; border-radius: 8px; cursor: pointer; margin-left: 8px; border: 2px solid transparent;"></div>
+        </div>
+        <span class="lbl">Strategy (Permanent)</span>
+        <div style="display:flex; gap:12px;" class="mb20">
+          <button id="fPStratB" class="strat-btn on" onclick="setPotStrat('before')">Before expenses</button>
+          <button id="fPStratA" class="strat-btn" onclick="setPotStrat('after')">After expenses</button>
+        </div>
+        <button class="btn btn-p" onclick="addPot()">Create Pot</button>
       </div>
-      <span class="lbl">Pick Color</span>
-      <input id="fPCol" type="color" class="mb20" style="width:100%; height:44px; border:none; background:none;" value="#6366f1">
-      <span class="lbl">Strategy (Permanent)</span>
-      <div style="display:flex; gap:12px;" class="mb20">
-        <button id="fPStratB" class="strat-btn on" onclick="setPotStrat('before')">Before expenses</button>
-        <button id="fPStratA" class="strat-btn" onclick="setPotStrat('after')">After expenses</button>
-      </div>
-      <button class="btn btn-p" onclick="addPot()">Create Pot</button>
+      <button class="close-btn-full" onclick="closeM('mPot')" style="background: #fff; color: var(--text2); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"><i class="fas fa-arrow-left"></i> Go Back</button>
     </div>
-    <button class="close-btn-full" onclick="closeM('mPot')"><i class="fas fa-times"></i> Close Window</button>
   </div>
 
   <div id="mPotDetail" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
     <h2 id="pDetTitle" style="font-weight: 900; padding: 24px 20px 0;">Pot Detail</h2>
     <div id="pDetContent" style="padding: 20px;"></div>
-    <button class="close-btn-full" onclick="closeM('mPotDetail')"><i class="fas fa-times"></i> Close Window</button>
+    <button class="close-btn-full" onclick="closeM('mPotDetail')" style="background: #fff; color: var(--text2); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"><i class="fas fa-arrow-left"></i> Go Back</button>
   </div>
 
   <div id="mDetail" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
     <h2 id="detTitle" style="font-weight: 900; padding: 24px 20px 0;">Detail</h2>
     <div id="detContent" style="padding: 20px;"></div>
     <div style="padding: 0 20px;"><button class="btn btn-o" style="color:var(--red); width:100%;" id="detDelBtn">Delete Item</button></div>
-    <button class="close-btn-full" onclick="closeM('mDetail')"><i class="fas fa-times"></i> Close Window</button>
+    <button class="close-btn-full" onclick="closeM('mDetail')" style="background: #fff; color: var(--text2); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"><i class="fas fa-arrow-left"></i> Go Back</button>
+  </div>
+
+  <!-- NOTIFICATIONS MODAL -->
+  <div id="mNotif" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
+    <h2 style="font-weight: 900; padding: 24px 20px 0; color: var(--ac);">Notifications</h2>
+    <div style="padding: 20px;">
+      <div id="notifList"></div>
+    </div>
+    <button class="close-btn-full" onclick="closeM('mNotif')" style="background: #fff; color: var(--text2); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"><i class="fas fa-arrow-left"></i> Go Back</button>
+  </div>
+
+  <!-- CALENDAR VIEW MODAL -->
+  <div id="mCalendar" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
+    <h2 style="font-weight: 900; padding: 24px 20px 0; color: var(--ac);">Calendar View</h2>
+    <div style="padding: 20px;">
+      <div id="calendarContent"></div>
+    </div>
+    <button class="close-btn-full" onclick="closeM('mCalendar')" style="background: #fff; color: var(--text2); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"><i class="fas fa-arrow-left"></i> Go Back</button>
+  </div>
+
+  <!-- CASH EXPENSES MODAL -->
+  <div id="mCashExpenses" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
+    <h2 style="font-weight: 900; padding: 24px 20px 0; color: var(--ac);">Cash Balance Details</h2>
+    <div style="padding: 20px;">
+      <div class="card mb20" style="background: var(--ac); color: #fff;">
+        <div class="fbc mb20">
+          <span>Cash Expenses</span>
+          <span id="cashExpTotal">RM 0.00</span>
+        </div>
+        <div class="fbc mb20">
+          <span>Savings Contributions</span>
+          <span id="savingsTotal">RM 0.00</span>
+        </div>
+        <div class="fbc" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: var(--s2); margin-top: var(--s2);">
+          <span>Net Cash Impact</span>
+          <span id="netCashImpact" style="font-weight: 900; font-size: 1.1rem;">RM 0.00</span>
+        </div>
+      </div>
+      <div id="cashExpList"></div>
+    </div>
+    <button class="close-btn-full" onclick="closeCashExpenses()" style="background: #fff; color: var(--text2); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 20px;"><i class="fas fa-arrow-left"></i> Go Back</button>
   </div>
 
   <script>
@@ -670,7 +1066,7 @@
     }
 
     let db = loadDb();
-    let cur = null, viewMo = new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (3600000 * 8));
+    let cur = null, viewMo = new Date();
     viewMo.setDate(1);
     let oData = { name: '', inc: [], exp: [], categories: { inc: [], exp: [] } };
     let anaTab = 'inc';
@@ -689,14 +1085,163 @@
       return myTime.toISOString().split('T')[0];
     };
     const moKey = (d) => d.toISOString().split('T')[0].substring(0, 7);
+    const getCurrentMonth = () => moKey(new Date());
 
     function init() {
+      // Ensure current account has transactions array
+      if (cur) {
+        const acc = ac();
+        if (!acc.transactions) acc.transactions = [];
+        if (!acc.savings) acc.savings = [];
+        sv();
+      }
       applyPrefs();
       setTimeout(() => {
-        if (db.accounts.length > 0) { cur = db.accounts[0].id; go('pgT'); }
-        else { showPg('pgW'); }
+        if (db.accounts.length > 0) { 
+          // If there's a current account, go to tracker
+          if (cur && db.accounts.find(a => a.id === cur)) {
+            go('pgT'); 
+            $('nav').style.display = 'flex';
+          } else {
+            // Show welcome page with account selection
+            showPg('pgW');
+            renderWelcomeAccountList();
+          }
+        }
+        else { 
+          showPg('pgW'); 
+        }
         $('loadingScreen').classList.add('fade-out');
       }, 1500);
+    }
+    
+    function renderWelcomeAccountList() {
+      const accounts = db.accounts || [];
+      
+      if (accounts.length === 0) {
+        $('welcomeAccountList').innerHTML = '';
+        return;
+      }
+      
+      $('welcomeAccountList').innerHTML = `
+        <button class="pill-btn" style="
+          width: 100%;
+          padding: 20px 40px;
+          font-size: 1.2rem;
+          font-weight: 800;
+          background: linear-gradient(135deg, var(--ac) 0%, var(--ac2) 100%);
+          color: #fff;
+          border: none;
+          border-radius: 50px;
+          box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+          cursor: pointer;
+          transition: all 0.3s ease;
+          margin-bottom: var(--s4);
+        " onclick="showAccountSelection()">
+          <i class="fas fa-exchange-alt" style="margin-right: 12px;"></i>
+          Switch Account
+        </button>
+      `;
+    }
+    
+    function showAccountSelection() {
+      const accounts = db.accounts || [];
+      
+      $('welcomeAccountList').innerHTML = `
+        <button class="pill-btn" style="
+          width: 100%;
+          padding: 16px 32px;
+          font-size: 1rem;
+          font-weight: 700;
+          background: var(--card);
+          color: var(--text);
+          border: 2px solid var(--border2);
+          border-radius: 50px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          margin-bottom: var(--s4);
+        " onclick="renderWelcomeAccountList()">
+          <i class="fas fa-arrow-left" style="margin-right: 8px;"></i>
+          Back
+        </button>
+        
+        <div style="margin-bottom: var(--s4);">
+          <h3 style="color: var(--text); margin-bottom: var(--s3); text-align: center;">Select an Account</h3>
+        </div>
+        
+        ${accounts.map(acc => {
+          const totalIncome = acc.incomes?.reduce((s, i) => s + i.amount, 0) || 0;
+          const totalExpenses = acc.expenses?.reduce((s, e) => s + e.amount, 0) || 0;
+          const balance = totalIncome - totalExpenses;
+          
+          return `
+            <div class="account-card" style="
+              padding: 24px;
+              border: none;
+              border-radius: 24px;
+              background: linear-gradient(135deg, #fff 0%, var(--card) 100%);
+              cursor: pointer;
+              transition: all 0.3s ease;
+              margin-bottom: var(--s3);
+              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+              position: relative;
+              overflow: hidden;
+            " onclick="switchAccount('${acc.id}')">
+              <!-- Decorative gradient overlay -->
+              <div style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, var(--ac) 0%, var(--ac2) 100%);
+              "></div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                <div style="
+                  width: 60px;
+                  height: 60px;
+                  border-radius: 50%;
+                  background: linear-gradient(135deg, var(--ac) 0%, var(--ac2) 100%);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 16px;
+                  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+                ">
+                  <i class="fas fa-wallet" style="color: #fff; font-size: 1.5rem;"></i>
+                </div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 900; color: var(--text); font-size: 1.3rem; margin-bottom: 4px;">${acc.name || acc.uName + "'s Budget"}</div>
+                  <div style="font-size: 0.9rem; color: var(--text2); font-weight: 500;">Account Balance</div>
+                </div>
+              </div>
+              
+              <div style="
+                padding: 16px;
+                background: linear-gradient(135deg, var(--ac-bg) 0%, rgba(99, 102, 241, 0.05) 100%);
+                border-radius: 16px;
+                text-align: center;
+                border: 1px solid rgba(99, 102, 241, 0.1);
+              ">
+                <div style="font-size: 1.8rem; font-weight: 900; color: var(--ac); margin-bottom: 4px;">${fm(balance)}</div>
+                <div style="font-size: 0.8rem; color: var(--text2); text-transform: uppercase; letter-spacing: 1px;">Available Balance</div>
+              </div>
+              
+              <div style="
+                position: absolute;
+                bottom: 12px;
+                right: 12px;
+                width: 8px;
+                height: 8px;
+                background: var(--green);
+                border-radius: 50%;
+                box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+              "></div>
+            </div>
+          `;
+        }).join('')}
+      `;
     }
 
     function applyPrefs() {
@@ -705,20 +1250,28 @@
     }
 
     function showPg(id) {
-      document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
-      const el = $(id); if (el) el.classList.add('on');
-      const noNav = ['pgW', 'pgOB1', 'pgOB2', 'pgOB3'].includes(id) || id.startsWith('m');
+      document.querySelectorAll('.pg').forEach(p => p.style.display = 'none');
+      $(id).style.display = 'block';
+      const noNav = id === 'pgW' || id === 'pgOB1' || id === 'pgOB2' || id === 'pgOB3';
       $('nav').style.display = noNav ? 'none' : 'flex';
       if (id === 'pgOB3') renderOBSummary();
-      if (id === 'pgT') renderMonthList();
+      if (id === 'pgT') {
+        // Set month picker value to current viewMo
+        const monthPicker = $('monthPicker');
+        if (monthPicker) {
+          monthPicker.value = viewMo;
+        }
+        $('nav').style.display = 'flex'; // Ensure nav shows for tracker page
+      }
     }
 
     function renderMonthList() {
       const list = $('monthList'); if (!list) return;
-      const currentMo = moKey(viewMo);
+      const currentMo = moKey(viewMo); // Use viewMo instead of current date
       let html = '';
+      // Use viewMo as center point instead of current date
       for (let i = -12; i <= 12; i++) {
-        const d = new Date(new Date().getFullYear(), new Date().getMonth() + i, 1);
+        const d = new Date(viewMo.getFullYear(), viewMo.getMonth() + i, 1);
         const key = moKey(d);
         const active = key === currentMo ? 'active' : '';
         html += `<div class="month-item ${active}" id="mo_${key}" onclick="setMo('${key}')">${d.toLocaleDateString('en-US', { month: 'short' })}</div>`;
@@ -726,41 +1279,45 @@
       list.innerHTML = html;
       const activeEl = $(`mo_${currentMo}`);
       if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+      
+      // Update month picker to match viewMo
+      const picker = $('monthPicker');
+      if (picker) {
+        picker.value = moKey(viewMo);
+      }
+      
+      // Debug: Log current month being displayed
+      console.log('Month List - Current viewMo:', currentMo, 'Displaying months around:', viewMo.toLocaleDateString());
     }
 
     function setMo(key) {
       viewMo = new Date(key + '-01');
-      processRecurring(); render(); renderMonthList();
+      processRecurring(); render();
+      
+      // Update month picker to match viewMo
+      const picker = $('monthPicker');
+      if (picker) {
+        picker.value = moKey(viewMo);
+      }
     }
-
-    function go(id, btn) {
-      if (id === 'pgT') processRecurring();
-      showPg(id);
-      document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
-      if (btn) btn.classList.add('on');
-      render();
-      if (id === 'pgD') renderAnalytics();
-      if (id === 'pgSe') renderSettingsCats();
-      if (id === 'pgC') renderCreditPg();
-    }
-
-    /* ONBOARDING */
-    function startOB() {
-      const n = $('inpN').value.trim(); if (!n) return alert('Enter name');
-      oData.name = n; showPg('pgOB1');
+    
+    function setMoFromPicker() {
+      const picker = $('monthPicker');
+      if (!picker || !picker.value) return;
+      setMo(picker.value);
     }
     function addOBInc() {
-      const n = $('oiN').value.trim(), a = parseFloat($('oiA').value), c = $('oiC').value, r = !$('oiR').classList.contains('off');
+      const n = $('oiN').value.trim(), a = parseFloat($('oiA').value), c = $('oiC').value, d = $('oiD').value || td(), r = !$('oiR').classList.contains('off');
       if (!n || isNaN(a)) return alert('Fill fields');
-      oData.inc.push({ id: 'i_' + Math.random(), name: n, amount: a, category: c || 'No Category', date: td(), recurring: r });
-      $('oiN').value = ''; $('oiA').value = ''; renderOBList('oIL', oData.inc, 'inc');
+      oData.inc.push({ id: 'i_' + Math.random(), name: n, amount: a, category: c || 'No Category', date: d, recurring: r });
+      $('oiN').value = ''; $('oiA').value = ''; $('oiD').value = ''; renderOBList('oIL', oData.inc, 'inc');
     }
     function addOBExp() {
-      const n = $('oeN').value.trim(), a = parseFloat($('oeA').value), c = $('oeC').value, p = $('oeP').value, t = $('oeT').value, r = !$('oeR').classList.contains('off');
+      const n = $('oeN').value.trim(), a = parseFloat($('oeA').value), c = $('oeC').value, p = $('oeP').value, t = $('oeT').value, d = $('oeDue').value || td(), r = !$('oeR').classList.contains('off');
       if (!n || isNaN(a) || a <= 0) return alert('Please enter a valid name and positive amount');
       if (!c) return alert('Please select or add a category');
-      oData.exp.push({ id: 'e_' + Math.random(), name: n, amount: a, category: c, type: t, date: td(), recurring: r, payment: p, paid: false });
-      $('oeN').value = ''; $('oeA').value = ''; renderOBList('oEL', oData.exp, 'exp');
+      oData.exp.push({ id: 'e_' + Math.random(), name: n, amount: a, category: c, type: t, date: d, recurring: r, payment: p, paid: false });
+      $('oeN').value = ''; $('oeA').value = ''; $('oeDue').value = ''; renderOBList('oEL', oData.exp, 'exp');
     }
     function renderOBList(id, list, type) {
       $(id).innerHTML = list.map((item, idx) => `
@@ -843,8 +1400,32 @@
     }
     function finOB() {
       const pn = $('regPN').value.trim() || (oData.name + "'s Budget");
-      const a = { id: 'ac_' + Date.now(), uName: oData.name, name: pn, incomes: oData.inc, expenses: oData.exp, savings: [], loans: [], categories: oData.categories };
-      db.accounts.push(a); cur = a.id; sv(); go('pgT');
+      const a = { 
+        id: 'ac_' + Date.now(), 
+        uName: oData.name, 
+        name: pn, 
+        incomes: oData.inc, 
+        expenses: oData.exp, 
+        savings: [], 
+        loans: [], 
+        categories: oData.categories,
+        transactions: []  
+      };
+      db.accounts.push(a); 
+      cur = a.id; 
+      sv(); 
+      go('pgT');
+    }
+
+    function go(id, btn) {
+      if (id === 'pgT') processRecurring();
+      showPg(id);
+      document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+      if (btn) btn.classList.add('on');
+      render();
+      if (id === 'pgD') renderAnalytics();
+      if (id === 'pgSe') renderSettingsCats();
+      if (id === 'pgC') renderCreditPg();
     }
 
     /* DATA MANAGEMENT */
@@ -863,7 +1444,7 @@
       $('fER').querySelector('i').style.display = 'block';
       const catSel = $('fEC');
       catSel.innerHTML = ac().categories.exp.map(c => `<option value="${c}">${c}</option>`).join('') || '<option value="">No Category</option>';
-      openM('mE');
+      go('pgE');
     }
     function saveE() {
       const id = $('fEId').value, n = $('fEN').value.trim(), a = parseFloat($('fEA').value), c = $('fEC').value, d = $('fED').value || td(), p = $('fEP').value, t = $('fET').value, r = !$('fER').classList.contains('off');
@@ -877,7 +1458,7 @@
       } else {
         acc.expenses.push({ id: 'e_'+Math.random(), name: n, amount: a, category: c, date: d, recurring: r, payment: p, type: t, paid: false });
       }
-      sv(); closeM('mE'); render();
+      sv(); go('pgT'); render();
     }
     function editE(id) {
       const e = ac().expenses.find(x => x.id === id); if (!e) return;
@@ -891,13 +1472,171 @@
       catSel.innerHTML = ac().categories.exp.map(c => `<option value="${c}" ${c===e.category?'selected':''}>${c}</option>`).join('');
       if (e.recurring) { $('fER').classList.remove('off'); $('fER').querySelector('i').style.display='block'; }
       else { $('fER').classList.add('off'); $('fER').querySelector('i').style.display='none'; }
-      openM('mE');
+      go('pgE');
     }
     function addCat(type) {
       const name = prompt('New category:'); if (!name) return;
       const cat = name.trim();
       if (ac()) { ac().categories[type].push(cat); sv(); render(); if ($('pgSe').classList.contains('on')) renderSettingsCats(); }
       else { oData.categories[type].push(cat); const selId = type === 'inc' ? 'oiC' : 'oeC'; $(selId).innerHTML += `<option value="${cat}">${cat}</option>`; }
+    }
+    
+    function renderSettingsCats() {
+      const acc = ac(); if (!acc) return;
+      
+      // Render account list
+      renderAccountList();
+      
+      // Render income categories
+      $('setCatInc').innerHTML = acc.categories.inc.map(cat => `
+        <div class="pill-btn" style="font-size:0.7rem; padding:6px 12px; min-height:32px;" onclick="removeCat('inc', '${cat}')">
+          ${cat} <i class="fas fa-times" style="margin-left: 8px; font-size: 0.6rem;"></i>
+        </div>
+      `).join('') || '<div class="empty" style="font-size:0.7rem; color: var(--text2);">No income categories</div>';
+      
+      // Render expense categories (if we add them to settings later)
+      // $('setCatExp').innerHTML = acc.categories.exp.map(cat => `
+      //   <div class="pill-btn" style="font-size:0.7rem; padding:6px 12px; min-height:32px;" onclick="removeCat('exp', '${cat}')">
+      //     ${cat} <i class="fas fa-times" style="margin-left: 8px; font-size: 0.6rem;"></i>
+      //   </div>
+      // `).join('') || '<div class="empty" style="font-size:0.7rem; color: var(--text2);">No expense categories</div>';
+    }
+    
+    function renderAccountList() {
+      const accounts = db.accounts || [];
+      const currentAcc = ac();
+      
+      $('accountList').innerHTML = accounts.map(acc => {
+        const isCurrent = acc.id === cur;
+        const totalIncome = acc.incomes?.reduce((s, i) => s + i.amount, 0) || 0;
+        const totalExpenses = acc.expenses?.reduce((s, e) => s + e.amount, 0) || 0;
+        const balance = totalIncome - totalExpenses;
+        
+        return `
+          <div class="account-card ${isCurrent ? 'current' : ''}" style="
+            padding: 16px;
+            border: 2px solid ${isCurrent ? 'var(--ac)' : 'var(--border2)'};
+            border-radius: 12px;
+            background: ${isCurrent ? 'var(--ac-bg)' : 'var(--card)'};
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+          " onclick="${!isCurrent ? `switchAccount('${acc.id}')` : ''}">
+            <div class="fbc" style="margin-bottom: 8px;">
+              <div style="flex: 1;">
+                <div style="font-weight: 800; color: var(--text); font-size: 1.1rem;">${acc.name || acc.uName + "'s Budget"}</div>
+                <div style="font-size: 0.8rem; color: var(--text2);">Balance: ${fm(balance)}</div>
+              </div>
+            </div>
+            ${!isCurrent ? `
+              <button 
+                class="trash-btn" 
+                style="
+                  position: absolute;
+                  top: 8px;
+                  right: 8px;
+                  width: 32px;
+                  height: 32px;
+                  border: 2px solid var(--red);
+                  border-radius: 50%;
+                  background: transparent;
+                  color: var(--red);
+                  cursor: pointer;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  transition: all 0.3s ease;
+                "
+                onclick="event.stopPropagation(); deleteAccount('${acc.id}')"
+                onmouseover="this.style.background='var(--red)'; this.style.color='#fff';"
+                onmouseout="this.style.background='transparent'; this.style.color='var(--red)';"
+              >
+                <i class="fas fa-trash" style="font-size: 0.8rem;"></i>
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }).join('') || '<div class="empty" style="font-size:0.7rem; color: var(--text2);">No accounts found</div>';
+    }
+    
+    function createNewAccount() {
+      const name = prompt('Enter your name for the new account:');
+      if (!name || !name.trim()) return;
+      
+      const newAccount = {
+        id: 'ac_' + Date.now(),
+        uName: name.trim(),
+        name: name.trim() + "'s Budget",
+        incomes: [],
+        expenses: [],
+        savings: [],
+        loans: [],
+        categories: { inc: [], exp: [] },
+        transactions: []
+      };
+      
+      db.accounts.push(newAccount);
+      sv();
+      
+      // Switch to new account
+      switchAccount(newAccount.id);
+      
+      alert(`Account "${newAccount.name}" created successfully!`);
+    }
+    
+    function switchAccount(accountId) {
+      if (accountId === cur) return;
+      
+      cur = accountId;
+      sv();
+      
+      // Reset view to current month
+      viewMo = new Date();
+      viewMo.setDate(1);
+      
+      // Navigate to tracker page
+      go('pgT');
+      
+      // Show success message
+      const acc = ac();
+      alert(`Switched to "${acc.name || acc.uName + "'s Budget"}"`);
+    }
+    
+    function deleteAccount(accountId) {
+      if (accountId === cur) {
+        alert('Cannot delete the current account. Please switch to another account first.');
+        return;
+      }
+      
+      const acc = db.accounts.find(a => a.id === accountId);
+      if (!acc) return;
+      
+      if (!confirm(`Are you sure you want to delete "${acc.name || acc.uName + "'s Budget"}"? This action cannot be undone and all data will be lost.`)) return;
+      
+      db.accounts = db.accounts.filter(a => a.id !== accountId);
+      sv();
+      
+      // Refresh account list
+      renderAccountList();
+      
+      alert(`Account "${acc.name || acc.uName + "'s Budget"}" has been deleted.`);
+    }
+    
+    function logout() {
+      if (!confirm('Are you sure you want to logout? You will need to select an account to continue.')) return;
+      
+      cur = null;
+      sv();
+      
+      // Navigate to welcome page
+      showPg('pgW');
+    }
+    
+    function removeCat(type, cat) {
+      if (!confirm(`Remove category "${cat}"?`)) return;
+      const acc = ac();
+      acc.categories[type] = acc.categories[type].filter(c => c !== cat);
+      sv(); renderSettingsCats();
     }
     function togglePaid(id) {
       const e = ac().expenses.find(x => x.id === id); if (!e) return;
@@ -937,9 +1676,20 @@
       const today = td();
       const mo = moKey(viewMo);
       
+      // Debug: Log current rendering context
+      console.log('=== RENDER DEBUG ===');
+      console.log('Today:', today);
+      console.log('viewMo date:', viewMo);
+      console.log('viewMo key:', mo);
+      console.log('======================');
+      
       const incMo = acc.incomes.filter(i => i.date.startsWith(mo));
       let expMo = acc.expenses.filter(e => e.date.startsWith(mo));
-
+      
+      // Debug: Log filtered data
+      console.log('Income items for month', mo, ':', incMo.length, 'items');
+      console.log('Expense items for month', mo, ':', expMo.length, 'items');
+      
       // Notification Logic
       let notifs = [];
       incMo.forEach(i => {
@@ -956,22 +1706,46 @@
           else if (diff <= 0) notifs.push(`🚨 ${e.name} is DUE! Please pay now.`);
         }
       });
-      $('notifArea').innerHTML = notifs.map(n => `<div class="card mb10" style="background:var(--red-bg); color:var(--red); font-size:0.75rem; font-weight:700; border:1px solid var(--red);">${n}</div>`).join('');
 
       const ti_received = incMo.filter(i => i.paid).reduce((s, i) => s + i.amount, 0);
       const te_cash_paid = expMo.filter(e => e.payment === 'cash' && e.paid).reduce((s, e) => s + e.amount, 0);
       const te_credit_paid = expMo.filter(e => e.payment === 'credit' && e.paid).reduce((s, e) => s + e.amount, 0);
       
-      $('statCredit').textContent = fm(te_credit_paid);
-      // Cash Balance is ONLY based on Received Income - Paid Cash Expenses
-      // If no income is received, Cash Balance stays at RM 0.00 (or negative if expenses are paid)
-      const cashBalance = ti_received - te_cash_paid;
-      $('statNet').textContent = fm(cashBalance);
-
-      // Sorting
-      const fSort = $('expSort').value;
-      if (fSort === 'due') expMo.sort((a,b) => new Date(a.date) - new Date(b.date));
+      // Calculate savings deductions for current month
+      const savingsDeductions = (acc.transactions || [])
+        .filter(t => t.type === 'savings' && t.date && t.date.startsWith(mo))
+        .reduce((s, t) => s + t.amount, 0);
       
+      $('statCredit').textContent = fm(te_credit_paid);
+      // Cash Balance is based on Received Income - Paid Cash Expenses - Savings Deductions
+      const cashBalance = ti_received - te_cash_paid - savingsDeductions;
+      $('statNet').textContent = fm(cashBalance);
+      
+      // Update cash balance color based on amount
+      if (cashBalance < 0) {
+        $('statNet').style.color = '#ff0000';
+        $('statNet').style.textShadow = '0 0 10px rgba(255, 0, 0, 0.5)';
+      } else if (cashBalance > 1000) {
+        $('statNet').style.color = '#00ff00';
+        $('statNet').style.textShadow = '0 0 10px rgba(0, 255, 0, 0.5)';
+      } else {
+        $('statNet').style.color = '#ffffff';
+        $('statNet').style.textShadow = 'none';
+      }
+
+      // Sorting (removed - filter buttons deleted)
+      
+      // Sort expenses: fixed expenses first, then variable expenses
+      expMo.sort((a, b) => {
+        // Fixed expenses come first
+        if (a.type === 'fixed' && b.type !== 'fixed') return -1;
+        if (a.type !== 'fixed' && b.type === 'fixed') return 1;
+        
+        // Within same type, sort by date
+        return new Date(a.date) - new Date(b.date);
+      });
+      
+      // Render income list
       $('iL').innerHTML = incMo.map(i => `
         <div class="item-card fbc" onclick="viewDetail('inc', '${i.id}')">
           <div class="paid-toggle ${i.paid ? 'on' : ''}" onclick="event.stopPropagation(); toggleReceived('${i.id}')">
@@ -989,33 +1763,41 @@
       $('eL').innerHTML = expMo.map(e => {
         const isDue = new Date(e.date) <= new Date(today) && !e.paid;
         const typeColor = e.type === 'fixed' ? 'var(--green)' : (e.type === 'variable' ? 'var(--blue)' : 'var(--border)');
+        const isPaid = e.paid;
+        const paymentIcon = e.payment === 'cash' ? '💵' : '💳';
         return `
-        <div class="item-card fbc" style="border-left: 4px solid ${typeColor}; ${isDue ? 'background: var(--red-bg);' : ''}" onclick="editE('${e.id}')">
+        <div class="item-card fbc" style="border-left: 4px solid ${typeColor}; ${isDue ? 'background: var(--red-bg);' : ''} ${isPaid ? 'opacity: 0.5; background: var(--border2);' : ''}" onclick="editE('${e.id}')">
           <div class="paid-toggle ${e.paid ? 'on' : ''}" onclick="event.stopPropagation(); togglePaid('${e.id}')">
             <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
             <span>${e.paid ? 'Paid' : 'Mark Paid'}</span>
           </div>
           <div style="flex:1; margin-left: var(--s3);">
-            <div style="font-weight:800;">${e.name} ${e.displayTag || ''}</div>
-            <div class="lbl" style="margin:0; font-size:0.6rem; color:${isDue ? 'var(--red)' : ''}">${e.category} • ${new Date(e.date).toLocaleDateString('en-GB')}</div>
+            <div style="font-weight:800; ${isPaid ? 'color: var(--text3);' : ''}">${e.name} ${e.displayTag || ''}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem; color:${isDue ? 'var(--red)' : (isPaid ? 'var(--text3)' : '')}">${paymentIcon} ${e.payment.charAt(0).toUpperCase() + e.payment.slice(1)} • ${new Date(e.date).toLocaleDateString('en-GB')}</div>
           </div>
-          <div class="am neg">-${fm(e.amount)}</div>
+          <div class="am neg" style="${isPaid ? 'color: var(--text3);' : ''}">-${fm(e.amount)}</div>
         </div>
       `}).join('');
 
-      renderPots(acc, mo);
+      renderPots(acc, mo);  // For savings page (all pots)
+      renderActivePots(acc, mo);  // For tracker page (active pots only)
+      renderLoans(acc, mo);
     }
-
     function renderDashPots(acc) {
       // Only show active pots (current < target)
       const activePots = acc.savings.filter(p => p.current < p.target);
       $('dashPots').innerHTML = activePots.map(p => {
         const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
+        
+        // Use the actual icon if it's a Font Awesome class, otherwise use emoji        
+        const iconDisplay = p.icon && p.icon.startsWith('fa-') 
+        ? `<i class="fas ${p.icon}" style="color: ${p.color || 'var(--ac)'};"></i>` 
+        : (p.icon || '🍯');       
         return `
           <div class="card fbc" style="padding: var(--s3);">
             <div style="flex:1;">
               <div class="lbl" style="margin:0;">Saving Pot</div>
-              <h4 style="font-weight:900;">${p.title}</h4>
+              <h4 style="font-weight:900;">${iconDisplay} ${p.title}</h4>
               <div style="font-size:0.75rem; color:var(--text2); font-weight:700;">${fm(p.current)} / ${fm(p.target)} (${pct}%)</div>
               <div class="neu-in" style="height:6px; border-radius:3px; overflow:hidden; margin-top: var(--s2); width:80%;">
                 <div style="width:${pct}%; height:100%; background:var(--green);"></div>
@@ -1026,12 +1808,62 @@
         `;
       }).join('');
     }
-
-    function saveToPot(id) {
+    function saveToPot(id, fromTracker = true) {
       const p = ac().savings.find(x => x.id === id); if (!p) return;
+      
+      // Check if pot is pushed to tracker (can't add from savings page)
+      if (!fromTracker && p.pushedMo) {
+        alert('This pot is already pushed to the tracker. Please add savings from the tracker page.');
+        return;
+      }
+      
       const amt = parseFloat(prompt('Amount to save into ' + p.title + ':', '10.00'));
-      if (isNaN(amt) || amt <= 0) return;
-      p.current += amt; sv(); render();
+      if (isNaN(amt)) return;
+      
+      // For tracker page: check cash balance and deduct from it
+      if (fromTracker) {
+        const today = td();
+        const mo = moKey(viewMo);
+        
+        // Calculate current cash balance
+        const incMo = ac().incomes.filter(i => i.date.startsWith(mo));
+        const expMo = ac().expenses.filter(e => e.date.startsWith(mo) && e.payment === 'cash');
+        
+        const ti_received = incMo.filter(i => i.paid).reduce((s, i) => s + i.amount, 0);
+        const te_cash_paid = expMo.filter(e => e.paid).reduce((s, e) => s + e.amount, 0);
+        
+        // Calculate existing savings deductions for current month
+        const savingsDeductions = (ac().transactions || [])
+          .filter(t => t.type === 'savings' && t.date && t.date.startsWith(mo))
+          .reduce((s, t) => s + t.amount, 0);
+        
+        const currentCashBalance = ti_received - te_cash_paid - savingsDeductions;
+        
+        // Check if enough cash balance (allow negative balance)
+        if (currentCashBalance - amt < 0) {
+          if (!confirm(`Warning: This will make your cash balance negative by ${fm(Math.abs(currentCashBalance - amt))}. Continue?`)) {
+            return;
+          }
+        }
+        
+        // Create transaction record for cash deduction
+        if (!ac().transactions) ac().transactions = [];
+        ac().transactions.push({
+          id: 'tx_' + Date.now(),
+          type: 'savings',
+          amount: amt,
+          date: mo + '-01',
+          potId: id,
+          description: `Savings: ${p.title}`
+        });
+      }
+      
+      // Update pot current amount
+      p.current += amt; 
+      sv(); 
+      render();
+      
+      alert(`Added ${fm(amt)} to ${p.title}`);
     }
 
     function renderLoans(acc, mo) {
@@ -1041,7 +1873,26 @@
         const totalPaid = relevantExps.filter(e => e.paid).reduce((s, e) => s + e.amount, 0);
         const pct = Math.min(100, (paidCount/l.tenure)*100).toFixed(0);
         
+        // Calculate remaining months based on selected month
         let remainingMonths = l.tenure - paidCount;
+        if (l.pushedMo) {
+          const selectedMonth = new Date(mo + '-01');
+          const startMonth = new Date(l.pushedMo + '-01');
+          const endMonth = new Date(startMonth);
+          endMonth.setMonth(endMonth.getMonth() + l.tenure);
+          
+          // If selected month is past the end date, don't show the loan
+          if (selectedMonth > endMonth) {
+            return '';
+          }
+          
+          // Calculate months remaining from selected month to end date
+          remainingMonths = Math.max(0, 
+            (endMonth.getFullYear() - selectedMonth.getFullYear()) * 12 + 
+            (endMonth.getMonth() - selectedMonth.getMonth())
+          );
+        }
+        
         if (remainingMonths < 0) remainingMonths = 0;
 
         // Calculate end date based on start date (pushedMo) and tenure
@@ -1053,7 +1904,7 @@
         }
 
         return `
-          <div class="item-card" style="border-left: 4px solid var(--ac);">
+          <div class="item-card" style="border-left: 4px solid var(--ac); cursor: pointer;" onclick="viewLoanDetail('${l.id}')">
             <div class="fbc" style="margin-bottom: var(--s2);"><h3 style="font-weight:900;">${l.title}</h3><div class="am">${fm(l.amount)}</div></div>
             <div class="fbc" style="font-size:0.75rem; color:var(--text2); font-weight:700; margin-bottom: var(--s2);">
               <span>Progress: ${fm(totalPaid)} / ${fm(l.amount)}</span>
@@ -1066,108 +1917,717 @@
               <span style="color:var(--ac);">${remainingMonths} months remaining</span>
               <span style="color:var(--text3);">${endDateStr}</span>
             </div>
-            ${!l.pushedMo ? `<button class="btn btn-p" style="width:100%; margin-top: var(--s3); height:44px;" onclick="pushLoan('${l.id}')">Start Loan Push</button>` : ''}
+            ${!l.pushedMo ? `<button class="btn btn-p" style="width:100%; margin-top: var(--s3); height:44px;" onclick="event.stopPropagation(); pushLoan('${l.id}')">Start Loan Push</button>` : ''}
           </div>
         `;
       }).join('') || '<div class="empty">No loans added</div>';
     }
-
-    function toggleSection(id) {
-      const content = $(id + 'Content');
-      const chevron = $(id + 'Chevron');
-      content.classList.toggle('collapsed');
-      chevron.classList.toggle('fa-chevron-down');
-      chevron.classList.toggle('fa-chevron-up');
+    function viewLoanDetail(id) {
+      const l = ac().loans.find(x => x.id === id); if (!l) return;
+      
+      const relevantExps = ac().expenses.filter(e => e.loanId === l.id);
+      const paidCount = relevantExps.filter(e => e.paid).length;
+      const totalPaid = relevantExps.filter(e => e.paid).reduce((s, e) => s + e.amount, 0);
+      const monthlyPayment = l.amount / l.tenure;
+      
+      $('loanDetailContent').innerHTML = `
+        <div class="card mb20">
+          <span class="lbl">Loan Title</span>
+          <input id="editLoanTitle" class="inp mb20" value="${l.title}">
+          
+          <span class="lbl">Total Amount</span>
+          <input id="editLoanAmount" class="inp mb20" type="number" value="${l.amount}">
+          
+          <span class="lbl">Tenure (Months)</span>
+          <input id="editLoanTenure" class="inp mb20" type="number" value="${l.tenure}">
+          
+          <span class="lbl">Monthly Due Day</span>
+          <input id="editLoanDue" class="inp mb20" type="number" value="${l.due || 1}" min="1" max="31">
+          
+          <div class="card" style="background: var(--ac-bg); border: 1px solid var(--ac);">
+            <h4 style="color: var(--ac); margin-bottom: var(--s3);">Loan Summary</h4>
+            <div class="fbc mb10">
+              <span>Monthly Payment:</span>
+              <b style="color: var(--ac);">${fm(monthlyPayment)}</b>
+            </div>
+            <div class="fbc mb10">
+              <span>Total Paid:</span>
+              <b>${fm(totalPaid)} / ${fm(l.amount)}</b>
+            </div>
+            <div class="fbc mb10">
+              <span>Progress:</span>
+              <b>${paidCount} / ${l.tenure} payments</b>
+            </div>
+            <div class="fbc">
+              <span>Status:</span>
+              <b style="color: ${l.pushedMo ? 'var(--green)' : 'var(--text3)'};">
+                ${l.pushedMo ? 'Active' : 'Not Started'}
+              </b>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h4 style="margin-bottom: var(--s3); color: var(--ac);">Payment History</h4>
+          <div style="max-height: 200px; overflow-y: auto;">
+            ${relevantExps.length > 0 ? relevantExps.map(e => `
+              <div class="fbc mb10" style="padding: var(--s2); background: var(--card2); border-radius: 8px;">
+                <div style="flex: 1;">
+                  <div style="font-weight: 700;">${new Date(e.date).toLocaleDateString('en-GB')}</div>
+                  <div style="font-size: 0.7rem; color: var(--text2);">Payment ${relevantExps.indexOf(e) + 1}</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-weight: 900; color: ${e.paid ? 'var(--green)' : 'var(--red)'};">
+                    ${e.paid ? 'Paid' : 'Pending'}
+                  </div>
+                  <div style="font-size: 0.6rem; color: var(--text3);">${fm(e.amount)}</div>
+                </div>
+              </div>
+            `).join('') : '<div class="empty">No payments generated yet</div>'}
+          </div>
+        </div>
+      `;
+      
+      // Store current loan ID for saving
+      window.currentEditingLoanId = id;
+      openM('mLoanDetail');
+    }
+    
+    function saveLoanDetails() {
+      const l = ac().loans.find(x => x.id === window.currentEditingLoanId);
+      if (!l) return;
+      
+      const newTitle = $('editLoanTitle').value.trim();
+      const newAmount = parseFloat($('editLoanAmount').value);
+      const newTenure = parseInt($('editLoanTenure').value);
+      const newDue = parseInt($('editLoanDue').value);
+      
+      if (!newTitle || isNaN(newAmount) || isNaN(newTenure) || isNaN(newDue)) {
+        alert('Please fill all fields with valid values');
+        return;
+      }
+      
+      if (newDue < 1 || newDue > 31) {
+        alert('Due day must be between 1 and 31');
+        return;
+      }
+      
+      // Update loan details
+      l.title = newTitle;
+      l.amount = newAmount;
+      l.tenure = newTenure;
+      l.due = newDue;
+      
+      // Regenerate payments if loan was already pushed
+      if (l.pushedMo) {
+        // Remove existing expenses for this loan
+        ac().expenses = ac().expenses.filter(e => e.loanId !== l.id);
+        
+        // Regenerate with new details
+        const monthlyPayment = l.amount / l.tenure;
+        for (let i = 0; i < l.tenure; i++) {
+          const paymentDate = new Date(l.pushedMo + '-01');
+          paymentDate.setMonth(paymentDate.getMonth() + i);
+          const dateStr = moKey(paymentDate);
+          
+          ac().expenses.push({
+            id: 'e_' + Date.now() + '_' + i,
+            name: l.title + ' Payment',
+            amount: monthlyPayment,
+            category: 'Loan Payment',
+            type: 'fixed',
+            date: dateStr + '-' + String(l.due || 1).padStart(2, '0'),
+            recurring: false,
+            payment: 'cash',
+            paid: false,
+            loanId: l.id
+          });
+        }
+      }
+      
+      sv(); render(); closeM('mLoanDetail');
+      alert('Loan details updated successfully!');
     }
 
+    function toggleSection(section) {
+      const content = document.getElementById(section + 'Content');
+      const chevron = document.getElementById(section + 'Chevron');
+      
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        chevron.className = 'fas fa-chevron-up';
+      } else {
+        content.style.display = 'none';
+        chevron.className = 'fas fa-chevron-down';
+      }
+    }
     function setAnaFilter(type) {
       document.querySelectorAll('.ana-nav-item').forEach(i => i.classList.toggle('on', i.dataset.type === type));
       // Filter logic for extraAnalytics content
       renderExtraAnalytics(ac(), type);
     }
+    function renderActivePots(acc, mo) {
+      const activePots = acc.savings.filter(p => {
+        // Filter out pots that have reached or exceeded their target
+        if (p.current >= p.target) return false;
+        
+        if (!p.active) return false;
+        
+        if (p.pushedMo) {
+          const start = new Date(p.pushedMo + '-01');
+          const end = new Date(p.targetMonth + '-01');
+          const current = new Date(mo + '-01');
+          return current >= start && current <= end;
+        }
+        return false;
+      });
+      
+      const beforePots = activePots.filter(p => p.strategy === 'before');
+      const afterPots = activePots.filter(p => p.strategy === 'after');
+      
+      $('beforeExpensesPots').innerHTML = beforePots.map(p => renderPotCard(p)).join('') || '';
+      $('afterExpensesPots').innerHTML = afterPots.map(p => renderPotCard(p)).join('') || '';
+    }
 
-    function renderPots(acc, mo) {
-      const pots = acc.savings || [];
-      $('potList').innerHTML = pots.map(p => {
-        const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
-        const isActive = p.active !== false;
-        return `
-          <div class="item-card" onclick="viewPotDetail('${p.id}')" style="cursor:pointer; border-left: 6px solid ${p.color || 'var(--ac)'}; background: ${isActive ? `linear-gradient(90deg, #fff 0%, ${(p.color || 'var(--ac)')}05 100%)` : 'linear-gradient(90deg, #f8fafc 0%, #eef2f7 100%)'}; opacity:${isActive ? '1' : '0.7'};">
-            <div class="fbc" style="margin-bottom: var(--s3);">
-              <h3 style="font-weight:900;">${p.icon || '🍯'} ${p.title}</h3>
-              <button class="pill-btn ${isActive ? 'on' : ''}" style="min-width:90px; min-height:32px; font-size:0.7rem;" onclick="event.stopPropagation(); togglePotActive('${p.id}')">${isActive ? 'Active' : 'Inactive'}</button>
-            </div>
-            <div style="font-size:1.1rem; color:var(--text); font-weight:900; margin-bottom: var(--s2);">${fm(p.current)} / ${fm(p.target)}</div>
-            <div class="neu-in" style="height:12px; border-radius:6px; overflow:hidden;">
-              <div style="width:${pct}%; height:100%; background: linear-gradient(90deg, ${p.color || 'var(--ac)'} 0%, var(--green) 100%); transition: width 0.5s ease-out;"></div>
-            </div>
-            <div style="text-align:right; font-size:0.7rem; font-weight:800; margin-top: var(--s1); color:var(--ac);">${pct}% Completed</div>
+    function renderPotCard(p) {
+      const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
+      const isCompleted = p.current >= p.target;
+      
+      // Calculate monthly contribution needed
+      const selectedMonth = new Date(viewMo + '-01');
+      const targetDate = new Date(p.targetMonth + '-01');
+      const monthsRemaining = Math.max(1, 
+        (targetDate.getFullYear() - selectedMonth.getFullYear()) * 12 + 
+        (targetDate.getMonth() - selectedMonth.getMonth())
+      );
+      const remaining = p.target - p.current;
+      const monthlyRequired = remaining / monthsRemaining;
+      
+      // For pushed pots, calculate monthly progress
+      const isPushed = p.pushedMo;
+      let monthlyProgress = 0;
+      let monthlyTarget = 0;
+      let monthsRemainingDisplay = monthsRemaining;
+      
+      if (isPushed) {
+        // Calculate what this month's target should be
+        const totalMonths = Math.max(1, 
+          (targetDate.getFullYear() - new Date(p.createdDate || selectedMonth).getFullYear()) * 12 + 
+          (targetDate.getMonth() - new Date(p.createdDate || selectedMonth).getMonth())
+        );
+        monthlyTarget = p.target / totalMonths;
+        
+        // Calculate how much has been contributed this month
+        const currentMo = moKey(viewMo);
+        const monthlyContributions = (ac().transactions || [])
+          .filter(t => t.type === 'savings' && t.potId === p.id && t.date && t.date.startsWith(currentMo))
+          .reduce((sum, t) => sum + t.amount, 0);
+        
+        monthlyProgress = Math.min(100, (monthlyContributions / monthlyTarget) * 100);
+      }
+      
+      // Dynamic progress bar color based on percentage
+      let progressColor;
+      if (pct >= 75) progressColor = 'var(--green)';
+      else if (pct >= 50) progressColor = 'var(--blue)';
+      else if (pct >= 25) progressColor = 'var(--orange)';
+      else progressColor = 'var(--red)';
+      
+      // Use emoji fallback
+      const iconDisplay = p.icon === 'fa-baby' ? '👶' 
+                      : p.icon === 'fa-home' ? '🏠'
+                      : p.icon === 'fa-laptop' ? '💻'
+                      : p.icon === 'fa-plane' ? '✈️'
+                      : p.icon === 'fa-car' ? '🚗'
+                      : p.icon === 'fa-bicycle' ? '🚴'
+                      : p.icon === 'fa-walking' ? '🚶'
+                      : '🍯';
+    
+      return `
+         <div class="item-card pot-card ${isCompleted ? 'completed-pot' : ''}" style="border: 2px solid ${isCompleted ? 'var(--green)' : (p.color || 'var(--ac)')}; box-shadow: 0 0 15px ${isCompleted ? 'var(--green)' : (p.color || 'var(--ac)')}30, 0 0 30px ${isCompleted ? 'var(--green)' : (p.color || 'var(--ac)')}15, inset 0 0 15px ${isCompleted ? 'var(--green)' : (p.color || 'var(--ac)')}08; cursor: pointer; transition: all 0.3s ease; margin-bottom: var(--s3); opacity: ${isCompleted ? 0.7 : 1};" onclick="viewPotDetail('${p.id}')">
+        <div class="fbc" style="margin-bottom: var(--s2);">
+      <h3 style="font-weight:900;">${iconDisplay} ${p.title} ${isCompleted ? '✅' : ''}</h3>
           </div>
-        `;
-      }).join('') || '<div class="empty">No saving pots yet</div>';
+          
+          ${isPushed ? `
+            <div style="background: var(--ac-bg); padding: var(--s2); border-radius: 8px; margin-bottom: var(--s2); border: 1px solid var(--ac);">
+              <div style="font-size: 0.7rem; color: var(--ac); font-weight: 700; text-align: center;">
+                📅 ${monthsRemainingDisplay} months remaining
+              </div>
+            </div>
+          ` : ''}
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s2); margin-bottom: var(--s2);">
+            <div>
+              <div class="lbl" style="font-size:0.7rem;">${isPushed ? 'Monthly Target' : 'Monthly'}</div>
+              <div style="font-size: 1rem; font-weight: 700; color: var(--text2);">${fm(isPushed ? monthlyTarget : p.target / Math.max(1, (new Date(p.targetMonth + '-01').getFullYear() - new Date().getFullYear()) * 12 + (new Date(p.targetMonth + '-01').getMonth() - new Date().getMonth())))}</div>
+            </div>
+            <div>
+              <div class="lbl" style="font-size:0.7rem;">${isPushed ? 'Monthly Progress' : 'Progress'}</div>
+              <div style="font-size: 0.9rem; font-weight: 800; color: ${progressColor};">${isPushed ? monthlyProgress.toFixed(0) + '%' : pct + '%'}</div>
+            </div>
+          </div>
+          
+          <div class="neu-in" style="height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: var(--s2);">
+            <div style="width: ${isPushed ? monthlyProgress : pct}%; height: 100%; background: ${progressColor}; transition: width 0.3s ease;"></div>
+          </div>
+          
+          ${isPushed && monthlyProgress >= 100 ? `
+            <div style="background: var(--green-bg); padding: var(--s2); border-radius: 8px; margin-bottom: var(--s2); text-align: center;">
+              <div style="font-size: 0.8rem; color: var(--green); font-weight: 700;">
+                ✅ Monthly target completed!
+              </div>
+            </div>
+          ` : ''}
+          
+          <div class="fbc" style="gap: var(--s2);">
+            <button class="pot-pay-btn" id="payBtn_${p.id}" style="width: 100%; height: 44px; font-size: 1rem; font-weight: 700;" onclick="event.stopPropagation(); saveToPot('${p.id}', true)">+ Add Payment</button>
+          </div>
+        </div>
+      `;
     }
 
-    function togglePotActive(id) {
-      const p = ac().savings.find(x => x.id === id); if (!p) return;
-      p.active = !p.active; sv(); render();
-    }
+// Helper function to get current cash balance
+function getCurrentBalance() {
+  const acc = ac();
+  
+  // Initialize arrays if they don't exist
+  if (!acc.incomes) acc.incomes = [];
+  if (!acc.expenses) acc.expenses = [];
+  if (!acc.transactions) acc.transactions = [];
+  sv(); // Save the updated account
+  
+  // Get current month (YYYY-MM format)
+  const currentMonth = getCurrentMonth();
+  
+  // Calculate income (current month + recurring)
+  const income = acc.incomes
+    .filter(inc => {
+      const isCurrentMonth = inc.date && inc.date.startsWith(currentMonth);
+      const isRecurring = inc.recurring === true;
+      return isCurrentMonth || isRecurring;
+    })
+    .reduce((sum, inc) => sum + inc.amount, 0);
+    
+  // Calculate expenses (EXCLUDE any expenses that might be credit)
+  // We'll update this once we see your expense structure
+  const expenses = acc.expenses
+    .filter(exp => {
+      const isCurrentMonth = exp.date && exp.date.startsWith(currentMonth);
+      const isRecurring = exp.recurring === true;
+      // TODO: Add credit exclusion once we see your expense structure
+      return isCurrentMonth || isRecurring;
+    })
+    .reduce((sum, exp) => sum + exp.amount, 0);
+      
+  return income - expenses;
+}
 
+function renderPots(acc, mo) {
+  // Get filter and sort criteria from dropdowns
+  const filterCriteria = document.querySelector('select[onchange*="filterPots"]').value;
+  const sortCriteria = document.querySelector('select[onchange*="sortPots"]').value;
+  
+  // Start with all pots
+  let filteredPots = [...acc.savings];
+  
+  // Apply filter
+  if (filterCriteria === 'active') {
+    filteredPots = filteredPots.filter(p => p.active && p.current < p.target);
+  } else if (filterCriteria === 'inactive') {
+    filteredPots = filteredPots.filter(p => !p.active);
+  } else if (filterCriteria === 'completed') {
+    filteredPots = filteredPots.filter(p => p.current >= p.target);
+  } else if (filterCriteria === 'incomplete') {
+    filteredPots = filteredPots.filter(p => p.current < p.target);
+  }
+  // 'all' shows all pots
+  
+  // Apply sort
+  if (sortCriteria === 'created-desc') {
+    filteredPots.sort((a, b) => b.id.localeCompare(a.id)); // Latest first
+  } else if (sortCriteria === 'created-asc') {
+    filteredPots.sort((a, b) => a.id.localeCompare(b.id)); // Oldest first
+  } else if (sortCriteria === 'title-asc') {
+    filteredPots.sort((a, b) => a.title.localeCompare(b.title));
+  } else if (sortCriteria === 'title-desc') {
+    filteredPots.sort((a, b) => b.title.localeCompare(a.title));
+  } else if (sortCriteria === 'date-asc') {
+    filteredPots.sort((a, b) => new Date(a.targetMonth) - new Date(b.targetMonth));
+  } else if (sortCriteria === 'date-desc') {
+    filteredPots.sort((a, b) => new Date(b.targetMonth) - new Date(a.targetMonth));
+  } else if (sortCriteria === 'progress-desc') {
+    filteredPots.sort((a, b) => (b.current/b.target) - (a.current/a.target));
+  } else if (sortCriteria === 'progress-asc') {
+    filteredPots.sort((a, b) => (a.current/a.target) - (b.current/b.target));
+  }
+  
+  // Render filtered pots
+  $('potList').innerHTML = filteredPots.map(p => {
+    const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
+    const isActive = p.active;
+    
+    // Use emoji fallback for now
+    const iconDisplay = p.icon === 'fa-baby' ? '👶' 
+                      : p.icon === 'fa-home' ? '🏠'
+                      : p.icon === 'fa-laptop' ? '💻'
+                      : p.icon === 'fa-plane' ? '✈️'
+                      : '🍯';
+    
+    // Calculate monthly contribution needed
+    const today = new Date();
+    const targetDate = new Date(p.targetMonth + '-01');
+    const monthsRemaining = Math.max(1, 
+      (targetDate.getFullYear() - today.getFullYear()) * 12 + 
+      (targetDate.getMonth() - today.getMonth())
+    );
+    const remaining = p.target - p.current;
+    const monthlyRequired = remaining / monthsRemaining;
+    return `
+    <div class="item-card ${!isActive ? 'inactive-pot' : ''}" style="border: 1px solid ${p.color || 'var(--text3)'}; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: ${!isActive ? 'linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%)' : 'linear-gradient(90deg, #fff 0%, ' + (p.color || 'var(--ac)') + '05 100%)'}; opacity: ${!isActive ? '0.6' : '1'}; cursor: pointer;" onclick="viewPotDetail('${p.id}')">
+      <div class="fbc" style="margin-bottom: var(--s3);">
+        <h3 style="font-weight:900; color: ${!isActive ? 'var(--text2)' : 'var(--text)'};">${iconDisplay} ${p.title}</h3>
+        <button class="pill-btn ${isActive ? 'on' : ''}" style="min-width:100px; min-height:36px; font-size:0.8rem; ${isActive ? 'background: var(--green); color: #fff; border-color: var(--green);' : ''}" onclick="event.stopPropagation(); togglePotActive('${p.id}')">${isActive ? 'Active' : 'Inactive'}</button>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin-bottom: var(--s3);">
+        <div>
+          <div class="lbl">Current Amount</div>
+          <div style="font-size: 1.1rem; font-weight: 900; color: ${!isActive ? 'var(--text2)' : 'var(--ac)'};">${fm(p.current)}</div>
+        </div>
+        <div>
+          <div class="lbl">Target Amount</div>
+          <div style="font-size: 1rem; font-weight: 700;">${fm(p.target)}</div>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin-bottom: var(--s3);">
+        <div>
+          <div class="lbl">Target Date</div>
+          <div style="font-size: 0.9rem; font-weight: 700;">${new Date(p.targetMonth + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</div>
+        </div>
+        <div>
+          <div class="lbl">Monthly Payment</div>
+          <div style="font-size: 0.9rem; font-weight: 700; color: var(--text2);">${fm(monthlyRequired)}</div>
+        </div>
+      </div>
+      
+      ${p.pushedMo ? `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin-bottom: var(--s3);">
+        <div>
+          <div class="lbl">Start Date</div>
+          <div style="font-size: 0.9rem; font-weight: 700;">${new Date(p.pushedMo + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</div>
+        </div>
+        <div>
+          <div class="lbl">Months Remaining</div>
+          <div style="font-size: 0.9rem; font-weight: 700;">${monthsRemaining}</div>
+        </div>
+      </div>
+      ` : ''}
+      
+      <div style="margin-bottom: var(--s3);">
+        <div class="lbl">Progress</div>
+        <div class="neu-in" style="height:12px; border-radius:6px; overflow:hidden;">
+          <div style="width:${pct}%; height:100%; background: ${!isActive ? 'var(--text3)' : (pct < 33 ? 'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)' : pct < 66 ? 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)' : 'linear-gradient(90deg, #10b981 0%, #059669 100%)')};"></div>
+        </div>
+        <div style="text-align:right; font-size:0.7rem; font-weight:800; margin-top: var(--s1); color: ${!isActive ? 'var(--text2)' : 'var(--ac)'};">${pct}% ${isActive ? 'Completed' : 'of Goal'}</div>
+      </div>
+      
+      <div class="fbc" style="gap: var(--s2);" onclick="event.stopPropagation()">
+        ${p.pushedMo ? 
+          `<div style="display: flex; align-items: center; gap: var(--s2); padding: var(--s2) var(--s3); background: linear-gradient(135deg, var(--green-bg) 0%, var(--green) 100%); border: 2px solid var(--green); border-radius: 20px; color: var(--green); font-weight: 700; font-size: 0.8rem;">
+            <i class="fas fa-check-circle" style="font-size: 0.9rem;"></i>
+            <span>At Tracker</span>
+          </div>` : 
+          `<button class="pot-pay-btn" id="payBtn_${p.id}" style="${p.pushedMo ? 'background: var(--text3); cursor: not-allowed;' : ''}" onclick="event.stopPropagation(); saveToPot('${p.id}', false)" ${p.pushedMo ? 'disabled' : ''}>${p.pushedMo ? 'Pushed to Tracker' : '+ Add Money'}</button>`}
+      </div>
+    </div>
+  `;
+  }).join('') || '<div class="empty">No saving pots</div>';
+}
+
+// ... (rest of the code remains the same)
     let potIcon = '🍯';
+    let potColor = '#6366f1';
+
     function setPotIcon(ico, el) {
       potIcon = ico;
+      
+      // Update all buttons to have proper color
+      document.querySelectorAll('#fPIco .pill-btn').forEach(b => {
+        b.style.color = 'var(--text)';
+      });
+      
+      // Set active button
+      el.classList.add('on');  // ✅ Use 'el' parameter
+      el.style.color = '#fff'; // ✅ Use 'el' parameter
+      
+      // Remove 'on' class from all buttons (redundant but safe)
       document.querySelectorAll('#fPIco .pill-btn').forEach(b => b.classList.remove('on'));
+      
+      // Add 'on' class to selected button
       el.classList.add('on');
     }
-
+    function updateIconColors() {
+      document.querySelectorAll('#fPIco .pill-btn:not(.on)').forEach(btn => {
+        btn.querySelector('i').style.color = 'var(--text)';
+      });
+      
+      document.querySelectorAll('#fPIco .pill-btn.on').forEach(btn => {
+        btn.querySelector('i').style.color = '#fff';
+      });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      updateIconColors();
+      
+      // Add color palette click handling
+      document.querySelectorAll('#fPCol .color-option').forEach(option => {
+        option.addEventListener('click', function() {
+          setPotColor(this.dataset.color, this);
+        });
+      });
+    });
+    function setPotColor(color, el) {
+      potColor = color;
+      
+      // Remove 'on' class from all color options
+      document.querySelectorAll('#fPCol .color-option').forEach(b => b.classList.remove('on'));
+      
+      // Add 'on' class to selected color
+      el.classList.add('on');
+    }
     function addPot() {
       const p = { 
         id: 'p_'+Date.now(), 
         title: $('fPTi').value, 
         target: parseFloat($('fPAm').value), 
-        current: 0, 
-        targetMo: $('fPMo').value, 
-        strat: potStrat,
-        icon: potIcon,
-        color: $('fPCol').value,
-        active: true 
+        targetMonth: $('fPMo').value,
+        icon: potIcon,  // This stores the selected icon class
+        color: potColor,  // This stores the selected color
+        strategy: potStrat,
+        current: 0,
+        active: true
       };
       ac().savings.push(p); sv(); closeM('mPot'); render();
     }
     function viewPotDetail(id) {
       const p = ac().savings.find(x => x.id === id); if (!p) return;
-      const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
-      const targetMonth = p.targetMonth || p.targetMo || '-';
-      const isActive = p.active !== false;
+      // Calculate percentage for progress bar
+const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
+      // In viewPotDetail function, make fields editable:
+      $('fPTi').value = p.title;
+      $('fPTi').readOnly = false;
+      $('fPTi').style.background = 'var(--input-bg)';
+      $('fPTi').style.border = '1px solid var(--text3)';
+      // Calculate monthly contribution needed
+      const today = new Date();
+      const targetDate = new Date(p.targetMonth + '-01');
+      const monthsRemaining = Math.max(1, 
+        (targetDate.getFullYear() - today.getFullYear()) * 12 + 
+        (targetDate.getMonth() - today.getMonth())
+      );
+      const remaining = p.target - p.current;
+      const monthlyRequired = remaining / monthsRemaining;
+      
       $('pDetContent').innerHTML = `
-        <div class="card" style="border-left: 6px solid ${p.color || 'var(--ac)'};">
-          <div style="font-size:1.2rem; font-weight:900; margin-bottom: var(--s2);">${p.icon || '🍯'} ${p.title}</div>
-          <div class="lbl" style="margin-bottom: var(--s3);">Detailed savings overview</div>
-
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--s3); margin-bottom: var(--s3);">
-            <div class="card" style="margin:0; padding:12px;">
+        <div class="card mb20">
+          <div class="fbc mb20">
+            <input type="text" id="editTitle" class="inp" value="${p.title}" style="flex: 1; font-size: 1.2rem; font-weight: 900;">
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin-bottom: var(--s4);">
+            <div>
               <div class="lbl">Current Amount</div>
-              <div style="font-size:1.1rem; font-weight:900; color:var(--green);">${fm(p.current)}</div>
+              <input type="number" id="editCurrent" class="inp" value="${p.current}" style="font-size: 1.1rem; font-weight: 900; color: var(--ac);">
             </div>
-            <div class="card" style="margin:0; padding:12px;">
+            <div>
               <div class="lbl">Target Amount</div>
-              <div style="font-size:1.1rem; font-weight:900;">${fm(p.target)}</div>
+              <input type="number" id="editTarget" class="inp" value="${p.target}" style="font-size: 1rem; font-weight: 700;">
             </div>
           </div>
-
-          <div class="fbc mb10"><span>Target Month</span><b>${targetMonth}</b></div>
-          <div class="fbc mb10"><span>Strategy</span><b>${p.strat || p.strategy || '-'}</b></div>
-          <div class="fbc mb20"><span>Status</span><b style="color:${isActive ? 'var(--green)' : 'var(--text2)'};">${isActive ? 'Active' : 'Inactive'}</b></div>
-
-          <div class="neu-in" style="height:12px; border-radius:8px; overflow:hidden;">
-            <div style="width:${pct}%; height:100%; background: linear-gradient(90deg, ${p.color || 'var(--ac)'} 0%, var(--green) 100%);"></div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin-bottom: var(--s4);">
+            <div>
+              <div class="lbl">Target Date</div>
+              <input type="month" id="editTargetMonth" class="inp" value="${p.targetMonth}" style="font-size: 0.9rem; font-weight: 700;">
+            </div>
+            <div>
+              <div class="lbl">Monthly Payment</div>
+              <div style="font-size: 0.9rem; font-weight: 700; color: var(--text2);">${fm(monthlyRequired)}</div>
+            </div>
           </div>
-          <div style="text-align:right; font-size:0.75rem; font-weight:800; margin-top: var(--s1); color:var(--ac);">${pct}% completed</div>
-        </div>`;
+          
+          ${p.pushedMo ? `
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin-bottom: var(--s4);">
+            <div>
+              <div class="lbl">Start Date</div>
+              <div style="font-size: 0.9rem; font-weight: 700;">${new Date(p.pushedMo + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</div>
+            </div>
+            <div>
+              <div class="lbl">Months Remaining</div>
+              <div style="font-size: 0.9rem; font-weight: 700;">${monthsRemaining}</div>
+            </div>
+          </div>
+          ` : ''}
+          
+          <div style="margin-bottom: var(--s4);">
+            <div class="lbl">Progress</div>
+            <div class="neu-in" style="height:12px; border-radius:6px; overflow:hidden;">
+              <div style="width:${pct}%; height:100%; background: ${pct < 33 ? 'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)' : pct < 66 ? 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)' : 'linear-gradient(90deg, #10b981 0%, #059669 100%)'};"></div>
+            </div>
+            <div style="text-align:right; font-size:0.7rem; font-weight:800; margin-top: var(--s1); color: var(--ac);">${pct}% Completed</div>
+          </div>
+          
+          <div class="fbc" style="gap: var(--s3);">
+          ${p.pushedMo ? 
+            `<div style="display: flex; align-items: center; justify-content: center; gap: var(--s2); padding: var(--s3); background: linear-gradient(135deg, var(--green-bg) 0%, var(--green) 100%); border: 2px solid var(--green); border-radius: 12px; color: var(--green); font-weight: 700; font-size: 0.9rem; width: 100%;">
+              <i class="fas fa-check-circle" style="font-size: 1rem;"></i>
+              <span>Manage at Tracker Page</span>
+            </div>` :
+            `<button class="btn btn-p" style="width:100%; height:44px; font-size:1rem; font-weight:700; background: var(--green); color: #fff;" onclick="addToPot('${p.id}')">+ Add Money</button>`
+          }
+        </div>
+
+      <div class="fbc" style="gap: var(--s3); margin-top: var(--s3);">
+        <button class="btn btn-o" style="background: var(--red); color: #fff; border-color: var(--red);" onclick="deletePot('${p.id}')"><i class="fas fa-trash"></i></button>
+        <button class="btn btn-o" style="width:100%; background: #fff; color: var(--green); border-color: var(--green);" onclick="savePotChanges('${p.id}')">Save Changes</button>
+      </div>
+      ${!p.pushedMo ? `<button class="btn btn-p" style="width:100%; margin-top: var(--s3); background: ${p.color || 'var(--ac)'}; color: #fff;" onclick="startMonthlySavings('${p.id}')">+ Main Page</button>` : ''}        </div>
+      `;      
       openM('mPotDetail');
     }
+    function addToPot(id) {
+      const p = ac().savings.find(x => x.id === id); if (!p) return;      
+      
+      // Use prompt instead of input field
+      const amount = parseFloat(prompt(`Add money to "${p.title}":`, ""));
+      if (isNaN(amount) || amount <= 0) return;      
+      
+      // Check cash balance
+      const currentBalance = getCurrentBalance();
+      if (currentBalance < amount) {
+        alert(`Cannot add ${fm(amount)} to ${p.title}.\n\nCurrent cash balance: ${fm(currentBalance)}\nAmount exceeds balance by: ${fm(amount - currentBalance)}\n\nPlease add income first or reduce the amount.`);
+        return;
+      }      
+      
+      p.current += amount;      
+      
+      // Create a special savings transaction that doesn't show in expenses
+      const savingsTransaction = {
+        id: Date.now().toString(),
+        type: 'savings', // Special type for internal tracking
+        category: 'Savings',
+        title: `Payment to ${p.title}`,
+        amount: amount,
+        date: getCurrentMonth() + '-01',
+        description: `Savings contribution to ${p.title}`,
+        hidden: true // Flag to hide from expense lists
+      };      
+      
+      // Add to transactions but mark as hidden
+      ac().transactions.push(savingsTransaction);
+      sv(); render();      
+      
+      // Prompt for monthly saving setup
+      if (!p.pushedMo) {
+        const startMonth = prompt(`Start monthly savings for "${p.title}"?\n\nEnter month (YYYY-MM format):`, getCurrentMonth());
+        if (startMonth && startMonth.match(/^\d{4}-\d{2}$/)) {
+          p.pushedMo = startMonth;
+          sv(); render();
+          alert(`Monthly savings started for ${p.title} from ${startMonth}`);
+        }
+      }      
+      
+      closeM('mPotDetail');
+      
+      // Add a small delay before showing success to prevent any race conditions
+      setTimeout(() => {
+        alert(`Added ${fm(amount)} to ${p.title}\nCash balance deducted: ${fm(amount)}`);
+      }, 100);
+    }
 
+    function savePotChanges(id) {
+      const p = ac().savings.find(x => x.id === id); if (!p) return;
+      
+      // Get values from editable fields (excluding current amount)
+      p.title = $('editTitle').value;
+      p.target = parseFloat($('editTarget').value) || 0;
+      p.targetMonth = $('editTargetMonth').value;
+      
+      sv(); render();
+      closeM('mPotDetail');
+      alert('Pot updated successfully!');
+    }
+    function sortPots(criteria) {
+      // Just trigger renderPots which will handle the sorting
+      renderPots(ac(), moKey(viewMo));
+    }
+    function filterPots(status) {
+      // Just trigger renderPots which will handle the filtering
+      renderPots(ac(), moKey(viewMo));
+    }
+    function editPot(id) {
+      const p = ac().savings.find(x => x.id === id); if (!p) return;
+      
+      // Pre-fill edit modal with current values
+      $('fPTi').value = p.title;
+      $('fPAm').value = p.target;
+      $('fPMo').value = p.targetMonth;
+      potIcon = p.icon;
+      potColor = p.color;
+      
+      // Update icon selection
+      document.querySelectorAll('#fPIco .pill-btn').forEach(b => b.classList.remove('on'));
+      document.querySelector(`[data-icon="${p.icon}"]`)?.classList.add('on');
+      
+      // Update color selection
+      document.querySelectorAll('#fPCol .color-option').forEach(b => b.classList.remove('on'));
+      document.querySelector(`[data-color="${p.color}"]`)?.classList.add('on');
+      
+      closeM('mPotDetail');
+      openM('mPot');
+    }
+    function deletePot(id) {
+      const p = ac().savings.find(x => x.id === id); if (!p) return;
+      if (!confirm(`Delete "${p.title}" pot? This cannot be undone.`)) return;
+      
+      ac().savings = ac().savings.filter(x => x.id !== id);
+      sv(); render();
+      closeM('mPotDetail');
+    }
+    function addToPotFromTracker(id) {
+      const p = ac().savings.find(x => x.id === id); if (!p) return;
+      const amount = parseFloat($(`potAdd_${id}`).value);
+      if (isNaN(amount) || amount <= 0) return alert('Please enter a valid amount');
+      
+      p.current += amount;
+      sv(); render();
+      
+      // Clear input
+      $(`potAdd_${id}`).value = '';
+      
+      // Show success feedback
+      const input = $(`potAdd_${id}`);
+      input.style.background = 'var(--green)';
+      input.style.color = '#fff';
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+}
+    function setPotStrat(strat) {
+      potStrat = strat;
+      
+      // Update button states
+      document.querySelectorAll('#fPStratB, #fPStratA').forEach(btn => btn.classList.remove('on'));
+      
+      if (strat === 'before') {
+        document.getElementById('fPStratB').classList.add('on');
+      } else {
+        document.getElementById('fPStratA').classList.add('on');
+      }
+    }
     let anaCharts = { line: null, bar: null };
-
     function setAnaTab(t) { 
       anaTab = t; 
       anaSelectedCats = []; // Reset filters when switching tabs
@@ -1231,136 +2691,479 @@
         });
       };
 
-      // 1. Income
-      renderSectionChart('incAnaChart', 'line', ['1M', '3M', '6M'], [100, 120, 110], 'var(--green)');
-      // 2. Expenses
-      renderSectionChart('expAnaChart', 'bar', ['Food', 'Bills', 'Rent'], [300, 500, 1200], 'var(--red)');
-      // 3. Credit
+      // 1. Income - Beautiful gradient line chart
+      const incCtx = $('incAnaChart').getContext('2d');
+      const incGradient = incCtx.createLinearGradient(0, 0, 0, 200);
+      incGradient.addColorStop(0, '#10b981');
+      incGradient.addColorStop(1, 'rgba(16, 185, 129, 0.1)');
+      
+      new Chart(incCtx, {
+        type: 'line',
+        data: {
+          labels: ['1M', '3M', '6M'],
+          datasets: [{
+            data: [100, 120, 110],
+            borderColor: '#10b981',
+            backgroundColor: incGradient,
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 5,
+            pointBackgroundColor: '#059669',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+      
+      // 2. Expenses - Beautiful gradient bars
+      const expCtx = $('expAnaChart').getContext('2d');
+      const expColors = ['#f59e0b', '#ef4444', '#f97316'];
+      const expGradients = expColors.map(color => {
+        const gradient = expCtx.createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, color + '40');
+        return gradient;
+      });
+      
+      new Chart(expCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Food', 'Bills', 'Rent'],
+          datasets: [{
+            data: [300, 500, 1200],
+            backgroundColor: expGradients,
+            borderColor: expColors,
+            borderWidth: 2,
+            borderRadius: 8
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+      
+      // 3. Credit - Beautiful doughnut with gradient
+      const credCtx = $('credAnaChart').getContext('2d');
       const credExps = acc.expenses.filter(e => e.payment === 'credit' && e.paid);
-      renderSectionChart('credAnaChart', 'doughnut', ['Used', 'Limit'], [credExps.reduce((s,e)=>s+e.amount,0), 5000], ['var(--ac2)', 'var(--border2)']);
+      const credGradient = credCtx.createRadialGradient(100, 100, 0, 100, 100, 100);
+      credGradient.addColorStop(0, '#8b5cf6');
+      credGradient.addColorStop(1, '#6366f1');
+      
+      new Chart(credCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Used', 'Limit'],
+          datasets: [{
+            data: [credExps.reduce((s,e)=>s+e.amount,0), 5000],
+            backgroundColor: [credGradient, 'rgba(229, 231, 235, 0.3)'],
+            borderColor: ['#8b5cf6', '#e5e7eb'],
+            borderWidth: 2
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+      });
 
-      // 4. Loan Chart
+      // 4. Loan Chart - Beautiful gradient doughnut
       const ctxL = $('loanChart').getContext('2d');
       const totalLoan = acc.loans.reduce((s,l) => s+l.amount, 0);
       const totalPaid = acc.expenses.filter(e => e.loanId && e.paid).reduce((s,e) => s+e.amount, 0);
       
       if (extraCharts.loan) extraCharts.loan.destroy();
+      
+      const loanGradient = ctxL.createRadialGradient(100, 100, 0, 100, 100, 100);
+      loanGradient.addColorStop(0, '#ec4899');
+      loanGradient.addColorStop(1, '#f43f5e');
+      
       extraCharts.loan = new Chart(ctxL, {
         type: 'doughnut',
         data: {
           labels: ['Paid', 'Remaining'],
-          datasets: [{ data: [totalPaid, Math.max(0, totalLoan - totalPaid)], backgroundColor: ['var(--ac)', 'var(--border2)'] }]
+          datasets: [{ 
+            data: [totalPaid, Math.max(0, totalLoan - totalPaid)], 
+            backgroundColor: [loanGradient, 'rgba(229, 231, 235, 0.3)'],
+            borderColor: ['#ec4899', '#e5e7eb'],
+            borderWidth: 2
+          }]
         },
         options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
       });
       $('loanStat').innerHTML = `<div class="fbc"><span>Total Debt:</span><span>${fm(totalLoan)}</span></div><div class="fbc"><span>Total Paid:</span><span>${fm(totalPaid)}</span></div>`;
 
-      // 5. Pot Chart
+      // 5. Pot Chart - Beautiful gradient bars
       const ctxP = $('potChart').getContext('2d');
       if (extraCharts.pot) extraCharts.pot.destroy();
+      
+      const potColors = acc.savings.map((_, i) => {
+        const colors = ['#14b8a6', '#06b6d4', '#22d3ee', '#0ea5e9', '#0284c7'];
+        return colors[i % colors.length];
+      });
+      
+      const potGradients = potColors.map(color => {
+        const gradient = ctxP.createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, color + '40');
+        return gradient;
+      });
+      
       extraCharts.pot = new Chart(ctxP, {
         type: 'bar',
         data: {
           labels: acc.savings.map(p => p.title),
-          datasets: [{ label: 'Progress %', data: acc.savings.map(p => (p.current/p.target)*100), backgroundColor: 'var(--green)' }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
-      });
-    }
-
-    function toggleAnaCat(c) {
-      if (anaSelectedCats.includes(c)) anaSelectedCats = anaSelectedCats.filter(x => x!==c);
-      else anaSelectedCats.push(c);
-      renderAnalytics();
-    }
-
-    function renderCharts(acc) {
-      const ctxL = $('lineChart').getContext('2d'), ctxB = $('barChart').getContext('2d');
-      if (anaCharts.line) anaCharts.line.destroy(); 
-      if (anaCharts.bar) anaCharts.bar.destroy();
-
-      const mo = moKey(viewMo);
-      const data = anaTab === 'inc' ? acc.incomes : acc.expenses;
-      const color = anaTab === 'inc' ? 'var(--green)' : 'var(--red)';
-
-      // 1. Line Chart: Last 6 Months Trend
-      const months = [];
-      for(let i=5; i>=0; i--) {
-        const d = new Date(viewMo.getFullYear(), viewMo.getMonth() - i, 1);
-        months.push(moKey(d));
-      }
-
-      const trendData = months.map(m => {
-        return data.filter(d => d.date.startsWith(m))
-                   .filter(d => d.paid) // Only include 'paid' items in analytics
-                   .filter(d => anaSelectedCats.length === 0 || anaSelectedCats.includes(d.category))
-                   .reduce((s, d) => s + d.amount, 0);
-      });
-
-      anaCharts.line = new Chart(ctxL, {
-        type: 'line',
-        data: {
-          labels: months.map(m => new Date(m+'-01').toLocaleDateString('en-US', {month:'short'})),
-          datasets: [{
-            label: anaTab.toUpperCase() + ' (Paid Only)',
-            data: trendData,
-            borderColor: color,
-            backgroundColor: color + '22',
-            fill: true,
-            tension: 0.4,
-            borderWidth: 3,
-            pointRadius: 4,
-            pointBackgroundColor: color
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { 
-            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-            x: { grid: { display: false } }
-          }
-        }
-      });
-
-      // 2. Bar Chart: Category Comparison for Selected Month
-      const moData = data.filter(d => d.date.startsWith(mo)).filter(d => d.paid); // Only include 'paid' items
-      const catsToCompare = anaSelectedCats.length > 0 ? anaSelectedCats : [...new Set(moData.map(d => d.category))];
-      
-      const barData = catsToCompare.map(c => {
-        return moData.filter(d => d.category === c).reduce((s, d) => s + d.amount, 0);
-      });
-
-      anaCharts.bar = new Chart(ctxB, {
-        type: 'bar',
-        data: {
-          labels: catsToCompare,
-          datasets: [{
-            label: 'Amount (RM)',
-            data: barData,
-            backgroundColor: color,
+          datasets: [{ 
+            label: 'Progress %', 
+            data: acc.savings.map(p => (p.current/p.target)*100), 
+            backgroundColor: potGradients,
+            borderColor: potColors,
+            borderWidth: 2,
             borderRadius: 8
           }]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
           scales: { 
-            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-            x: { grid: { display: false } }
+            y: { 
+              beginAtZero: true, 
+              max: 100,
+              grid: { color: 'rgba(0,0,0,0.03)' },
+              ticks: { color: '#64748b' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#64748b' }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              callbacks: {
+                label: function(context) {
+                  return context.parsed.y.toFixed(1) + '% Complete';
+                }
+              }
+            }
           }
         }
       });
-    }
 
-    function setTheme(t) { db.prefs.theme = t; sv(); applyPrefs(); }
-    function resetData() { if (confirm('Reset all?')) { localStorage.removeItem(K); location.reload(); } }
-    function openM(id) { $(id).style.display = 'block'; setTimeout(()=>$(id).classList.add('on'), 10); }
+      function renderCharts(acc) {
+        const ctxL = $('anaLineChart').getContext('2d');
+        const ctxB = $('anaBarChart').getContext('2d');
+
+          // Create gradient for line chart
+          const gradient = ctxL.createLinearGradient(0, 0, 0, 200);
+          gradient.addColorStop(0, colors.border);
+          gradient.addColorStop(1, colors.background);
+
+          anaCharts.line = new Chart(ctxL, {
+            type: 'line',
+            data: {
+              labels: months.map(m => new Date(m+'-01').toLocaleDateString('en-US', {month:'short'})),
+              datasets: [{
+                label: anaTab.toUpperCase() + ' (Paid Only)',
+                data: trendData,
+                borderColor: colors.border,
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: colors.point,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { 
+                legend: { display: false },
+                tooltip: {
+                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  titleColor: '#fff',
+                  bodyColor: '#fff',
+                  borderColor: colors.border,
+                  borderWidth: 1
+                }
+              },
+              scales: { 
+                y: { 
+                  beginAtZero: true, 
+                  grid: { 
+                    color: 'rgba(0,0,0,0.03)',
+                    drawBorder: false
+                  },
+                  ticks: { color: '#64748b' }
+                },
+                x: { 
+                  grid: { display: false },
+                  ticks: { color: '#64748b' }
+                }
+              }
+            }
+          });
+
+          // 2. Bar Chart: Category Comparison with beautiful colors
+          const moData = data.filter(d => d.date.startsWith(mo)).filter(d => d.paid); // Only include 'paid' items
+          const catsToCompare = anaSelectedCats.length > 0 ? anaSelectedCats : [...new Set(moData.map(d => d.category))];
+
+          // Beautiful color palette for categories
+          const barColors = catsToCompare.map((_, i) => {
+            const colors = [
+              '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6',
+              '#f97316', '#14b8a6', '#ef4444', '#06b6d4', '#84cc16',
+              '#a855f7', '#f43f5e', '#22d3ee', '#facc15', '#4ade80'
+            ];
+            return colors[i % colors.length];
+          });
+
+          // Create gradients for bars
+          const barGradients = barColors.map(color => {
+            const gradient = ctxB.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, color);
+            gradient.addColorStop(1, color + '40');
+            return gradient;
+          });
+
+          const barData = catsToCompare.map(c => {
+            return moData.filter(d => d.category === c).reduce((s, d) => s + d.amount, 0);
+          });
+
+          anaCharts.bar = new Chart(ctxB, {
+            type: 'bar',
+            data: {
+              labels: catsToCompare,
+              datasets: [{
+                label: 'Amount (RM)',
+                data: barData,
+                backgroundColor: barGradients,
+                borderColor: barColors,
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { 
+                legend: { display: false },
+                tooltip: {
+                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  titleColor: '#fff',
+                  bodyColor: '#fff',
+                  borderColor: barColors[0],
+                  borderWidth: 1
+                }
+              },
+              scales: { 
+                y: { 
+                  beginAtZero: true, 
+                  grid: { 
+                    color: 'rgba(0,0,0,0.03)',
+                    drawBorder: false
+                  },
+                  ticks: { color: '#64748b' }
+                },
+                x: { 
+                  grid: { display: false },
+                  ticks: { color: '#64748b' }
+                }
+              }
+            }
+          });
+        }
+
+        function setTheme(t) { db.prefs.theme = t; sv(); applyPrefs(); }
+        function resetData() { if (confirm('Reset all?')) { localStorage.removeItem(K); location.reload(); } }
+        function openM(id) { $(id).style.display = 'block'; setTimeout(()=>$(id).classList.add('on'), 10); }
+        function closeM(id) { $(id).classList.remove('on'); setTimeout(()=>$(id).style.display = 'none', 300); }
+        function addLoan() 
+        { 
+          const l = { 
+            id: 'l_'+Date.now(), 
+            title: $('fLTi').value,           
+            amount: parseFloat($('fLAm').value), 
+            tenure: parseInt($('fLTn').value),   
+            rate: 0,                           
+            due: $('fLDu').value,             
+            pushedMo: null 
+          }; 
+          ac().loans.push(l); sv(); closeM('mLoan'); render(); 
+        }
+        //function addLoan() { console.log('addLoan function called!'); console.log('fLTi element:', fLTi); console.log('fLAm element:', fLAm); console.log('fLTn element:', fLTn); console.log('fLDu element:', fLDu); const l = { id: 'l_'+Date.now(), title: fLTi.value, amount: parseFloat(fLAm.value), tenure: parseInt(fLTn.value), rate: 0, due: fLDu.value, pushedMo: null }; ac().loans.push(l); sv(); closeM('mLoan'); render(); }
+        function pushLoan(id) { 
+          const l = ac().loans.find(x => x.id === id); 
+          if (!l) return;
+          
+          const monthlyPayment = l.amount / l.tenure;
+          const startMo = moKey(viewMo);
+          
+          // Generate monthly expense entries for the loan
+          for (let i = 0; i < l.tenure; i++) {
+            const paymentDate = new Date(startMo + '-01');
+            paymentDate.setMonth(paymentDate.getMonth() + i);
+            const dateStr = moKey(paymentDate);
+            
+            // Check if expense for this month already exists
+            const existingExpense = ac().expenses.find(e => 
+              e.loanId === l.id && e.date.startsWith(dateStr)
+            );
+            
+            if (!existingExpense) {
+              ac().expenses.push({
+                id: 'e_' + Date.now() + '_' + i,
+                name: l.title + ' Payment',
+                amount: monthlyPayment,
+                category: 'Loan Payment',
+                type: 'fixed',
+                date: dateStr + '-' + String(l.due || 1).padStart(2, '0'),
+                recurring: false,
+                payment: 'cash',
+                paid: false,
+                loanId: l.id
+              });
+            }
+          }
+          
+          l.pushedMo = startMo; 
+          sv(); 
+          render(); 
+          alert('Loan payments have been generated and added to your expenses!');
+        }
+        function startMonthlySavings(potId) {
+          const p = ac().savings.find(x => x.id === potId); if (!p) return;
+          
+          // Mark pot as pushed to main page
+          p.pushedMo = moKey(viewMo);
+          p.active = true;
+          
+          // Calculate monthly contribution
+          const monthsLeft = Math.max(0, Math.ceil((new Date(p.targetMonth + '-01') - new Date()) / (1000 * 60 * 60 * 24 * 30)));
+          const monthlyAmount = Math.ceil((p.target - p.current) / monthsLeft);
+          
+          // Create monthly transaction record
+          const transaction = {
+            id: 'trans_' + Date.now(),
+            type: 'savings',
+            title: `Payment to ${p.title}`,
+            amount: monthlyAmount,
+            date: td(),
+            potId: potId
+          };
+          
+          // Add to transactions
+          if (!ac().transactions) ac().transactions = [];
+          ac().transactions.push(transaction);
+          
+          // Add expense entry for this month
+          const expense = {
+            id: 'e_' + Date.now(),
+            name: `Payment to ${p.title}`,
+            amount: monthlyAmount,
+            category: 'Savings',
     function closeM(id) { $(id).classList.remove('on'); setTimeout(()=>$(id).style.display = 'none', 300); }
-    function addLoan() { const l = { id: 'l_'+Date.now(), title: $('fLTi').value, amount: parseFloat($('fLAm').value), tenure: parseInt($('fLTn').value), rate: parseFloat($('fLRt').value), due: $('fLDu').value, pushedMo: null }; ac().loans.push(l); sv(); closeM('mLoan'); render(); }
-    function pushLoan(id) { const l = ac().loans.find(x => x.id === id); l.pushedMo = moKey(viewMo); sv(); render(); }
+    function addLoan() 
+    { 
+      const l = { 
+        id: 'l_'+Date.now(), 
+        title: $('fLTi').value,           
+        amount: parseFloat($('fLAm').value), 
+        tenure: parseInt($('fLTn').value),   
+        rate: 0,                           
+        due: $('fLDu').value,             
+        pushedMo: null 
+      }; 
+      ac().loans.push(l); sv(); closeM('mLoan'); render(); 
+    }
+    //function addLoan() { console.log('addLoan function called!'); console.log('fLTi element:', fLTi); console.log('fLAm element:', fLAm); console.log('fLTn element:', fLTn); console.log('fLDu element:', fLDu); const l = { id: 'l_'+Date.now(), title: fLTi.value, amount: parseFloat(fLAm.value), tenure: parseInt(fLTn.value), rate: 0, due: fLDu.value, pushedMo: null }; ac().loans.push(l); sv(); closeM('mLoan'); render(); }
+    function pushLoan(id) { 
+      const l = ac().loans.find(x => x.id === id); 
+      if (!l) return;
+      
+      const monthlyPayment = l.amount / l.tenure;
+      const startMo = moKey(viewMo);
+      
+      // Generate monthly expense entries for the loan
+      for (let i = 0; i < l.tenure; i++) {
+        const paymentDate = new Date(startMo + '-01');
+        paymentDate.setMonth(paymentDate.getMonth() + i);
+        const dateStr = moKey(paymentDate);
+        
+        // Check if expense for this month already exists
+        const existingExpense = ac().expenses.find(e => 
+          e.loanId === l.id && e.date.startsWith(dateStr)
+        );
+        
+        if (!existingExpense) {
+          ac().expenses.push({
+            id: 'e_' + Date.now() + '_' + i,
+            name: l.title + ' Payment',
+            amount: monthlyPayment,
+            category: 'Loan Payment',
+            type: 'fixed',
+            date: dateStr + '-' + String(l.due || 1).padStart(2, '0'),
+            recurring: false,
+            payment: 'cash',
+            paid: false,
+            loanId: l.id
+          });
+        }
+      }
+      
+      l.pushedMo = startMo; 
+      sv(); 
+      render(); 
+      alert('Loan payments have been generated and added to your expenses!');
+    }
+    function startMonthlySavings(potId) {
+      const p = ac().savings.find(x => x.id === potId); if (!p) return;
+      
+      // Mark pot as pushed to main page
+      p.pushedMo = moKey(viewMo);
+      p.active = true;
+      
+      // Calculate monthly contribution
+      const monthsLeft = Math.max(0, Math.ceil((new Date(p.targetMonth + '-01') - new Date()) / (1000 * 60 * 60 * 24 * 30)));
+      const monthlyAmount = Math.ceil((p.target - p.current) / monthsLeft);
+      
+      // Create monthly transaction record
+      const transaction = {
+        id: 'trans_' + Date.now(),
+        type: 'savings',
+        title: `Payment to ${p.title}`,
+        amount: monthlyAmount,
+        date: td(),
+        potId: potId
+      };
+      
+      // Add to transactions
+      if (!ac().transactions) ac().transactions = [];
+      ac().transactions.push(transaction);
+      
+      // Add expense entry for this month
+      const expense = {
+        id: 'e_' + Date.now(),
+        name: `Payment to ${p.title}`,
+        amount: monthlyAmount,
+        category: 'Savings',
+        type: 'fixed',
+        date: td(),
+        payment: 'cash',
+        recurring: false,
+        paid: false,
+        potId: potId
+      };
+      
+      ac().expenses.push(expense);
+      sv(); render();
+      
+      alert(`Started monthly savings for ${p.title}. Monthly contribution: RM ${monthlyAmount.toFixed(2)}`);
+    }
     function viewDetail(type, id) {
       const item = (type==='inc'?ac().incomes:ac().expenses).find(x=>x.id===id); if (!item) return;
       $('detTitle').textContent = item.name;
@@ -1376,41 +3179,6 @@
         </div>
       `;
       
-      $('detContent').innerHTML = detailHtml;
-      $('detDelBtn').onclick = () => { if (confirm('Delete?')) { if (type==='inc') ac().incomes = ac().incomes.filter(x=>x.id!==id); else ac().expenses = ac().expenses.filter(x=>x.id!==id); sv(); closeM('mDetail'); render(); } };
-      openM('mDetail');
-    }
-
-    function renderCreditPg() {
-      const acc = ac(); if (!acc) return;
-      const credExps = acc.expenses.filter(e => e.payment === 'credit');
-      const totalOutstanding = credExps.reduce((s, e) => s + e.amount, 0);
-      
-      $('credTotal').textContent = fm(totalOutstanding);
-      const limit = Math.max(5000, totalOutstanding);
-      $('credUsageFill').style.width = Math.min(100, (totalOutstanding/limit)*100) + '%';
-
-      const sort = $('credSort').value;
-      if (sort === 'high') credExps.sort((a,b) => b.amount - a.amount);
-      else credExps.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-      $('credList').innerHTML = credExps.map(e => `
-        <div class="item-card fbc" style="border-left: 4px solid ${e.paid ? 'var(--green)' : 'var(--red)'}; background:${e.paid ? 'var(--green-bg)' : 'var(--red-bg)'};">
-          <div style="flex:1;">
-            <div style="font-weight:800;">${e.name}</div>
-            <div class="lbl" style="margin:0; font-size:0.6rem;">${new Date(e.date).toLocaleDateString('en-GB')} | ${e.category} | ${e.paid ? 'Paid' : 'Unpaid'}</div>
-          </div>
-          <div style="text-align:right;">
-            <div class="am pos" style="margin-bottom: var(--s2); color: ${e.paid ? 'var(--green)' : 'var(--red)'};">${fm(e.amount)}</div>
-            <button class="pill-btn on" style="min-height:32px; padding:0 var(--s3); font-size:0.7rem;" onclick="settleCreditItem('${e.id}')">Settle</button>
-          </div>
-        </div>
-      `).join('') || '<div class="empty">No credit expenses</div>';
-    }
-
-    function settleCreditItem(id) {
-      const e = ac().expenses.find(x => x.id === id); if (!e) return;
-      if (confirm('Settle this credit item with cash?')) {
         e.payment = 'cash'; // Convert to cash to reduce credit usage
         sv(); renderCreditPg(); render();
       }
@@ -1421,7 +3189,7 @@
       if (isNaN(amt) || amt <= 0) return alert('Enter valid amount');
       
       const acc = ac();
-      const credExps = acc.expenses.filter(e => e.payment === 'credit').sort((a,b) => b.amount - a.amount);
+      const credExps = acc.expenses.filter(e => e.payment === 'credit' && !e.paid).sort((a,b) => b.amount - a.amount);
       const totalOutstanding = credExps.reduce((s, e) => s + e.amount, 0);
       
       if (amt > totalOutstanding) return alert('Payment exceeds outstanding credit');
@@ -1431,7 +3199,7 @@
         if (remainingToPay <= 0) break;
         if (e.amount <= remainingToPay) {
           remainingToPay -= e.amount;
-          e.payment = 'cash'; // Fully settled
+          e.payment = 'cash'; // Convert to cash when settled
         } else {
           // Partially settle if possible (split item)
           const settledPart = { ...e, id: 'e_'+Math.random(), amount: remainingToPay, payment: 'cash' };
@@ -1441,9 +3209,302 @@
         }
       }
       
-      $('payCredAmt').value = '';
-      sv(); renderCreditPg(); render();
-      alert('Credit payment successful');
+      
+      $('cashExpList').innerHTML = listHtml;
+      
+      // Show the cash expenses page
+      $('pgCashExp').style.display = 'block';
+    }
+
+    function closeCashExpenses() {
+      $('pgCashExp').style.display = 'none';
+    }
+
+    function togglePaid(id) {
+      const e = ac().expenses.find(x => x.id === id); if (!e) return;
+      e.paid = !e.paid;
+      sv(); 
+      render(); // Update the main tracker in real-time
+    }
+
+    function showNotifications() {
+      const acc = ac(); if (!acc) return;
+      const today = td();
+      const mo = moKey(viewMo);
+      
+      let notifs = [];
+      
+      // Income notifications
+      acc.incomes.forEach(i => {
+        if (i.date.startsWith(mo) && !i.paid) {
+          const diff = (new Date(i.date) - new Date(today)) / 86400000;
+          if (diff <= 2 && diff > 0) notifs.push({ type: 'income', icon: '', message: `Almost pay day for ${i.name}`, priority: 'medium' });
+          else if (diff <= 0) notifs.push({ type: 'income', icon: '', message: `${i.name} should be in by now`, priority: 'high' });
+        }
+      });
+      
+      // Expense notifications
+      acc.expenses.forEach(e => {
+        if (e.date.startsWith(mo) && !e.paid) {
+          const diff = (new Date(e.date) - new Date(today)) / 86400000;
+          if (diff === 1) notifs.push({ type: 'expense', icon: '', message: `1 day left to pay ${e.name}!`, priority: 'high' });
+          else if (diff <= 0) notifs.push({ type: 'expense', icon: '', message: `${e.name} is DUE!`, priority: 'urgent' });
+        }
+      });
+      
+      // Savings notifications
+      acc.savings.forEach(p => {
+        if (p.active && p.current < p.target) {
+          const today = new Date();
+          const targetDate = new Date(p.targetMonth + '-01');
+          const daysLeft = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+          
+          if (daysLeft <= 30 && daysLeft > 0) {
+            const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
+            if (pct < 50) notifs.push({ type: 'savings', icon: '', message: `${p.title}: Only ${pct}% saved, ${daysLeft} days left!`, priority: 'medium' });
+          }
+        }
+      });
+      
+      // Sort by priority
+      const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+      notifs.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+      
+      $('notifList').innerHTML = notifs.length > 0 ? notifs.map(n => `
+        <div class="card mb10" style="border-left: 4px solid ${
+          n.priority === 'urgent' ? 'var(--red)' : 
+          n.priority === 'high' ? 'var(--orange)' : 
+          'var(--ac)'
+        }; padding: var(--s3);">
+          <div style="display: flex; align-items: center; gap: var(--s2);">
+            <span style="font-size: 1.2rem;">${n.icon}</span>
+            <div style="flex: 1;">
+              <div style="font-weight: 700; color: var(--text);">${n.message}</div>
+              <div style="font-size: 0.7rem; color: var(--text2); text-transform: uppercase;">${n.type}</div>
+            </div>
+          </div>
+        </div>
+      `).join('') : '<div class="empty">No notifications</div>';
+      
+      openM('mNotif');
+    }
+
+    function changeCalendarMonth(direction) {
+      const currentMonth = new Date(viewMo);
+      currentMonth.setMonth(currentMonth.getMonth() + direction);
+      viewMo = currentMonth;
+      showCalendarView();
+    }
+
+    function showCalendarView() {
+      const acc = ac(); if (!acc) return;
+      const mo = moKey(viewMo);
+      const today = td();
+      const year = parseInt(mo.split('-')[0]);
+      const month = parseInt(mo.split('-')[1]) - 1;
+      
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startingDayOfWeek = firstDay.getDay();
+      
+      let calendarHTML = `
+        <div class="card mb20">
+          <div class="fbc mb20">
+            <button class="btn btn-o" onclick="changeCalendarMonth(-1)">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <h3 style="margin: 0; color: var(--ac);">${firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h3>
+            <button class="btn btn-o" onclick="changeCalendarMonth(1)">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; margin-bottom: var(--s2);">
+            <div style="font-weight: 700; color: var(--text2); font-size: 0.8rem;">Sun</div>
+            <div style="font-weight: 700; color: var(--text2); font-size: 0.8rem;">Mon</div>
+            <div style="font-weight: 700; color: var(--text2); font-size: 0.8rem;">Tue</div>
+            <div style="font-weight: 700; color: var(--text2); font-size: 0.8rem;">Wed</div>
+            <div style="font-weight: 700; color: var(--text2); font-size: 0.8rem;">Thu</div>
+            <div style="font-weight: 700; color: var(--text2); font-size: 0.8rem;">Fri</div>
+            <div style="font-weight: 700; color: var(--text2); font-size: 0.8rem;">Sat</div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;">
+      `;
+      
+      // Empty cells for days before month starts
+      for (let i = 0; i < startingDayOfWeek; i++) {
+        calendarHTML += '<div style="padding: 8px;"></div>';
+      }
+      
+      // Days of the month
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const isToday = dateStr === today;
+        const hasIncome = acc.incomes.some(i => i.date === dateStr);
+        const hasExpense = acc.expenses.some(e => e.date === dateStr);
+        
+        let bgColor = 'var(--card)';
+        let textColor = 'var(--text)';
+        let events = [];
+        
+        if (hasIncome) events.push('');
+        if (hasExpense) events.push('');
+        
+        if (isToday) {
+          bgColor = 'var(--ac)';
+          textColor = '#fff';
+        }
+        
+        calendarHTML += `
+          <div style="
+            padding: 8px; 
+            background: ${bgColor}; 
+            color: ${textColor}; 
+            border-radius: 8px; 
+            cursor: pointer;
+            font-weight: ${isToday ? '900' : '700'};
+            text-align: center;
+            position: relative;
+          " onclick="setMo('${year}-${String(month + 1).padStart(2, '0')}'); closeM('mCalendar');">
+            <div>${day}</div>
+            ${events.length > 0 ? `<div style="font-size: 0.6rem; margin-top: 2px;">${events.join(' ')}</div>` : ''}
+          </div>
+        `;
+      }
+      
+      calendarHTML += '</div></div>';
+      
+      // Events list for the month
+      const monthEvents = [];
+      acc.incomes.filter(i => i.date.startsWith(mo)).forEach(i => {
+        monthEvents.push({ type: 'income', name: i.name, date: i.date, amount: i.amount, paid: i.paid });
+      });
+      acc.expenses.filter(e => e.date.startsWith(mo)).forEach(e => {
+        monthEvents.push({ type: 'expense', name: e.name, date: e.date, amount: e.amount, paid: e.paid });
+      });
+      
+      monthEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      if (monthEvents.length > 0) {
+        calendarHTML += `
+          <div class="card">
+            <h4 style="margin-bottom: var(--s3); color: var(--ac);">Monthly Events</h4>
+            <div style="max-height: 200px; overflow-y: auto;">
+              ${monthEvents.map(event => `
+                <div class="fbc mb10" style="padding: var(--s2); background: var(--card2); border-radius: 8px;">
+                  <div style="flex: 1;">
+                    <div style="font-weight: 700; color: var(--text);">${event.name}</div>
+                    <div style="font-size: 0.7rem; color: var(--text2);">${new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' })}</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-weight: 900; color: ${event.type === 'income' ? 'var(--green)' : 'var(--red)'};">
+                      ${event.type === 'income' ? '+' : '-'}${fm(event.amount)}
+                    </div>
+                    <div style="font-size: 0.6rem; color: ${event.paid ? 'var(--green)' : 'var(--text2)'};">
+                      ${event.paid ? 'Paid' : 'Pending'}
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      $('calendarContent').innerHTML = calendarHTML;
+      openM('mCalendar');
+    }
+
+    // Cash Expenses Page Functions
+    function showCashExpenses() {
+      const acc = ac();
+      const mo = moKey(viewMo);
+      
+      // Get cash expenses for current month
+      const cashExpenses = acc.expenses.filter(e => e.payment === 'cash' && e.date.startsWith(mo));
+      const totalCashExpenses = cashExpenses.reduce((sum, e) => sum + e.amount, 0);
+      
+      // Get savings contributions for current month
+      const savingsContributions = (acc.transactions || [])
+        .filter(t => t.type === 'savings' && t.date && t.date.startsWith(mo));
+      const totalSavings = savingsContributions.reduce((sum, t) => sum + t.amount, 0);
+      
+      // Update totals display
+      $('cashExpTotal').textContent = fm(totalCashExpenses);
+      $('savingsTotal').textContent = fm(totalSavings);
+      $('netCashImpact').textContent = fm(totalCashExpenses + totalSavings);
+      
+      // Render combined list
+      let listHtml = '';
+      
+      // Add cash expenses section
+      if (cashExpenses.length > 0) {
+        listHtml += `
+          <div style="margin-bottom: var(--s4); margin-top: var(--s5);">
+            <h4 style="color: var(--red); font-weight: 800; margin-bottom: var(--s2);">Cash Expenses</h4>
+            ${cashExpenses.map(e => {
+              const isDue = new Date(e.date) <= new Date() && !e.paid;
+              const typeColor = e.type === 'fixed' ? 'var(--green)' : (e.type === 'variable' ? 'var(--blue)' : 'var(--border)');
+              
+              return `
+                <div class="item-card fbc" style="border-left: 4px solid ${typeColor}; ${isDue ? 'background: var(--red-bg);' : ''}; margin-bottom: var(--s3);">
+                  <div class="paid-toggle ${e.paid ? 'on' : ''}" onclick="event.stopPropagation(); togglePaid('${e.id}')">
+                    <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
+                    <span>${e.paid ? 'Paid' : 'Unpaid'}</span>
+                  </div>
+                  <div style="flex:1; margin-left: var(--s3);">
+                    <div style="font-weight:800;">${e.name || 'Unnamed Expense'}</div>
+                    <div class="lbl" style="margin:0; font-size:0.6rem; color:${isDue ? 'var(--red)' : ''}">${e.category || 'No Category'} • ${new Date(e.date).toLocaleDateString('en-GB')}</div>
+                  </div>
+                  <div class="am neg">-${fm(e.amount || 0)}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+      
+      // Add savings contributions section
+      if (savingsContributions.length > 0) {
+        listHtml += `
+          <div style="margin-bottom: var(--s4);">
+            <h4 style="color: var(--green); font-weight: 800; margin-bottom: var(--s2);">Savings Contributions</h4>
+            ${savingsContributions.map(t => {
+              // Extract pot name from transaction title with fallback
+              const potName = (t.title && t.title.replace) ? t.title.replace('Payment to ', '') : 'Savings Contribution';
+              
+              return `
+                <div class="item-card fbc" style="border-left: 4px solid var(--green); background: var(--green-bg); margin-bottom: var(--s3);">
+                  <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; margin-right: var(--s3);">
+                    <i class="fas fa-coins" style="color: #fff; font-size: 16px;"></i>
+                  </div>
+                  <div style="flex:1;">
+                    <div style="font-weight:800; color: var(--green);">${potName}</div>
+                    <div class="lbl" style="margin:0; font-size:0.6rem; color: var(--green);">Savings • ${new Date(t.date || td()).toLocaleDateString('en-GB')}</div>
+                  </div>
+                  <div class="am neg" style="color: var(--green);">-${fm(t.amount || 0)}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+      
+      // Show empty message if no items
+      if (cashExpenses.length === 0 && savingsContributions.length === 0) {
+        listHtml = '<div class="empty">No cash expenses or savings contributions for this month</div>';
+      }
+      
+      $('cashExpList').innerHTML = listHtml;
+      
+      // Show: cash expenses modal
+      openM('mCashExpenses');
+    }
+
+    function closeCashExpenses() {
+      closeM('mCashExpenses');
     }
 
     init();
