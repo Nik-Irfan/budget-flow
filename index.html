@@ -839,6 +839,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       <button class="pill-btn dashed" style="width:100%;" onclick="addCat('inc')">+ Add Category</button>
     </div>
     <div class="card">
+    </div>
   </div>
 
   <!-- NAV -->
@@ -1045,84 +1046,6 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         }
         $('loadingScreen').classList.add('fade-out');
       }, 1500);
-    }
-
-    // Comprehensive debug function
-    function debugNavAll() {
-      console.log('🔍 === COMPREHENSIVE NAVIGATION DEBUG ===');
-      
-      // 1. Element existence
-      const nav = $('nav');
-      console.log('🔍 Nav element exists:', !!nav);
-      if (!nav) {
-        console.log('❌ Nav element not found!');
-        return;
-      }
-      
-      // 2. HTML content
-      console.log('🔍 Nav HTML:', nav.innerHTML.substring(0, 200) + '...');
-      
-      // 3. CSS styles
-      console.log('🔍 Nav display style:', nav.style.display);
-      console.log('🔍 Computed display:', window.getComputedStyle(nav).display);
-      console.log('🔍 Computed visibility:', window.getComputedStyle(nav).visibility);
-      console.log('🔍 Computed opacity:', window.getComputedStyle(nav).opacity);
-      console.log('🔍 Computed position:', window.getComputedStyle(nav).position);
-      console.log('🔍 Computed bottom:', window.getComputedStyle(nav).bottom);
-      console.log('🔍 Computed left:', window.getComputedStyle(nav).left);
-      console.log('🔍 Computed z-index:', window.getComputedStyle(nav).zIndex);
-      console.log('🔍 Computed height:', window.getComputedStyle(nav).height);
-      console.log('🔍 Computed width:', window.getComputedStyle(nav).width);
-      
-      // 4. Position and dimensions
-      const rect = nav.getBoundingClientRect();
-      console.log('🔍 Nav rect:', rect);
-      console.log('🔍 Nav viewport position:', {
-        top: rect.top,
-        bottom: rect.bottom,
-        left: rect.left,
-        right: rect.right,
-        width: rect.width,
-        height: rect.height
-      });
-      
-      // 5. Parent elements
-      console.log('🔍 Parent element:', nav.parentElement);
-      console.log('🔍 Parent display:', window.getComputedStyle(nav.parentElement).display);
-      
-      // 6. Viewport info
-      console.log('🔍 Viewport height:', window.innerHeight);
-      console.log('🔍 Document height:', document.documentElement.scrollHeight);
-      console.log('🔍 Scroll position:', window.scrollY);
-      
-      // 7. Body styles
-      console.log('🔍 Body overflow:', window.getComputedStyle(document.body).overflow);
-      console.log('🔍 Body overflow-x:', window.getComputedStyle(document.body).overflowX);
-      console.log('🔍 Body overflow-y:', window.getComputedStyle(document.body).overflowY);
-      
-      // 8. Check if nav is in viewport
-      const isInViewport = rect.top >= 0 && rect.left >= 0 && 
-                           rect.bottom <= window.innerHeight && 
-                           rect.right <= window.innerWidth;
-      console.log('🔍 Is nav in viewport:', isInViewport);
-      
-      console.log('🔍 === END COMPREHENSIVE DEBUG ===');
-    }
-
-    // Force show nav function
-    function forceShowNav() {
-      console.log('🔧 Forcing nav to show...');
-      const nav = $('nav');
-      if (nav) {
-        nav.style.display = 'flex !important';
-        nav.style.visibility = 'visible !important';
-        nav.style.zIndex = '9999 !important';
-        nav.style.position = 'fixed !important';
-        nav.style.bottom = '20px !important';
-        nav.style.left = '50% !important';
-        nav.style.transform = 'translateX(-50%) !important';
-        console.log('🔧 Nav forced to show');
-      }
     }
 
     function applyPrefs() {
@@ -1843,9 +1766,6 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       return income - expenses;
     }
     function renderPots(acc, mo) {
-      console.log('renderPots called with:', acc, mo);
-      console.log('savings array:', acc.savings);
-      
       // Get filter and sort criteria from dropdowns
       const filterCriteria = document.querySelector('select[onchange*="filterPots"]').value;
       const sortCriteria = document.querySelector('select[onchange*="sortPots"]').value;
@@ -1884,8 +1804,6 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         filteredPots.sort((a, b) => (a.current/a.target) - (b.current/b.target));
       }
       
-      console.log('filteredPots after filter/sort:', filteredPots);
-      
       // Render filtered pots
       $('potList').innerHTML = filteredPots.map(p => {
         const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
@@ -1898,7 +1816,6 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
                           : p.icon === 'fa-plane' ? '✈️'
                           : '🍯';
         
-        console.log('rendering pot:', p.title, 'active:', isActive);
         // Calculate monthly contribution needed
         const today = new Date();
         const targetDate = new Date(p.targetMonth + '-01');
@@ -1963,8 +1880,6 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         </div>
       `;
       }).join('') || '<div class="empty">No saving pots</div>';
-      
-      console.log('renderPots completed, potList innerHTML:', $('potList').innerHTML);
     }
     function togglePotActive(id) {
       const p = ac().savings.find(x => x.id === id); if (!p) return;
@@ -2440,11 +2355,6 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
     function closeM(id) { $(id).classList.remove('on'); setTimeout(()=>$(id).style.display = 'none', 300); }
     function addLoan() 
     { 
-      console.log('addLoan function called!'); 
-      console.log('fLTi element:', $('fLTi')); 
-      console.log('fLAm element:', $('fLAm')); 
-      console.log('fLTn element:', $('fLTn')); 
-      console.log('fLDu element:', $('fLDu')); 
       const l = { 
         id: 'l_'+Date.now(), 
         title: $('fLTi').value,           
@@ -2454,7 +2364,7 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
         due: $('fLDu').value,             
         pushedMo: null 
       }; 
-      console.log('Loan object created:', l); console.log('Current account:', ac()); ac().loans.push(l); console.log('Loan added to account'); sv(); console.log('Data saved'); closeM('mLoan'); console.log('Modal closed'); render(); console.log('Render completed'); 
+      ac().loans.push(l); sv(); closeM('mLoan'); render(); 
     }
     //function addLoan() { console.log('addLoan function called!'); console.log('fLTi element:', fLTi); console.log('fLAm element:', fLAm); console.log('fLTn element:', fLTn); console.log('fLDu element:', fLDu); const l = { id: 'l_'+Date.now(), title: fLTi.value, amount: parseFloat(fLAm.value), tenure: parseInt(fLTn.value), rate: 0, due: fLDu.value, pushedMo: null }; ac().loans.push(l); sv(); closeM('mLoan'); render(); }
     function pushLoan(id) { 
