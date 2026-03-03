@@ -973,12 +973,25 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         <button class="btn" style="flex:1;" onclick="setTheme('dark')">Dark</button>
       </div>
     </div>
-    <div class="card">
+<div class="card">
       <span class="lbl">Income Categories</span>
       <div id="setCatInc" class="mb10" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
       <button class="pill-btn dashed" style="width:100%;" onclick="addCat('inc')">+ Add Category</button>
     </div>
+    
     <div class="card">
+      <span class="lbl">Data Management</span>
+      <div style="display: flex; flex-direction: column; gap: var(--s3);">
+      <button class="btn btn-o" style="color: var(--orange); border-color: var(--orange);" onclick="clearIncomeExpenses()">
+        <i class="fas fa-trash"></i> Clear All Data
+      </button>
+        <button class="btn btn-o" style="color: var(--red); border-color: var(--red);" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+        <button class="btn btn-o" style="color: var(--ac); border-color: var(--ac);" onclick="generateTestData()">
+          <i class="fas fa-flask"></i> Generate Test Data
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1123,25 +1136,33 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
 
   <!-- CASH EXPENSES MODAL -->
   <div id="mCashExpenses" class="pg" style="position: fixed; inset:0; background: var(--bg); z-index: 2000; display: none;">
-    <h2 style="font-weight: 900; padding: 24px 20px 0; color: var(--ac);">Cash Balance Details</h2>
-    <div style="padding: 20px;">
-      <div class="card mb20" style="background: var(--ac); color: #fff;">
-        <div class="fbc mb20">
-          <span>Cash Expenses</span>
-          <span id="cashExpTotal">RM 0.00</span>
+    <h2 style="font-weight: 900; padding: var(--s4) var(--s4) var(--s2); color: var(--ac);">Cash Balance Details</h2>
+    <div style="padding: 0 var(--s4) var(--s4);">
+      <div class="card mb20" style="background: var(--ac); color: #fff; padding: var(--s5);">
+        <div class="fbc mb20" style="gap: var(--s3);">
+          <div>
+            <div style="font-size: 0.8rem; opacity: 0.8; margin-bottom: var(--s1);">Cash Expenses</div>
+            <div id="cashExpTotal" style="font-weight: 900; font-size: 1.3rem;">RM 0.00</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.8rem; opacity: 0.8; margin-bottom: var(--s1);">Savings</div>
+            <div id="savingsTotal" style="font-weight: 900; font-size: 1.3rem;">RM 0.00</div>
+          </div>
         </div>
-        <div class="fbc mb20">
-          <span>Savings Contributions</span>
-          <span id="savingsTotal">RM 0.00</span>
-        </div>
-        <div class="fbc" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: var(--s2); margin-top: var(--s2);">
-          <span>Net Cash Impact</span>
-          <span id="netCashImpact" style="font-weight: 900; font-size: 1.1rem;">RM 0.00</span>
+        <div class="fbc" style="border-top: 1px solid rgba(255,255,255,0.3); padding-top: var(--s4); margin-top: var(--s3); gap: var(--s3);">
+          <div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">Net Impact</div>
+            <div id="netCashImpact" style="font-weight: 900; font-size: 1.5rem;">RM 0.00</div>
+          </div>
         </div>
       </div>
-      <div id="cashExpList"></div>
+      
+      <div class="card" style="padding: var(--s4);">
+        <h3 style="font-weight: 800; margin-bottom: var(--s4); color: var(--text);">Cash Expenses Breakdown</h3>
+        <div id="cashExpList" style="display: flex; flex-direction: column; gap: var(--s3);"></div>
+      </div>
     </div>
-    <button class="close-btn-full" onclick="closeCashExpenses()" style="background: #fff; color: var(--text2); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 20px;"><i class="fas fa-arrow-left"></i> Go Back</button>
+    <button class="close-btn-full" onclick="closeCashExpenses()" style="background: #fff; color: var(--text2); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 0 var(--s4) var(--s4);"><i class="fas fa-arrow-left"></i> Go Back</button>
   </div>
 
   <script>
@@ -1306,7 +1327,6 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       sv();
       console.log('=== END MONTHLY RESET ===');
     }
-
     function setMo(key) {
       console.log('=== MONTH SELECTION DEBUG ===');
       console.log('Before - Selected Month Key:', key);
@@ -1317,11 +1337,30 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       console.log('After - New viewMo:', viewMo);
       console.log('After - New viewMo key:', moKey(viewMo));
       
-      processRecurring(); render(); renderCalendarGrid();
+      // Reset paid status for income/expenses when switching months
+      const acc = ac();
+      if (acc) {
+        const newMonth = moKey(viewMo);
+        
+        // Reset income paid status for items not in the new month
+        acc.incomes.forEach(inc => {
+          if (!inc.date.startsWith(newMonth)) {
+            inc.paid = false;
+          }
+        });
+        
+        // Reset expense paid status for items not in the new month  
+        acc.expenses.forEach(exp => {
+          if (!exp.date.startsWith(newMonth)) {
+            exp.paid = false;
+          }
+        });
+        
+        sv();
+      }
       
-      console.log('=== END MONTH DEBUG ===');
+      processRecurring(); render(); renderCalendarGrid();
     }
-
     function go(id, btn) {
       if (id === 'pgT') processRecurring();
       showPg(id);
@@ -1540,7 +1579,12 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
     }
     function toggleReceived(id) {
       const i = ac().incomes.find(x => x.id === id); if (!i) return;
-      i.paid = !i.paid; 
+      i.paid = !i.paid;
+      
+      // If marking as paid, update date to current month
+      if (i.paid) {
+        i.date = getCurrentMonth() + '-01';
+      } 
       
       sv(); render();
     }
@@ -1858,6 +1902,13 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       renderExtraAnalytics(ac(), type);
     }
     function renderActivePots(acc, mo) {
+      // Safety check: if no savings or empty array, clear DOM and return
+      if (!acc.savings || acc.savings.length === 0) {
+        $('beforeExpensesPots').innerHTML = '';
+        $('afterExpensesPots').innerHTML = '';
+        return;
+      }
+      
       const activePots = acc.savings.filter(p => {
         // Filter out pots that have reached or exceeded their target
         if (p.current >= p.target) return false;
@@ -2006,55 +2057,55 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
     function getCurrentBalance() {
       const acc = ac();
       
-      console.log('=== CASH BALANCE DEBUG ===');
-      console.log('Account data:', acc);
-      
       // Initialize arrays if they don't exist
       if (!acc.incomes) acc.incomes = [];
       if (!acc.expenses) acc.expenses = [];
       if (!acc.transactions) acc.transactions = [];      
+      
       // Get current month (YYYY-MM format)
       const currentMonth = getCurrentMonth();
-      console.log('Current month for balance:', currentMonth);      
-      // Calculate income (current month + recurring) - include paid items regardless of month
+      
+      // Debug: Log all income items
+      console.log('All income items:', acc.incomes.map(inc => ({
+        name: inc.name,
+        amount: inc.amount,
+        date: inc.date,
+        paid: inc.paid,
+        startsWithCurrentMonth: inc.date && inc.date.startsWith(currentMonth)
+      })));
+      
+      // Calculate income (current month + recurring) - only include paid items
       const income = acc.incomes
         .filter(inc => {
           const isCurrentMonth = inc.date && inc.date.startsWith(currentMonth);
-          const isRecurring = inc.recurring === true;
-          const isPaid = inc.paid === true; // Only include paid income
-          const include = isPaid; // Include all paid income regardless of month
-          console.log(`Income: ${inc.name} - Amount: ${inc.amount} - Current: ${isCurrentMonth} - Recurring: ${isRecurring} - Paid: ${isPaid} - Include: ${include}`);
+          const isPaid = inc.paid === true;
+          const include = isCurrentMonth && isPaid;
+          console.log(`Income: ${inc.name} - Amount: ${inc.amount} - Current: ${isCurrentMonth} - Paid: ${isPaid} - Include: ${include}`);
           return include;
         })
-        .reduce((sum, inc) => sum + inc.amount, 0);      
-      // Calculate cash expenses only (exclude credit expenses) - ONLY include paid items
+        .reduce((sum, inc) => sum + inc.amount, 0);    
+      
+      // Calculate cash expenses only (exclude credit expenses) - only include paid items
       const cashExpenses = acc.expenses
         .filter(exp => {
           const isCurrentMonth = exp.date && exp.date.startsWith(currentMonth);
           const isCash = exp.payment === 'cash';
-          const isPaid = exp.paid === true; // Only include paid expenses
-          const include = isCurrentMonth && isCash && isPaid; // Only include current month paid expenses
-          console.log(`Expense: ${exp.name} - Amount: ${exp.amount} - Current: ${isCurrentMonth} - Cash: ${isCash} - Paid: ${isPaid} - Include: ${include}`);
+          const isPaid = exp.paid === true;
+          const include = isCurrentMonth && isCash && isPaid;
           return include;
         })
         .reduce((sum, exp) => sum + exp.amount, 0);
-        
-      console.log('Total paid cash expenses:', cashExpenses);
-        
+          
       // Calculate savings contributions (deductions from cash)
       const savingsDeductions = (acc.transactions || [])
         .filter(t => t.type === 'savings' && t.date && t.date.startsWith(currentMonth))
         .reduce((sum, t) => sum + t.amount, 0);
-        
-      console.log('Total savings deductions:', savingsDeductions);
-      
+          
       // Calculate balance: income - cash expenses - savings deductions
       const calculatedBalance = income - cashExpenses - Math.min(savingsDeductions, Math.max(0, income - cashExpenses));
       
       console.log('Balance calculation:', `${income} - ${cashExpenses} - ${savingsDeductions} = ${calculatedBalance}`);
-      console.log('=== END CASH BALANCE DEBUG ===');
       
-      // Always use calculated balance for dynamic updates
       return calculatedBalance;
     }
     let potColor = '#6366f1';
@@ -3050,8 +3101,185 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
       openM('mCashExpenses');
     }
 
-    function closeCashExpenses() {
+function closeCashExpenses() {
       closeM('mCashExpenses');
+    }
+
+  function clearIncomeExpenses() {
+    if (!confirm('Are you sure you want to clear ALL data? This will clear income, expenses, savings pots, loans, and transactions. This cannot be undone.')) return;
+    
+    const acc = ac();
+    if (acc) {
+      acc.incomes = [];
+      acc.expenses = [];
+      acc.savings = []; // Clear savings pots
+      acc.loans = [];    // Clear loans
+      acc.transactions = []; // Clear transactions too
+      
+      // Also clear the DOM elements directly to ensure nothing remains visible
+      $('beforeExpensesPots').innerHTML = '';
+      $('afterExpensesPots').innerHTML = '';
+      $('potList').innerHTML = '';
+      $('loanList').innerHTML = '';
+      
+      sv();
+      render();
+      alert('All data has been cleared including income, expenses, savings pots, loans, and transaction history.');
+    }
+  }
+    function logout() {
+      if (!confirm('Are you sure you want to logout? This will return you to the registration page.')) return;
+      
+      // Clear current account and go to registration
+      cur = null;
+      showPg('pgW');
+      $('nav').style.display = 'none';
+    }
+
+function generateTestData() {
+  if (!confirm('Generate test data? This will add sample income, expenses, savings pots, and loans for testing.')) return;
+  
+  const acc = ac();
+  if (!acc) return;
+  
+  const today = td();
+  const currentMonth = getCurrentMonth();
+  
+  // Clear existing data first
+  acc.incomes = [];
+  acc.expenses = [];
+  acc.savings = [];
+  acc.loans = [];
+  acc.transactions = [];
+  
+  // Add test income
+  acc.incomes.push(
+    { id: 'i_test1', name: 'Test Salary', amount: 5000, category: 'Salary', date: currentMonth + '-15', recurring: true, paid: false },
+    { id: 'i_test2', name: 'Freelance Work', amount: 1500, category: 'Freelance', date: currentMonth + '-20', recurring: false, paid: false },
+    { id: 'i_test3', name: 'Investment Returns', amount: 800, category: 'Investment', date: currentMonth + '-05', recurring: true, paid: false },
+    { id: 'i_test4', name: 'Part-time Job', amount: 1200, category: 'Side Hustle', date: currentMonth + '-10', recurring: true, paid: false }
+  );
+  
+  // Add test expenses
+  acc.expenses.push(
+    { id: 'e_test1', name: 'Rent', amount: 1200, category: 'Housing', type: 'fixed', date: currentMonth + '-01', recurring: true, payment: 'cash', paid: false },
+    { id: 'e_test2', name: 'Groceries', amount: 400, category: 'Food', type: 'variable', date: currentMonth + '-10', recurring: true, payment: 'cash', paid: false },
+    { id: 'e_test3', name: 'Utilities', amount: 150, category: 'Bills', type: 'fixed', date: currentMonth + '-15', recurring: true, payment: 'cash', paid: false },
+    { id: 'e_test4', name: 'Internet', amount: 100, category: 'Bills', type: 'fixed', date: currentMonth + '-20', recurring: true, payment: 'credit', paid: false },
+    { id: 'e_test5', name: 'Dining Out', amount: 200, category: 'Food', type: 'variable', date: currentMonth + '-25', recurring: false, payment: 'cash', paid: false },
+    { id: 'e_test6', name: 'Car Insurance', amount: 300, category: 'Transport', type: 'fixed', date: currentMonth + '-05', recurring: true, payment: 'cash', paid: false },
+    { id: 'e_test7', name: 'Shopping', amount: 250, category: 'Personal', type: 'variable', date: currentMonth + '-12', recurring: false, payment: 'credit', paid: false }
+  );
+  
+      // Add test savings pots with different conditions
+      acc.savings.push(
+        { 
+          id: 'p_test1', 
+          title: 'Emergency Fund', 
+          target: 10000, 
+          targetMonth: '2024-12', 
+          icon: 'fa-shield-halved', 
+          color: '#10b981', 
+          strategy: 'before', 
+          current: 2500, 
+          active: true,
+          pushedMo: currentMonth 
+        },
+        { 
+          id: 'p_test2', 
+          title: 'Vacation Fund', 
+          target: 5000, 
+          targetMonth: '2024-08', 
+          icon: 'fa-plane', 
+          color: '#f59e0b', 
+          strategy: 'after', 
+          current: 1200, 
+          active: true,
+          pushedMo: currentMonth 
+        },
+        { 
+          id: 'p_test3', 
+          title: 'New Laptop', 
+          target: 3000, 
+          targetMonth: '2024-10', 
+          icon: 'fa-laptop', 
+          color: '#6366f1', 
+          strategy: 'before', 
+          current: 800, 
+          active: true,
+          pushedMo: currentMonth 
+        },
+        { 
+          id: 'p_test4', 
+          title: 'Home Renovation', 
+          target: 15000, 
+          targetMonth: '2025-06', 
+          icon: 'fa-home', 
+          color: '#ef4444', 
+          strategy: 'after', 
+          current: 2000, 
+          active: false // Not yet started
+        },
+        { 
+          id: 'p_test5', 
+          title: 'Wedding Fund', 
+          target: 20000, 
+          targetMonth: '2025-12', 
+          icon: 'fa-heart', 
+          color: '#ec4899', 
+          strategy: 'before', 
+          current: 5000, 
+          active: true,
+          pushedMo: currentMonth 
+        }
+      );
+      
+      // Add test loans with different conditions
+      acc.loans.push(
+        { 
+          id: 'l_test1', 
+          title: 'Car Loan', 
+          amount: 50000, 
+          tenure: 60, 
+          rate: 0, 
+          due: 15, 
+          pushedMo: null // Not yet started
+        },
+        { 
+          id: 'l_test2', 
+          title: 'Personal Loan', 
+          amount: 10000, 
+          tenure: 24, 
+          rate: 0, 
+          due: 5, 
+          pushedMo: currentMonth // Already started
+        },
+        { 
+          id: 'l_test3', 
+          title: 'Education Loan', 
+          amount: 25000, 
+          tenure: 36, 
+          rate: 0, 
+          due: 25, 
+          pushedMo: null // Not yet started
+        }
+      );
+      
+      // Ensure categories exist
+      if (!acc.categories.inc.includes('Salary')) acc.categories.inc.push('Salary');
+      if (!acc.categories.inc.includes('Freelance')) acc.categories.inc.push('Freelance');
+      if (!acc.categories.inc.includes('Investment')) acc.categories.inc.push('Investment');
+      if (!acc.categories.inc.includes('Side Hustle')) acc.categories.inc.push('Side Hustle');
+      
+      if (!acc.categories.exp.includes('Housing')) acc.categories.exp.push('Housing');
+      if (!acc.categories.exp.includes('Food')) acc.categories.exp.push('Food');
+      if (!acc.categories.exp.includes('Bills')) acc.categories.exp.push('Bills');
+      if (!acc.categories.exp.includes('Transport')) acc.categories.exp.push('Transport');
+      if (!acc.categories.exp.includes('Personal')) acc.categories.exp.push('Personal');
+      
+      sv();
+      render();
+      alert('Test data generated! You now have:\n• 4 income items\n• 7 expenses (cash & credit)\n• 5 savings pots (active & inactive)\n• 3 loans (started & not started)\n\nYou can decide which loans and savings pots to push to the main page!');
     }
 
     init();
