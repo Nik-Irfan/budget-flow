@@ -1166,13 +1166,100 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
   </div>
 
   <script>
+    alert('Script starts here!');
+    
+    // Define all constants and functions FIRST
     const K = 'bf4';
     const DB_DEFAULTS = { accounts: [], prefs: { theme: 'light', accent: 'indigo' } };
+  
+    function renderCreditPg() {
+      console.log('=== CREDIT PAGE DEBUG ===');
+      const acc = ac();
+      if (!acc) {
+        console.log('No account found');
+        return;
+      }
+      
+      console.log('Account:', acc);
+      console.log('Expenses:', acc.expenses);
+      
+      // Get unpaid credit expenses only (NOT paid ones)
+      const unpaidCreditExpenses = acc.expenses.filter(e => e.payment === 'credit' && !e.paid);
+      const totalCreditOutstanding = unpaidCreditExpenses.reduce((sum, e) => sum + e.amount, 0);
+
+      console.log('Unpaid credit expenses:', unpaidCreditExpenses);
+      console.log('Total credit outstanding:', totalCreditOutstanding);
+      
+      const container = $('credList');
+      if (!container) {
+        console.log('Credit container not found');
+        return;
+      }
+      
+      if (unpaidCreditExpenses.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="padding: var(--s4); margin-bottom: var(--s4);">
+            <h3 style="font-weight: 800; margin-bottom: var(--s3);">Total Credit Outstanding</h3>
+            <div style="font-weight: 900; font-size: 2rem; color: var(--green); text-align: center; padding: var(--s3) 0;">
+              ${fm(0)}
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      // Sort by selected option
+      const sortValue = $('credSort')?.value || 'high';
+      const sorted = [...unpaidCreditExpenses].sort((a, b) => {
+        if (sortValue === 'high') return b.amount - a.amount;
+        if (sortValue === 'date') return new Date(b.date) - new Date(a.date);
+        return 0;
+      });
+      
+    container.innerHTML = `
+      <!-- Credit Outstanding Summary -->
+      <div class="card" style="padding: var(--s4); margin-bottom: var(--s4);">
+        <h3 style="font-weight: 800; margin-bottom: var(--s3);">Total Credit Outstanding</h3>
+        <div style="font-weight: 900; font-size: 2rem; color: var(--red); text-align: center; padding: var(--s3) 0;">
+          ${fm(totalCreditOutstanding)}
+        </div>
+      </div>
+      
+      <!-- Individual Credit Items -->
+      ${sorted.map(e => `
+        <div class="item-card" style="border-left: 4px solid var(--purple);">
+          <div style="flex:1;">
+            <div style="font-weight:800;">${e.name}</div>
+            <div class="lbl">${new Date(e.date).toLocaleDateString('en-GB')} • ${e.category || 'Uncategorized'}</div>
+          </div>
+          <div class="am neg">-${fm(e.amount)}</div>
+        </div>
+      `).join('')}
+    `;
+      
+      console.log('=== END CREDIT PAGE DEBUG ===');
+    }
+    
+    function go(id) {
+      console.log('=== PAGE NAVIGATION DEBUG ===');
+      console.log('Navigating to page:', id);
+      
+      showPg(id);
+      render();
+      if (id === 'pgD') renderAnalytics();
+      if (id === 'pgSe') renderSettingsCats();
+      if (id === 'pgC') {
+        console.log('Rendering credit page...');
+        renderCreditPg();
+      }
+      
+      console.log('=== END PAGE NAVIGATION DEBUG ===');
+    }
 
     function loadDb() {
       const raw = localStorage.getItem(K);
       if (!raw) return structuredClone(DB_DEFAULTS);
-
+  
       try {
         const parsed = JSON.parse(raw) || {};
         return {
@@ -1183,21 +1270,19 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
             ...(parsed.prefs || {})
           }
         };
-      } catch {
+      } catch (e) {
+        console.error('DB load error:', e);
         return structuredClone(DB_DEFAULTS);
       }
     }
-
+  
     let db = loadDb();
     let cur = null, viewMo = new Date();
     viewMo = new Date(viewMo.getFullYear(), viewMo.getMonth(), 1); // Properly set to first day of current month
     let oData = { name: '', inc: [], exp: [], categories: { inc: [], exp: [] } };
     let anaTab = 'inc';
     let anaSelectedCats = [];
-    let potStrat = 'before';
-
-    const $ = id => document.getElementById(id);
-    const sv = () => localStorage.setItem(K, JSON.stringify(db));
+  
     const ac = () => db.accounts.find(a => a.id === cur);
     const fm = n => 'RM ' + (+n).toFixed(2);
     const td = () => {
@@ -1210,26 +1295,50 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
     const moKey = (d) => d.toISOString().split('T')[0].substring(0, 7);
     const getCurrentMonth = () => moKey(new Date());
 
+    const $ = id => document.getElementById(id);
+    const sv = () => localStorage.setItem(K, JSON.stringify(db));
+    let potStrat = 'before';
+
+    // NOW you can use them
+    console.log('=== SCRIPT START ===');
+    console.log('Current date:', new Date());
+    console.log('Current month:', getCurrentMonth());
+  
     function init() {
-      // Ensure current account has transactions array
-      if (cur) {
-        const acc = ac();
-        if (!acc.transactions) acc.transactions = [];
-        if (!acc.savings) acc.savings = [];
-        sv();
+      try {
+        console.log('=== INIT START ===');
+        
+        // Set to current month on page load
+        viewMo = new Date();
+        
+        console.log('=== INIT DEBUG ===');
+        console.log('viewMo set to:', viewMo);
+        console.log('moKey(viewMo):', moKey(viewMo));
+        
+        // Ensure current account has transactions array
+        if (cur) {
+          const acc = ac();
+          if (!acc.transactions) acc.transactions = [];
+          if (!acc.savings) acc.savings = [];
+          sv();
+        }
+        applyPrefs();
+        setTimeout(() => {
+          if (db.accounts.length > 0) { 
+            cur = db.accounts[0].id; 
+            go('pgT'); 
+            $('nav').style.display = 'flex'; // Show navigation bar
+          }
+          else { 
+            showPg('pgW'); 
+          }
+          $('loadingScreen').classList.add('fade-out');
+        }, 1500);
+        
+        console.log('=== INIT END ===');
+      } catch (error) {
+        console.error('INIT ERROR:', error);
       }
-      applyPrefs();
-      setTimeout(() => {
-        if (db.accounts.length > 0) { 
-          cur = db.accounts[0].id; 
-          go('pgT'); 
-          $('nav').style.display = 'flex'; // Show navigation bar
-        }
-        else { 
-          showPg('pgW'); 
-        }
-        $('loadingScreen').classList.add('fade-out');
-      }, 1500);
     }
 
     function applyPrefs() {
@@ -1332,11 +1441,13 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       console.log('Before - Selected Month Key:', key);
       console.log('Before - Current viewMo:', viewMo);
       
-      viewMo = new Date(key + '-01');
+      // Parse the key manually to avoid timezone issues
+      const [year, month] = key.split('-').map(Number);
+      viewMo = new Date(year, month - 1, 1); // month-1 because JS months are 0-indexed
       
       console.log('After - New viewMo:', viewMo);
       console.log('After - New viewMo key:', moKey(viewMo));
-      
+          
       // Reset paid status for income/expenses when switching months
       const acc = ac();
       if (acc) {
@@ -1569,13 +1680,22 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       const e = ac().expenses.find(x => x.id === id); if (!e) return;
       e.paid = !e.paid;
       
+      console.log(`Toggled expense: ${e.name} - Now paid: ${e.paid}`);
+      
       // If it's an auto-generated saving item being marked as paid
       if (e.potId && e.paid) {
         const p = ac().savings.find(x => x.id === e.potId);
         if (p) p.current += e.amount;
       }
       
-      sv(); render();
+      sv(); 
+      render();
+      
+      // Refresh credit page if we're on it
+      if ($('pgC').style.display !== 'none') {
+        console.log('Refreshing credit page...');
+        renderCreditPg();
+      }
     }
     function toggleReceived(id) {
       const i = ac().incomes.find(x => x.id === id); if (!i) return;
@@ -1585,6 +1705,21 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       
       sv(); 
       render();
+      
+      // Force update cash balance display
+      const currentCashBalance = getCurrentBalance();
+      const statNetEl = $('statNet');
+      if (statNetEl) {
+        statNetEl.textContent = fm(currentCashBalance);
+        if (currentCashBalance < 0) {
+          statNetEl.style.color = '#ff6b6b';
+        } else if (currentCashBalance >= 1000) {
+          statNetEl.style.color = '#00ff00';
+        } else {
+          statNetEl.style.color = currentCashBalance >= 0 ? '#ffffff' : 'var(--red)';
+        }
+        console.log('Updated cash balance display to:', fm(currentCashBalance));
+      }
     }
     function processRecurring() {
       const acc = ac(); if (!acc) return;
@@ -1646,7 +1781,13 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       const acc = ac(); if (!acc) return;
       const today = td();
       const mo = moKey(viewMo);
-      
+
+      // Add debugging to check month synchronization
+      console.log('=== RENDER DEBUG ===');
+      console.log('viewMo:', viewMo);
+      console.log('mo (filtered):', mo);
+      console.log('getCurrentMonth():', getCurrentMonth());
+
       // Clear all existing totals at the start
       document.querySelectorAll('#income-totals, #expense-totals').forEach(el => el.remove());
       
@@ -1661,11 +1802,11 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       if (statNetEl) {
         statNetEl.textContent = fm(currentCashBalance);
         if (currentCashBalance < 0) {
-          statNetEl.style.color = '#ff6b6b'; // Bright light red for negative
+          statNetEl.style.color = '#ff6b6b';
         } else if (currentCashBalance >= 1000) {
-          statNetEl.style.color = '#00ff00'; // Bright green for above 1000
+          statNetEl.style.color = '#00ff00';
         } else {
-          statNetEl.style.color = currentCashBalance >= 0 ? '#ffffff' : 'var(--red)'; // White for 0-999, red for negative
+          statNetEl.style.color = currentCashBalance >= 0 ? '#ffffff' : 'var(--red)';
         }
       }
       
@@ -1946,44 +2087,77 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       renderExtraAnalytics(ac(), type);
     }
     function renderActivePots(acc, mo) {
+      console.log('=== SAVINGS PAGE DEBUG ===');
+      console.log('Account:', acc);
+      console.log('Savings array:', acc.savings);
+      console.log('Savings length:', acc.savings ? acc.savings.length : 0);
+      console.log('Month:', mo);
+
       // Safety check: if no savings or empty array, clear DOM and return
       if (!acc.savings || acc.savings.length === 0) {
+        console.log('No savings found, clearing DOM');
         $('beforeExpensesPots').innerHTML = '';
         $('afterExpensesPots').innerHTML = '';
         return;
       }
-      
-      const activePots = acc.savings.filter(p => {
+
+      console.log('Rendering pots...');
+
+const activePots = acc.savings.filter(p => {
+  console.log(`Checking pot: ${p.name}`);
+  console.log(`  - Current: ${p.current}, Target: ${p.target}`);
+  console.log(`  - Active: ${p.active}`);
+  console.log(`  - PushedMo: ${p.pushedMo}`);
+  
         // Filter out pots that have reached or exceeded their target
-        if (p.current >= p.target) return false;
-        
-        if (!p.active) return false;
-        
-        if (p.pushedMo) {
-          const start = new Date(p.pushedMo + '-01');
-          const end = new Date(p.targetMonth + '-01');
-          const current = new Date(mo + '-01');
-          return current >= start && current <= end;
+        if (p.current >= p.target) {
+          console.log(`  - FILTERED: Reached target`);
+          return false;
         }
-        return false;
+        
+        if (!p.active) {
+          console.log(`  - FILTERED: Not active`);
+          return false;
+        }
+        
+      if (p.pushedMo) {
+        const start = new Date(p.pushedMo + '-01');
+        const end = new Date(p.targetMonth + '-01');
+        const current = new Date(mo + '-01');
+        const inRange = current >= start && current <= end;
+        console.log(`  - Date range: ${start} to ${end}, Current: ${current}, In range: ${inRange}`);
+        if (!inRange) {
+          console.log(`  - FILTERED: Not in date range`);
+          return false;
+        }
+      } else {
+        // If no pushedMo, show the pot
+        console.log(`  - No pushedMo, showing pot`);
+      }
+        
+        console.log(`  - PASSED: This pot will be shown`);
+        return true;
       });
+
+      console.log('Active pots after filtering:', activePots);
+      console.log('Active pots length:', activePots.length);
       
-      // Sort pots by strategy: push to month first, then before expenses, then after expenses
-      const sortedPots = activePots.sort((a, b) => {
-        // Pots with target month come first
-        if (a.targetMonth && !b.targetMonth) return -1;
-        if (!a.targetMonth && b.targetMonth) return 1;
-        
-        // Then by strategy: before expenses first, after expenses last
-        const strategyOrder = { 'before': 0, 'after': 1 };
-        const aStrategy = strategyOrder[a.strategy] || 2;
-        const bStrategy = strategyOrder[b.strategy] || 2;
-        
-        if (aStrategy !== bStrategy) return aStrategy - bStrategy;
-        
-        // Finally by title
-        return a.title.localeCompare(b.title);
-      });
+    // Sort pots by strategy: push to month first, then before expenses, then after expenses
+    const sortedPots = activePots.sort((a, b) => {
+      // Handle undefined names
+      const nameA = a.name || 'Unnamed Pot';
+      const nameB = b.name || 'Unnamed Pot';
+      
+      // Pots with target month come first
+      if (a.targetMonth && !b.targetMonth) return -1;
+      if (!a.targetMonth && b.targetMonth) return 1;
+      if (a.targetMonth && b.targetMonth) return nameA.localeCompare(nameB);
+      
+      // Then by strategy
+      if (a.strategy === 'before' && b.strategy !== 'before') return -1;
+      if (a.strategy !== 'before' && b.strategy === 'before') return 1;
+      return nameA.localeCompare(nameB);
+    });
       
       const beforePots = sortedPots.filter(p => p.strategy === 'before');
       const afterPots = sortedPots.filter(p => p.strategy === 'after');
@@ -2098,7 +2272,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       }, 500);
     }
     // Helper function to get current cash balance
-    function getCurrentBalance() {
+   function getCurrentBalance() {
       const acc = ac();
       
       // Initialize arrays if they don't exist
@@ -2109,36 +2283,28 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       // Get current month (YYYY-MM format)
       const currentMonth = getCurrentMonth();
       
-      // Debug: Log all income items
-      console.log('All income items:', acc.incomes.map(inc => ({
-        name: inc.name,
-        amount: inc.amount,
-        date: inc.date,
-        paid: inc.paid,
-        startsWithCurrentMonth: inc.date && inc.date.startsWith(currentMonth)
-      })));
+      // Calculate income (current month + recurring) - only include paid items
+      const income = acc.incomes
+        .filter(inc => {
+          const isCurrentMonth = inc.date && inc.date.startsWith(currentMonth);
+          const isPaid = inc.paid === true;
+          const include = isCurrentMonth && isPaid;
+          console.log(`Income: ${inc.name} - Amount: ${inc.amount} - Current: ${isCurrentMonth} - Paid: ${isPaid} - Include: ${include}`);
+          return include;
+        })
+        .reduce((sum, inc) => sum + inc.amount, 0);    
       
-    // Calculate income (current month + recurring) - only include paid items
-    const income = acc.incomes
-      .filter(inc => {
-        const isCurrentMonth = inc.date && inc.date.startsWith(currentMonth);
-        const isPaid = inc.paid === true;
-        const include = isCurrentMonth && isPaid;
-        console.log(`Income: ${inc.name} - Amount: ${inc.amount} - Current: ${isCurrentMonth} - Paid: ${isPaid} - Include: ${include}`);
-        return include;
-      })
-      .reduce((sum, inc) => sum + inc.amount, 0);       
-      
-    // Calculate cash expenses only (exclude credit expenses) - only include PAID cash expenses
-    const cashExpenses = acc.expenses
-      .filter(exp => {
-        const isCurrentMonth = exp.date && exp.date.startsWith(currentMonth);
-        const isCash = exp.payment === 'cash';
-        const isPaid = exp.paid === true; // Only include paid expenses
-        const include = isCurrentMonth && isCash && isPaid;
-        return include;
-      })
-      .reduce((sum, exp) => sum + exp.amount, 0);
+      // Calculate cash expenses only (exclude credit expenses) - only include PAID cash expenses
+      const cashExpenses = acc.expenses
+        .filter(exp => {
+          const isCurrentMonth = exp.date && exp.date.startsWith(currentMonth);
+          const isCash = exp.payment === 'cash';
+          const isPaid = exp.paid === true; // Only include paid expenses
+          const include = isCurrentMonth && isCash && isPaid;
+          console.log(`Expense: ${exp.name} - Amount: ${exp.amount} - Current: ${isCurrentMonth} - Cash: ${isCash} - Paid: ${isPaid} - Include: ${include}`);
+          return include;
+        })
+        .reduce((sum, exp) => sum + exp.amount, 0);
           
       // Calculate savings contributions (deductions from cash)
       const savingsDeductions = (acc.transactions || [])
@@ -2146,7 +2312,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         .reduce((sum, t) => sum + t.amount, 0);
           
       // Calculate balance: income - cash expenses - savings deductions
-      const calculatedBalance = income - cashExpenses - Math.min(savingsDeductions, Math.max(0, income - cashExpenses));
+      const calculatedBalance = income - cashExpenses - savingsDeductions;
       
       console.log('Balance calculation:', `${income} - ${cashExpenses} - ${savingsDeductions} = ${calculatedBalance}`);
       
@@ -2880,8 +3046,26 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
     function togglePaid(id) {
       const e = ac().expenses.find(x => x.id === id); if (!e) return;
       e.paid = !e.paid;
+      
+      console.log(`Toggled expense: ${e.name} - Now paid: ${e.paid}`);
+      
       sv(); 
-      render(); // Update the main tracker in real-time
+      render();
+      
+      // Force update cash balance display
+      const currentCashBalance = getCurrentBalance();
+      const statNetEl = $('statNet');
+      if (statNetEl) {
+        statNetEl.textContent = fm(currentCashBalance);
+        if (currentCashBalance < 0) {
+          statNetEl.style.color = '#ff6b6b';
+        } else if (currentCashBalance >= 1000) {
+          statNetEl.style.color = '#00ff00';
+        } else {
+          statNetEl.style.color = currentCashBalance >= 0 ? '#ffffff' : 'var(--red)';
+        }
+        console.log('Updated cash balance display to:', fm(currentCashBalance));
+      }
     }
 
     function showNotifications() {
@@ -3206,7 +3390,10 @@ function generateTestData() {
   if (!confirm('Generate test data? This will add sample income, expenses, savings pots, and loans for testing.')) return;
   
   const acc = ac();
-  if (!acc) return;
+  if (!acc) {
+    alert('Please create an account first!');
+    return;
+  }
   
   const today = td();
   const currentMonth = getCurrentMonth();
@@ -3217,6 +3404,8 @@ function generateTestData() {
   acc.savings = [];
   acc.loans = [];
   acc.transactions = [];
+
+   console.log('Data cleared, adding new test data...');
   
   // Add test income
   acc.incomes.push(
@@ -3237,68 +3426,53 @@ function generateTestData() {
     { id: 'e_test7', name: 'Shopping', amount: 250, category: 'Personal', type: 'variable', date: currentMonth + '-12', recurring: false, payment: 'credit', paid: false }
   );
   
-      // Add test savings pots with different conditions
-      acc.savings.push(
-        { 
-          id: 'p_test1', 
-          title: 'Emergency Fund', 
-          target: 10000, 
-          targetMonth: '2024-12', 
-          icon: 'fa-shield-halved', 
-          color: '#10b981', 
-          strategy: 'before', 
-          current: 2500, 
-          active: true,
-          pushedMo: currentMonth 
-        },
-        { 
-          id: 'p_test2', 
-          title: 'Vacation Fund', 
-          target: 5000, 
-          targetMonth: '2024-08', 
-          icon: 'fa-plane', 
-          color: '#f59e0b', 
-          strategy: 'after', 
-          current: 1200, 
-          active: true,
-          pushedMo: currentMonth 
-        },
-        { 
-          id: 'p_test3', 
-          title: 'New Laptop', 
-          target: 3000, 
-          targetMonth: '2024-10', 
-          icon: 'fa-laptop', 
-          color: '#6366f1', 
-          strategy: 'before', 
-          current: 800, 
-          active: true,
-          pushedMo: currentMonth 
-        },
-        { 
-          id: 'p_test4', 
-          title: 'Home Renovation', 
-          target: 15000, 
-          targetMonth: '2025-06', 
-          icon: 'fa-home', 
-          color: '#ef4444', 
-          strategy: 'after', 
-          current: 2000, 
-          active: false // Not yet started
-        },
-        { 
-          id: 'p_test5', 
-          title: 'Wedding Fund', 
-          target: 20000, 
-          targetMonth: '2025-12', 
-          icon: 'fa-heart', 
-          color: '#ec4899', 
-          strategy: 'before', 
-          current: 5000, 
-          active: true,
-          pushedMo: currentMonth 
-        }
-      );
+    // Add test savings pots with different conditions
+    acc.savings.push(
+      { 
+        id: 'p_test1', 
+        name: 'Emergency Fund',  // <-- CHANGE title to name
+        target: 10000,
+        current: 2500,
+        targetMonth: '2026-12',  // <-- ADD TARGET MONTH
+        active: true,
+        pushedMo: null  // <-- SET TO NULL
+      },
+      { 
+        id: 'p_test2', 
+        name: 'Vacation Fund',  // <-- CHANGE title to name
+        target: 5000,
+        current: 1200,
+        targetMonth: '2026-12',  // <-- ADD TARGET MONTH
+        active: true,
+        pushedMo: null  // <-- SET TO NULL
+      },
+      { 
+        id: 'p_test3', 
+        name: 'Car Repair',  // <-- CHANGE title to name
+        target: 3000,
+        current: 800,
+        targetMonth: '2026-12',  // <-- ADD TARGET MONTH
+        active: true,
+        pushedMo: null  // <-- SET TO NULL
+      },
+      { 
+        id: 'p_test4', 
+        name: 'Investment',  // <-- CHANGE title to name
+        target: 15000,
+        current: 2000,
+        targetMonth: '2026-12',  // <-- ADD TARGET MONTH
+        active: true,
+        pushedMo: null  // <-- SET TO NULL
+      },
+      { 
+        id: 'p_test5', 
+        name: 'Home Renovation',  // <-- CHANGE title to name
+        target: 20000,
+        current: 5000,
+        active: false,  // <-- MAKE ONE INACTIVE
+        pushedMo: null  // <-- SET TO NULL
+      }
+    );
       
       // Add test loans with different conditions
       acc.loans.push(
@@ -3345,10 +3519,12 @@ function generateTestData() {
       
       sv();
       render();
+      console.log('Test data generation complete!');
       alert('Test data generated! You now have:\n• 4 income items\n• 7 expenses (cash & credit)\n• 5 savings pots (active & inactive)\n• 3 loans (started & not started)\n\nYou can decide which loans and savings pots to push to the main page!');
     }
-
+    alert('Right Before init()');
     init();
+    alert('Script reached the end!');
   </script>
 </body>
 </html>
