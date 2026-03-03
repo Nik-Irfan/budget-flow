@@ -1581,10 +1581,12 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       const i = ac().incomes.find(x => x.id === id); if (!i) return;
       i.paid = !i.paid;
       
-      console.log(`Toggled income: ${i.name} - Now paid: ${i.paid}`);
+      // If marking as paid, update date to current month
+      if (i.paid) {
+        i.date = getCurrentMonth() + '-01';
+      } 
       
-      sv(); 
-      render();
+      sv(); render();
     }
     function processRecurring() {
       const acc = ac(); if (!acc) return;
@@ -1650,9 +1652,9 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       // Update notification icon
       updateNotificationIcon();
       
-      // Dashboard stats - use dynamic cash balance (paid income only)
+      // Dashboard stats - use dynamic cash balance
       const currentCashBalance = getCurrentBalance();
-
+      
       // Update statNet if element exists
       const statNetEl = $('statNet');
       if (statNetEl) {
@@ -1666,61 +1668,27 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         }
       }
       
-    // Income list - check if element exists
-    const incListEl = $('iL');
-    if (incListEl) {
-      // Calculate totals for summary
-      const incMo = acc.incomes.filter(i => i.date.startsWith(mo));
-      const totalIncome = incMo.reduce((sum, i) => sum + i.amount, 0);
-      const paidIncome = incMo.filter(i => i.paid).reduce((sum, i) => sum + i.amount, 0);
-      const totalExpenses = acc.expenses.filter(e => e.date.startsWith(mo)).reduce((sum, e) => sum + e.amount, 0);
-      
-      // Add summary card
-      const summaryHtml = `
-        <div class="card mb20" style="background: var(--green); color: #fff;">
-          <div class="fbc mb10">
-            <div>
-              <div style="font-size: 0.8rem; opacity: 0.8;">Total Income</div>
-              <div style="font-weight: 900; font-size: 1.3rem;">${fm(totalIncome)}</div>
+      // Income list - check if element exists
+      const incListEl = $('iL');
+      if (incListEl) {
+        const incMo = acc.incomes.filter(i => i.date.startsWith(mo));
+        incListEl.innerHTML = incMo.map(i => {
+          const isReceived = i.paid;
+          return `
+            <div class="item-card fbc" style="border-left: 4px solid var(--green); ${isReceived ? 'opacity: 0.5;' : ''}" onclick="viewDetail('inc', '${i.id}')">
+              <div class="paid-toggle ${i.paid ? 'on' : ''}" onclick="event.stopPropagation(); toggleReceived('${i.id}')">
+                <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
+                <span>${i.paid ? 'Received' : 'Pending'}</span>
+              </div>
+              <div style="flex:1; margin-left: var(--s3);">
+                <div style="font-weight:800;">${i.name}</div>
+                <div class="lbl" style="margin:0; font-size:0.6rem;">${new Date(i.date).toLocaleDateString('en-GB')}</div>
+              </div>
+              <div class="am pos" style="${isReceived ? 'color: var(--text3);' : ''}">+${fm(i.amount)}</div>
             </div>
-            <div style="text-align: right;">
-              <div style="font-size: 0.8rem; opacity: 0.8;">Total Expenses</div>
-              <div style="font-weight: 900; font-size: 1.3rem;">${fm(totalExpenses)}</div>
-            </div>
-          </div>
-          <div class="fbc" style="border-top: 1px solid rgba(255,255,255,0.3); padding-top: var(--s2); margin-top: var(--s3);">
-            <div>
-              <div style="font-size: 0.8rem; opacity: 0.8;">Received Income</div>
-              <div style="font-weight: 900; font-size: 1.1rem;">${fm(paidIncome)}</div>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-size: 0.8rem; opacity: 0.8;">Available Cash</div>
-              <div style="font-weight: 900; font-size: 1.1rem;">${fm(paidIncome - totalExpenses)}</div>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      // Insert summary before the income list
-      incListEl.insertAdjacentHTML('beforebegin', summaryHtml);
-      
-      incListEl.innerHTML = incMo.map(i => {
-        const isReceived = i.paid;
-        return `
-          <div class="item-card fbc" style="border-left: 4px solid var(--green); ${isReceived ? 'opacity: 0.5;' : ''}" onclick="viewDetail('inc', '${i.id}')">
-            <div class="paid-toggle ${i.paid ? 'on' : ''}" onclick="event.stopPropagation(); toggleReceived('${i.id}')">
-              <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
-              <span>${i.paid ? 'Received' : 'Pending'}</span>
-            </div>
-            <div style="flex:1; margin-left: var(--s3);">
-              <div style="font-weight:800;">${i.name}</div>
-              <div class="lbl" style="margin:0; font-size:0.6rem;">${new Date(i.date).toLocaleDateString('en-GB')}</div>
-            </div>
-            <div class="am pos" style="${isReceived ? 'color: var(--text3);' : ''}">+${fm(i.amount)}</div>
-          </div>
-        `;
-      }).join('') || '<div class="empty">No income this month</div>';
-    }
+          `;
+        }).join('') || '<div class="empty">No income this month</div>';
+      }
       
       // Expense list - check if element exists
       const expListEl = $('eL');
@@ -2106,23 +2074,24 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         startsWithCurrentMonth: inc.date && inc.date.startsWith(currentMonth)
       })));
       
-    // Calculate income (current month + recurring) - only include paid items
-    const income = acc.incomes
-      .filter(inc => {
-        const isCurrentMonth = inc.date && inc.date.startsWith(currentMonth);
-        const isPaid = inc.paid === true;
-        const include = isCurrentMonth && isPaid;
-        console.log(`Income: ${inc.name} - Amount: ${inc.amount} - Current: ${isCurrentMonth} - Paid: ${isPaid} - Include: ${include}`);
-        return include;
-      })
-      .reduce((sum, inc) => sum + inc.amount, 0);       
+      // Calculate income (current month + recurring) - only include paid items
+      const income = acc.incomes
+        .filter(inc => {
+          const isCurrentMonth = inc.date && inc.date.startsWith(currentMonth);
+          const isPaid = inc.paid === true;
+          const include = isCurrentMonth && isPaid;
+          console.log(`Income: ${inc.name} - Amount: ${inc.amount} - Current: ${isCurrentMonth} - Paid: ${isPaid} - Include: ${include}`);
+          return include;
+        })
+        .reduce((sum, inc) => sum + inc.amount, 0);    
       
-      // Calculate cash expenses only (exclude credit expenses) - include ALL items, not just paid
+      // Calculate cash expenses only (exclude credit expenses) - only include paid items
       const cashExpenses = acc.expenses
         .filter(exp => {
           const isCurrentMonth = exp.date && exp.date.startsWith(currentMonth);
           const isCash = exp.payment === 'cash';
-          const include = isCurrentMonth && isCash;
+          const isPaid = exp.paid === true;
+          const include = isCurrentMonth && isCash && isPaid;
           return include;
         })
         .reduce((sum, exp) => sum + exp.amount, 0);
@@ -2437,7 +2406,6 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
     }
 
     let extraCharts = { loan: null, pot: null, cred: null };
-
     function renderAnalytics() {
       const acc = ac(); if (!acc) return;
       const cats = acc.categories[anaTab];
@@ -2450,18 +2418,6 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
       $('anaCatList').innerHTML = activeCats.map(c => `
         <div class="pill-btn ${anaSelectedCats.includes(c)?'on':''}" style="font-size:0.7rem; padding:8px 12px; min-height:36px;" onclick="toggleAnaCat('${c}')">${c}</div>
       `).join('') || '<div class="empty">No categories found this month</div>';
-      
-      // Add main chart containers
-      $('anaContent').innerHTML = `
-        <div class="card mb20">
-          <h3 style="font-weight: 800; margin-bottom: var(--s4); color: var(--text);">6-Month Trend</h3>
-          <div style="height: 300px;"><canvas id="lineChart"></canvas></div>
-        </div>
-        <div class="card mb20">
-          <h3 style="font-weight: 800; margin-bottom: var(--s4); color: var(--text);">Category Breakdown</h3>
-          <div style="height: 300px;"><canvas id="barChart"></canvas></div>
-        </div>
-      `;
       
       renderCharts(acc);
       renderExtraAnalytics(acc);
@@ -2548,91 +2504,84 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
     }
 
     function renderCharts(acc) {
-      // Check if main chart containers exist
-      const lineChartEl = $('lineChart');
-      const barChartEl = $('barChart');
-      
-      // Only render main charts if the canvas elements exist
-      if (lineChartEl && barChartEl) {
-        const ctxL = lineChartEl.getContext('2d'), ctxB = barChartEl.getContext('2d');
-        if (anaCharts.line) anaCharts.line.destroy(); 
-        if (anaCharts.bar) anaCharts.bar.destroy();
+      const ctxL = $('lineChart').getContext('2d'), ctxB = $('barChart').getContext('2d');
+      if (anaCharts.line) anaCharts.line.destroy(); 
+      if (anaCharts.bar) anaCharts.bar.destroy();
 
-        const mo = moKey(viewMo);
-        const data = anaTab === 'inc' ? acc.incomes : acc.expenses;
-        const color = anaTab === 'inc' ? 'var(--green)' : 'var(--red)';
+      const mo = moKey(viewMo);
+      const data = anaTab === 'inc' ? acc.incomes : acc.expenses;
+      const color = anaTab === 'inc' ? 'var(--green)' : 'var(--red)';
 
-        // 1. Line Chart: Last 6 Months Trend
-        const months = [];
-        for(let i=5; i>=0; i--) {
-          const d = new Date(viewMo.getFullYear(), viewMo.getMonth() - i, 1);
-          months.push(moKey(d));
-        }
-
-        const trendData = months.map(m => {
-          return data.filter(d => d.date.startsWith(m))
-                    .filter(d => d.paid) // Only include 'paid' items in analytics
-                    .filter(d => anaSelectedCats.length === 0 || anaSelectedCats.includes(d.category))
-                    .reduce((s, d) => s + d.amount, 0);
-        });
-
-        anaCharts.line = new Chart(ctxL, {
-          type: 'line',
-          data: {
-            labels: months.map(m => new Date(m+'-01').toLocaleDateString('en-US', {month:'short'})),
-            datasets: [{
-              label: anaTab.toUpperCase() + ' (Paid Only)',
-              data: trendData,
-              borderColor: color,
-              backgroundColor: color + '22',
-              fill: true,
-              tension: 0.4,
-              borderWidth: 3,
-              pointRadius: 4,
-              pointBackgroundColor: color
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { 
-              y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-              x: { grid: { display: false } }
-            }
-          }
-        });
-
-        // 2. Bar Chart: Category Comparison for Selected Month
-        const moData = data.filter(d => d.date.startsWith(mo)).filter(d => d.paid); // Only include 'paid' items
-        const catsToCompare = anaSelectedCats.length > 0 ? anaSelectedCats : [...new Set(moData.map(d => d.category))];
-        
-        const barData = catsToCompare.map(c => {
-          return moData.filter(d => d.category === c).reduce((s, d) => s + d.amount, 0);
-        });
-
-        anaCharts.bar = new Chart(ctxB, {
-          type: 'bar',
-          data: {
-            labels: catsToCompare,
-            datasets: [{
-              label: 'Amount (RM)',
-              data: barData,
-              backgroundColor: color,
-              borderRadius: 8
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { 
-              y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-              x: { grid: { display: false } }
-            }
-          }
-        });
+      // 1. Line Chart: Last 6 Months Trend
+      const months = [];
+      for(let i=5; i>=0; i--) {
+        const d = new Date(viewMo.getFullYear(), viewMo.getMonth() - i, 1);
+        months.push(moKey(d));
       }
+
+      const trendData = months.map(m => {
+        return data.filter(d => d.date.startsWith(m))
+                   .filter(d => d.paid) // Only include 'paid' items in analytics
+                   .filter(d => anaSelectedCats.length === 0 || anaSelectedCats.includes(d.category))
+                   .reduce((s, d) => s + d.amount, 0);
+      });
+
+      anaCharts.line = new Chart(ctxL, {
+        type: 'line',
+        data: {
+          labels: months.map(m => new Date(m+'-01').toLocaleDateString('en-US', {month:'short'})),
+          datasets: [{
+            label: anaTab.toUpperCase() + ' (Paid Only)',
+            data: trendData,
+            borderColor: color,
+            backgroundColor: color + '22',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 4,
+            pointBackgroundColor: color
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { 
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // 2. Bar Chart: Category Comparison for Selected Month
+      const moData = data.filter(d => d.date.startsWith(mo)).filter(d => d.paid); // Only include 'paid' items
+      const catsToCompare = anaSelectedCats.length > 0 ? anaSelectedCats : [...new Set(moData.map(d => d.category))];
+      
+      const barData = catsToCompare.map(c => {
+        return moData.filter(d => d.category === c).reduce((s, d) => s + d.amount, 0);
+      });
+
+      anaCharts.bar = new Chart(ctxB, {
+        type: 'bar',
+        data: {
+          labels: catsToCompare,
+          datasets: [{
+            label: 'Amount (RM)',
+            data: barData,
+            backgroundColor: color,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { 
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
     }
 
     function setTheme(t) { db.prefs.theme = t; sv(); applyPrefs(); }
@@ -3071,14 +3020,10 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
       const acc = ac();
       const mo = moKey(viewMo);
       
-    // Get cash expenses for current month (paid only for balance calculation)
-    const cashExpenses = acc.expenses.filter(e => 
-      e.payment === 'cash' && 
-      e.date.startsWith(mo) && 
-      e.paid === true  // Only show paid expenses
-    );
-    const totalCashExpenses = cashExpenses.reduce((sum, e) => sum + e.amount, 0);
-          
+      // Get cash expenses for current month
+      const cashExpenses = acc.expenses.filter(e => e.payment === 'cash' && e.date.startsWith(mo));
+      const totalCashExpenses = cashExpenses.reduce((sum, e) => sum + e.amount, 0);
+      
       // Get savings contributions for current month
       const savingsContributions = (acc.transactions || [])
         .filter(t => t.type === 'savings' && t.date && t.date.startsWith(mo));
@@ -3092,30 +3037,32 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
       // Render combined list
       let listHtml = '';
       
-    // Add cash expenses section
-    if (cashExpenses.length > 0) {
-      listHtml += `
-        <div style="margin-bottom: var(--s4);">
-          <h4 style="color: var(--red); font-weight: 800; margin-bottom: var(--s2);">Paid Cash Expenses</h4>
-          ${cashExpenses.map(e => {
-            const typeColor = e.type === 'fixed' ? 'var(--green)' : (e.type === 'variable' ? 'var(--blue)' : 'var(--border)');
-            
-            return `
-              <div class="item-card fbc" style="border-left: 4px solid ${typeColor}; opacity: 0.7; margin-bottom: var(--s3);">
-                <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--red); display: flex; align-items: center; justify-content: center; margin-right: var(--s3);">
-                  <i class="fas fa-check" style="color: #fff; font-size: 16px;"></i>
+      // Add cash expenses section
+      if (cashExpenses.length > 0) {
+        listHtml += `
+          <div style="margin-bottom: var(--s4);">
+            <h4 style="color: var(--red); font-weight: 800; margin-bottom: var(--s2);">Cash Expenses</h4>
+            ${cashExpenses.map(e => {
+              const isDue = new Date(e.date) <= new Date() && !e.paid;
+              const typeColor = e.type === 'fixed' ? 'var(--green)' : (e.type === 'variable' ? 'var(--blue)' : 'var(--border)');
+              
+              return `
+                <div class="item-card fbc" style="border-left: 4px solid ${typeColor}; ${isDue ? 'background: var(--red-bg);' : ''}; margin-bottom: var(--s3);">
+                  <div class="paid-toggle ${e.paid ? 'on' : ''}" onclick="event.stopPropagation(); togglePaid('${e.id}')">
+                    <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
+                    <span>${e.paid ? 'Paid' : 'Paid'}</span>
+                  </div>
+                  <div style="flex:1; margin-left: var(--s3);">
+                    <div style="font-weight:800;">${e.name}</div>
+                    <div class="lbl" style="margin:0; font-size:0.6rem; color:${isDue ? 'var(--red)' : ''}">${e.category} • ${new Date(e.date).toLocaleDateString('en-GB')}</div>
+                  </div>
+                  <div class="am neg">-${fm(e.amount)}</div>
                 </div>
-                <div style="flex:1;">
-                  <div style="font-weight:800; color: var(--text2);">${e.name}</div>
-                  <div class="lbl" style="margin:0; font-size:0.6rem; color: var(--text2);">${e.category} • ${new Date(e.date).toLocaleDateString('en-GB')}</div>
-                </div>
-                <div class="am neg" style="color: var(--text2);">-${fm(e.amount)}</div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-    }
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
       
       // Add savings contributions section
       if (savingsContributions.length > 0) {
@@ -3143,10 +3090,10 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
         `;
       }
       
-    // Show empty message if no items
-    if (cashExpenses.length === 0 && savingsContributions.length === 0) {
-      listHtml = '<div class="empty">No paid cash expenses or savings contributions for this month</div>';
-    }
+      // Show empty message if no items
+      if (cashExpenses.length === 0 && savingsContributions.length === 0) {
+        listHtml = '<div class="empty">No cash expenses or savings contributions for this month</div>';
+      }
       
       $('cashExpList').innerHTML = listHtml;
       
