@@ -1647,6 +1647,9 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       const today = td();
       const mo = moKey(viewMo);
       
+      // Clear all existing totals at the start
+      document.querySelectorAll('#income-totals, #expense-totals').forEach(el => el.remove());
+      
       // Update notification icon
       updateNotificationIcon();
       
@@ -1669,41 +1672,29 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
     // Income list - check if element exists
     const incListEl = $('iL');
     if (incListEl) {
-      // Calculate totals for summary
+      // Calculate totals for inline display
       const incMo = acc.incomes.filter(i => i.date.startsWith(mo));
       const totalIncome = incMo.reduce((sum, i) => sum + i.amount, 0);
       const paidIncome = incMo.filter(i => i.paid).reduce((sum, i) => sum + i.amount, 0);
-      const totalExpenses = acc.expenses.filter(e => e.date.startsWith(mo)).reduce((sum, e) => sum + e.amount, 0);
-      
-      // Add summary card
-      const summaryHtml = `
-        <div class="card mb20" style="background: var(--green); color: #fff;">
-          <div class="fbc mb10">
-            <div>
-              <div style="font-size: 0.8rem; opacity: 0.8;">Total Income</div>
-              <div style="font-weight: 900; font-size: 1.3rem;">${fm(totalIncome)}</div>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-size: 0.8rem; opacity: 0.8;">Total Expenses</div>
-              <div style="font-weight: 900; font-size: 1.3rem;">${fm(totalExpenses)}</div>
-            </div>
+           
+      // Remove ALL existing income totals
+      const existingIncHeaders = document.querySelectorAll('#income-totals');
+      existingIncHeaders.forEach(header => header.remove());
+
+      // Add inline totals header with ID
+      const headerHtml = `
+        <div id="income-totals" class="fbc mb10" style="font-size: 0.8rem; color: var(--text2);">
+          <div>
+            <span>Income: </span><strong style="color: var(--green);">${fm(totalIncome)}</strong>
           </div>
-          <div class="fbc" style="border-top: 1px solid rgba(255,255,255,0.3); padding-top: var(--s2); margin-top: var(--s3);">
-            <div>
-              <div style="font-size: 0.8rem; opacity: 0.8;">Received Income</div>
-              <div style="font-weight: 900; font-size: 1.1rem;">${fm(paidIncome)}</div>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-size: 0.8rem; opacity: 0.8;">Available Cash</div>
-              <div style="font-weight: 900; font-size: 1.1rem;">${fm(paidIncome - totalExpenses)}</div>
-            </div>
+          <div style="text-align: right;">
+            <span>Received: </span><strong style="color: var(--green);">${fm(paidIncome)}</strong>
           </div>
         </div>
       `;
-      
-      // Insert summary before the income list
-      incListEl.insertAdjacentHTML('beforebegin', summaryHtml);
-      
+
+      incListEl.insertAdjacentHTML('beforebegin', headerHtml);
+            
       incListEl.innerHTML = incMo.map(i => {
         const isReceived = i.paid;
         return `
@@ -1722,36 +1713,57 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       }).join('') || '<div class="empty">No income this month</div>';
     }
       
-      // Expense list - check if element exists
-      const expListEl = $('eL');
-      if (expListEl) {
-        const expMo = acc.expenses.filter(e => e.date.startsWith(mo));
-        expListEl.innerHTML = expMo.sort((a,b) => {
-          // Fixed expenses first, then variable
-          if (a.type === 'fixed' && b.type !== 'fixed') return -1;
-          if (a.type !== 'fixed' && b.type === 'fixed') return 1;
-          return new Date(b.date) - new Date(a.date);
-        }).map(e => {
-          const isDue = new Date(e.date) <= new Date() && !e.paid;
-          const typeColor = e.type === 'fixed' ? 'var(--green)' : (e.type === 'variable' ? 'var(--blue)' : 'var(--border)');
-          const isPaid = e.paid;
-          const paymentType = e.payment === 'cash' ? 'Cash' : 'Credit';
-          return `
-            <div class="item-card fbc" style="border-left: 4px solid ${typeColor}; ${isDue ? 'background: var(--red-bg);' : ''} ${isPaid ? 'opacity: 0.5; background: var(--border2);' : ''}" onclick="editE('${e.id}')">
-              <div class="paid-toggle ${e.paid ? 'on' : ''}" onclick="event.stopPropagation(); togglePaid('${e.id}')">
-                <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
-                <span>${e.paid ? 'Paid' : 'Unpaid'}</span>
-              </div>
-              <div style="flex:1; margin-left: var(--s3);">
-                <div style="font-weight:800; ${isPaid ? 'color: var(--text3);' : ''}">${e.name} ${e.displayTag || ''}</div>
-                <div class="lbl" style="margin:0; font-size:0.6rem; color:${isDue ? 'var(--red)' : (isPaid ? 'var(--text3)' : '')}">${paymentType} • ${new Date(e.date).toLocaleDateString('en-GB')}</div>
-              </div>
-              <div class="am neg" style="${isPaid ? 'color: var(--text3);' : ''}">-${fm(e.amount)}</div>
-            </div>
-          `;
-        }).join('') || '<div class="empty">No expenses this month</div>';
-      }
-      
+   // Expense list - check if element exists
+  const expListEl = $('eL');
+  if (expListEl) {
+    // Calculate totals for inline display
+    const expMo = acc.expenses.filter(e => e.date.startsWith(mo));
+    const totalExpenses = expMo.reduce((sum, e) => sum + e.amount, 0);
+    const paidExpenses = expMo.filter(e => e.paid).reduce((sum, e) => sum + e.amount, 0);
+        
+    // Remove ALL existing expense totals
+    const existingExpHeaders = document.querySelectorAll('#expense-totals');
+    existingExpHeaders.forEach(header => header.remove());
+
+    // Add inline totals header with ID
+    const headerHtml = `
+      <div id="expense-totals" class="fbc mb10" style="font-size: 0.8rem; color: var(--text2);">
+        <div>
+          <span>Expenses: </span><strong style="color: var(--red);">${fm(totalExpenses)}</strong>
+        </div>
+        <div style="text-align: right;">
+          <span>Paid: </span><strong style="color: var(--red);">${fm(paidExpenses)}</strong>
+        </div>
+      </div>
+    `;
+
+    expListEl.insertAdjacentHTML('beforebegin', headerHtml);
+
+    expListEl.innerHTML = expMo.sort((a,b) => {
+      // Fixed expenses first, then variable
+      if (a.type === 'fixed' && b.type !== 'fixed') return -1;
+      if (a.type !== 'fixed' && b.type === 'fixed') return 1;
+      return new Date(b.date) - new Date(a.date);
+    }).map(e => {
+      const isDue = new Date(e.date) <= new Date() && !e.paid;
+      const typeColor = e.type === 'fixed' ? 'var(--green)' : (e.type === 'variable' ? 'var(--blue)' : 'var(--border)');
+      const isPaid = e.paid;
+      const paymentType = e.payment === 'cash' ? 'Cash' : 'Credit';
+      return `
+        <div class="item-card fbc" style="border-left: 4px solid ${typeColor}; ${isDue ? 'background: var(--red-bg);' : ''} ${isPaid ? 'opacity: 0.5; background: var(--border2);' : ''}" onclick="editE('${e.id}')">
+          <div class="paid-toggle ${e.paid ? 'on' : ''}" onclick="event.stopPropagation(); togglePaid('${e.id}')">
+            <i class="fas fa-check" style="font-size:14px !important; color: inherit;"></i>
+            <span>${e.paid ? 'Paid' : 'Unpaid'}</span>
+          </div>
+          <div style="flex:1; margin-left: var(--s3);">
+            <div style="font-weight:800; ${isPaid ? 'color: var(--text3);' : ''}">${e.name} ${e.displayTag || ''}</div>
+            <div class="lbl" style="margin:0; font-size:0.6rem; color:${isDue ? 'var(--red)' : (isPaid ? 'var(--text3)' : '')}">${paymentType} • ${new Date(e.date).toLocaleDateString('en-GB')}</div>
+          </div>
+          <div class="am neg" style="${isPaid ? 'color: var(--text3);' : ''}">-${fm(e.amount)}</div>
+        </div>
+      `;
+    }).join('') || '<div class="empty">No expenses this month</div>';
+  }    
       // Update current month display
       const currentMonthEl = $('currentMonthDisplay');
       if (currentMonthEl) {
@@ -2117,15 +2129,16 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       })
       .reduce((sum, inc) => sum + inc.amount, 0);       
       
-      // Calculate cash expenses only (exclude credit expenses) - include ALL items, not just paid
-      const cashExpenses = acc.expenses
-        .filter(exp => {
-          const isCurrentMonth = exp.date && exp.date.startsWith(currentMonth);
-          const isCash = exp.payment === 'cash';
-          const include = isCurrentMonth && isCash;
-          return include;
-        })
-        .reduce((sum, exp) => sum + exp.amount, 0);
+    // Calculate cash expenses only (exclude credit expenses) - only include PAID cash expenses
+    const cashExpenses = acc.expenses
+      .filter(exp => {
+        const isCurrentMonth = exp.date && exp.date.startsWith(currentMonth);
+        const isCash = exp.payment === 'cash';
+        const isPaid = exp.paid === true; // Only include paid expenses
+        const include = isCurrentMonth && isCash && isPaid;
+        return include;
+      })
+      .reduce((sum, exp) => sum + exp.amount, 0);
           
       // Calculate savings contributions (deductions from cash)
       const savingsDeductions = (acc.transactions || [])
