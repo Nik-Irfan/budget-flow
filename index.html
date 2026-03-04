@@ -1175,7 +1175,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
     const acc = ac();
     if (!acc) return;
     
-    const creditUsageExpenses = acc.expenses.filter(e => e.payment === 'credit' && e.paid);
+    const creditUsageExpenses = acc.expenses.filter(e => e.payment === 'credit' && e.paid && e.type !== 'credit-payment');
     const creditPayments = acc.expenses.filter(e => e.type === 'credit-payment');
     
     console.log('=== PAYMENT DEBUG ===');
@@ -1233,7 +1233,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       }
 
       // Get expenses that were marked as "paid with credit" on tracker page
-      const creditUsageExpenses = acc.expenses.filter(e => e.payment === 'credit' && e.paid);
+      const creditUsageExpenses = acc.expenses.filter(e => e.payment === 'credit' && e.paid && e.type !== 'credit-payment');
       const creditPayments = acc.expenses.filter(e => e.type === 'credit-payment');
       console.log('All credit-payment expenses:', acc.expenses.filter(e => e.type === 'credit-payment'));      
       
