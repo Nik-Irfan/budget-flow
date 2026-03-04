@@ -1001,7 +1001,15 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
     <button class="nb on" onclick="go('pgT', this)"><i class="fas fa-wallet"></i></button>
     <button class="nb" onclick="go('pgL', this)"><i class="fas fa-hand-holding-dollar"></i></button>
     <button class="nb" onclick="go('pgC', this)"><i class="fas fa-credit-card"></i></button>
-    <button class="nb" onclick="go('pgS', this)"><i class="fas fa-coins"></i></button>
+    <button class="nb" onclick="
+        console.log('Savings button clicked!');
+        try {
+          go('pgS', this);
+          console.log('go function executed successfully');
+        } catch(error) {
+          console.error('Error in go function:', error);
+        }
+      "><i class="fas fa-coins"></i></button>
     <button class="nb" onclick="go('pgD', this)"><i class="fas fa-chart-line"></i></button>
     <button class="nb" onclick="go('pgSe', this)"><i class="fas fa-cog"></i></button>
   </nav>
@@ -1168,6 +1176,99 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
 
   <script>
 
+function renderAllPots(acc) {
+  console.log('=== ALL POTS DEBUG 2 ===');
+  console.log('Account:', acc);
+  console.log('Savings array:', acc.savings);
+  
+  if (!acc.savings || acc.savings.length === 0) {
+    console.log('No savings found, clearing DOM');
+    $('potList').innerHTML = '<div class="empty">No savings pots found</div>';
+    return;
+  }
+  
+  // Show ALL pots including completed and expired ones
+  const allPots = acc.savings.filter(p => true); // Show all pots
+  
+  // Render the pots with comprehensive management features
+  let html = '';
+  allPots.forEach(p => {
+    const progress = Math.min(100, (p.current / p.target) * 100);
+    const status = p.active ? 'Active' : 'Inactive';
+    const isPushed = p.pushedMo ? true : false;
+    const isCompleted = p.current >= p.target;
+    const isExpired = p.targetMonth && new Date(p.targetMonth + '-01') < new Date();
+    
+    // Determine progress bar color based on thresholds
+    let progressColor = 'var(--ac)'; // Default color (0-39%)
+    if (progress >= 40 && progress < 80) progressColor = 'var(--orange)'; // Warning color (40-79%)
+    if (progress >= 80 && progress < 100) progressColor = 'var(--green)'; // Success color (80-99%)
+    if (progress >= 100) progressColor = 'var(--gold)'; // Achievement color (100%)
+    
+    // Determine visual state
+    let visualState = '';
+    if (!p.active) visualState = 'opacity: 0.5; background: var(--border2);';
+    if (isExpired) visualState = 'opacity: 0.4; background: var(--border2);';
+    
+    html += `
+      <div class="item-card" style="padding-bottom: 12px; ${visualState}">
+        <div class="fbc" style="margin-bottom: var(--s2);">
+          <div style="flex:1;">
+            <div style="font-weight:800; display: flex; align-items: center; gap: var(--s1);">
+              ${p.name}
+              ${isCompleted ? '<i class="fas fa-trophy" style="color: var(--gold); font-size: 0.8rem;"></i>' : ''}
+              ${isExpired ? '<i class="fas fa-clock" style="color: var(--red); font-size: 0.8rem;"></i>' : ''}
+            </div>
+            <div class="lbl">${status} • Target: RM ${fm(p.target)}</div>
+            ${p.targetMonth ? `<div class="lbl">Target: ${p.targetMonth}</div>` : ''}
+            ${isCompleted ? '<div class="lbl" style="color: var(--green);">Goal Completed!</div>' : ''}
+            ${isExpired ? '<div class="lbl" style="color: var(--red);">Expired</div>' : ''}
+          </div>
+          <div style="text-align: right;">
+            <div class="am">${fm(p.current)}</div>
+            <div class="lbl">${progress.toFixed(1)}%</div>
+          </div>
+        </div>
+        
+        <!-- Progress bar with dynamic colors -->
+        <div style="height: 4px; background: var(--border2); border-radius: 2px; margin-bottom: var(--s2);">
+          <div style="width: ${progress}%; height: 100%; background: ${progressColor}; border-radius: 2px; transition: 0.3s;"></div>
+        </div>
+        
+        <!-- Action buttons -->
+        <div class="fbc" style="gap: var(--s2);">
+          <!-- Active/Inactive Toggle -->
+          <button class="btn ${p.active ? 'btn-s' : 'btn-p'}" onclick="togglePotActive('${p.id}')" style="flex: 1; padding: 4px 8px; font-size: 0.7rem;">
+            <i class="fas fa-${p.active ? 'pause' : 'play'}"></i> ${p.active ? 'Pause' : 'Activate'}
+          </button>
+          
+          <!-- Add Money (only if active and not pushed) -->
+          ${p.active && !isPushed && !isCompleted ? `
+            <button class="btn btn-s" onclick="saveToPot('${p.id}')" style="flex: 1; padding: 4px 8px; font-size: 0.7rem;">
+              <i class="fas fa-plus"></i> Add
+            </button>
+          ` : ''}
+          
+          <!-- Push to Tracker (only if active and not pushed and not completed) -->
+          ${p.active && !isPushed && !isCompleted ? `
+            <button class="btn btn-p" onclick="pushPot('${p.id}')" style="flex: 1; padding: 4px 8px; font-size: 0.7rem;">
+              <i class="fas fa-arrow-up"></i> Push
+            </button>
+          ` : ''}
+          
+          <!-- Edit (always available, but with restrictions) -->
+          <button class="btn btn-s" onclick="editPot('${p.id}')" style="flex: 1; padding: 4px 8px; font-size: 0.7rem;">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+        </div>
+      </div>
+    `;
+  });
+  
+  $('potList').innerHTML = html || '<div class="empty">No savings pots found</div>';
+  console.log('=== END ALL POTS DEBUG ===');
+}
+
   function updateCreditTotal() {
     const acc = ac();
     if (!acc) return;
@@ -1319,26 +1420,16 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       //console.log('=== END CREDIT PAGE DEBUG ===');
     }
     
-    function go(id) {
-      //console.log('=== PAGE NAVIGATION DEBUG ===');
-      //console.log('Navigating to page:', id);
-      
+    function go(id, btn) {
+      if (id === 'pgT') processRecurring();
       showPg(id);
+      document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+      if (btn) btn.classList.add('on');
       render();
       if (id === 'pgD') renderAnalytics();
       if (id === 'pgSe') renderSettingsCats();
-      if (id === 'pgC') {
-        //console.log('Rendering credit page...');
-        renderCreditPg();
-      }
-      
-      // Add savings page refresh
-      if (id === 'pgS') {
-        //console.log('Rendering savings page...');
-        renderActivePots(ac(), moKey(viewMo));
-      }
-      
-      //console.log('=== END PAGE NAVIGATION DEBUG ===');
+      if (id === 'pgC') renderCreditPg();
+      if (id === 'pgS') renderAllPots(ac()); // Ensure savings page renders with real-time data
     }
 
     function loadDb() {
@@ -1563,6 +1654,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       
       processRecurring(); render(); renderCalendarGrid();
     }
+
     function go(id, btn) {
       if (id === 'pgT') processRecurring();
       showPg(id);
@@ -1572,6 +1664,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       if (id === 'pgD') renderAnalytics();
       if (id === 'pgSe') renderSettingsCats();
       if (id === 'pgC') renderCreditPg();
+      if (id === 'pgS') renderAllPots(ac()); // Add this line for savings
     }
 
     /* ONBOARDING */
@@ -1829,14 +1922,30 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       }
     }
 
+    function toggleReceived(id) {
+      const i = ac().incomes.find(x => x.id === id); 
+      if (!i) return;
+      
+      i.paid = !i.paid;
+      
+      console.log(`Toggled income: ${i.name} - Now received: ${i.paid}`);
+      
+      sv(); 
+      render();
+    }
+
+    function togglePaid(id) {
+      // existing togglePaid code...
+    }
+
     function processRecurring() {
       const acc = ac(); if (!acc) return;
       const mo = moKey(viewMo);
-      console.log('=== MONTH FILTERING DEBUG ===');
-      console.log('viewMo:', viewMo);
-      console.log('moKey(viewMo):', mo);
-      console.log('getCurrentMonth():', getCurrentMonth());
-      console.log('=== END MONTH FILTERING DEBUG ===');
+    //  console.log('=== MONTH FILTERING DEBUG ===');
+   //   console.log('viewMo:', viewMo);
+    //  console.log('moKey(viewMo):', mo);
+    //  console.log('getCurrentMonth():', getCurrentMonth());
+    //  console.log('=== END MONTH FILTERING DEBUG ===');
       acc.incomes.forEach(inc => {
         if (inc.recurring && !acc.incomes.some(e => e.name === inc.name && e.date.startsWith(mo))) {
           acc.incomes.push({ ...inc, id: 'i_'+Math.random(), date: mo + '-01' });
@@ -2022,11 +2131,11 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
     // Update current month display
     const currentMonthEl = $('currentMonthDisplay');
     if (currentMonthEl) {
-      console.log('=== MONTH DISPLAY DEBUG ===');
-      console.log('viewMo:', viewMo);
-      console.log('viewMo month:', viewMo.getMonth());
-      console.log('Formatted display:', viewMo.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
-      console.log('=== END MONTH DISPLAY DEBUG ===');
+      // console.log('=== MONTH DISPLAY DEBUG ===');
+      // console.log('viewMo:', viewMo);
+      // console.log('viewMo month:', viewMo.getMonth());
+     // console.log('Formatted display:', viewMo.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
+      // console.log('=== END MONTH DISPLAY DEBUG ===');
       
       currentMonthEl.textContent = viewMo.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     }
@@ -2062,15 +2171,33 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         }).join('') || '<div class="empty" style="text-align: center; padding: var(--s4); color: var(--text3); font-size: 0.9rem;">No pushed saving pots</div>';
       }
     }
+
     function saveToPot(id) {
-      const p = ac().savings.find(x => x.id === id); if (!p) return;
+      console.log('=== SAVE TO POT DEBUG ===');
+      console.log('Pot ID:', id);
+      
+      const p = ac().savings.find(x => x.id === id); 
+      if (!p) {
+        console.log('ERROR: Pot not found with ID:', id);
+        return;
+      }
+      
+      console.log('Pot found:', p);
+      console.log('Current amount before:', p.current);
+      
       const amt = parseFloat(prompt('Amount to save into ' + p.title + ':', '10.00'));
-      if (isNaN(amt) || amt <= 0) return;
+      console.log('Entered amount:', amt);
+      
+      if (isNaN(amt) || amt <= 0) {
+        console.log('ERROR: Invalid amount:', amt);
+        return;
+      }
       
       // Add to pot
       p.current += amt;
+      console.log('New pot amount after adding:', p.current);
       
-      // Create a savings transaction to track the deduction
+      // Create a savings transaction
       const savingsTransaction = {
         id: Date.now().toString(),
         type: 'savings',
@@ -2082,13 +2209,110 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         hidden: true
       };
       
+      console.log('Created transaction:', savingsTransaction);
+      
       // Add to transactions
       if (!ac().transactions) ac().transactions = [];
       ac().transactions.push(savingsTransaction);
+      console.log('Transaction added to account');
       
-                              
-      sv(); render();
-      alert(`Added ${fm(amt)} to ${p.title}`);
+      sv();      
+      render();
+      console.log('Data saved');
+      console.log('About to call render()');
+      render(); // Explicitly call render to refresh UI
+      console.log('Render completed');
+      console.log('=== END SAVE TO POT DEBUG ===');
+    }
+    
+    function editPot(id) {
+      console.log('=== EDIT POT DEBUG ===');
+      console.log('Pot ID:', id);
+      
+      const p = ac().savings.find(x => x.id === id); 
+      if (!p) {
+        console.log('ERROR: Pot not found with ID:', id);
+        return;
+      }
+      
+      console.log('Pot found:', p);
+      
+      // Create edit modal or use existing one
+      const newName = prompt('Edit pot name:', p.name || p.title || '');
+      if (newName === null) return; // User cancelled
+      
+      const newTarget = parseFloat(prompt('Edit target amount (current amount cannot be changed):', p.target));
+      if (isNaN(newTarget) || newTarget <= 0) {
+        alert('Invalid target amount');
+        return;
+      }
+      
+      const newTargetMonth = prompt('Edit target month (YYYY-MM):', p.targetMonth || '');
+      if (newTargetMonth === null) return; // User cancelled
+      
+      // Update pot details (but not current amount)
+      if (newName !== '') p.name = newName;
+      if (newName !== '') p.title = newName; // Update both name and title for compatibility
+      p.target = newTarget;
+      if (newTargetMonth !== '') p.targetMonth = newTargetMonth;
+      
+      console.log('Updated pot:', p);
+      
+      sv();
+      render();
+      console.log('=== END EDIT POT DEBUG ===');
+    }
+    
+    function togglePotActive(id) {
+      console.log('=== TOGGLE POT ACTIVE DEBUG ===');
+      console.log('Pot ID:', id);
+      
+      const p = ac().savings.find(x => x.id === id); 
+      if (!p) {
+        console.log('ERROR: Pot not found with ID:', id);
+        return;
+      }
+      
+      console.log('Pot found:', p);
+      console.log('Current active state:', p.active);
+      
+      // Toggle active state
+      p.active = !p.active;
+      console.log('New active state:', p.active);
+      
+      sv();
+      render();
+      console.log('=== END TOGGLE POT ACTIVE DEBUG ===');
+    }
+    
+    function pushPot(id) {
+      console.log('=== PUSH POT DEBUG ===');
+      console.log('Pot ID:', id);
+      
+      const p = ac().savings.find(x => x.id === id); 
+      if (!p) {
+        console.log('ERROR: Pot not found with ID:', id);
+        return;
+      }
+      
+      console.log('Pot found:', p);
+      console.log('Current amount:', p.current);
+      console.log('Target:', p.target);
+      
+      // Simple prompt for month only (no year needed)
+      const targetMonth = prompt(`Enter target month (MM-YYYY):`, getCurrentMonth().substring(5) + '-' + new Date().getFullYear());
+      if (!targetMonth) return;
+      
+      // Mark pot as pushed to target month
+      p.pushedMo = targetMonth;
+      p.active = true;
+      
+      console.log('Pot pushed to month:', targetMonth);
+      console.log('Updated pot:', p);
+      
+      sv();
+      render();
+      console.log('=== END PUSH POT DEBUG ===');
     }
 
     function renderLoans(acc, mo) {
@@ -2223,15 +2447,45 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
 
       //console.log('Rendering pots...');
 
-const activePots = acc.savings.filter(p => {
-  //console.log(`Checking pot: ${p.name}`);
-  //console.log(`  - Current: ${p.current}, Target: ${p.target}`);
-  //console.log(`  - Active: ${p.active}`);
-  //console.log(`  - PushedMo: ${p.pushedMo}`);
-  
-        // Filter out pots that have reached or exceeded their target
+      // LIFECYCLE MANAGEMENT: Remove expired and completed pots
+      const currentMonth = new Date(mo + '-01');
+      const nextMonth = new Date(currentMonth);
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      const nextMonthKey = moKey(nextMonth);
+      
+      // Process lifecycle for all pots
+      acc.savings.forEach(p => {
+        // Remove goal-reached pots immediately
+        if (p.current >= p.target) {
+          console.log(`Removing completed pot: ${p.name}`);
+          // Keep the pot but mark as completed for savings page
+          p.completed = true;
+          p.active = false;
+        }
+        
+        // Remove expired pots at beginning of next month
+        if (p.targetMonth && new Date(p.targetMonth + '-01') < currentMonth) {
+          console.log(`Removing expired pot: ${p.name}`);
+          // Keep the pot but mark as expired for savings page
+          p.expired = true;
+          p.active = false;
+        }
+      });
+
+      const activePots = acc.savings.filter(p => {
+        //console.log(`Checking pot: ${p.name}`);
+        //console.log(`  - Current: ${p.current}, Target: ${p.target}`);
+        //console.log(`  - Active: ${p.active}`);
+        //console.log(`  - PushedMo: ${p.pushedMo}`);
+        
+        // Filter out completed and expired pots
         if (p.current >= p.target) {
           //console.log(`  - FILTERED: Reached target`);
+          return false;
+        }
+        
+        if (p.targetMonth && new Date(p.targetMonth + '-01') < currentMonth) {
+          //console.log(`  - FILTERED: Expired`);
           return false;
         }
         
@@ -2240,23 +2494,23 @@ const activePots = acc.savings.filter(p => {
           return false;
         }
         
-      if (p.pushedMo) {
-        const start = new Date(p.pushedMo + '-01');
-        const end = new Date(p.targetMonth + '-01');
-        const current = new Date(mo + '-01');
-        const inRange = current >= start && current <= end;
-        //console.log(`  - Date range: ${start} to ${end}, Current: ${current}, In range: ${inRange}`);
-        if (!inRange) {
-          //console.log(`  - FILTERED: Not in date range`);
-          return false;
+        if (p.pushedMo) {
+          const start = new Date(p.pushedMo + '-01');
+          const end = new Date(p.targetMonth + '-01');
+          const current = new Date(mo + '-01');
+          const inRange = current >= start && current <= end;
+          //console.log(`  - Date range: ${start} to ${end}, Current: ${current}, In range: ${inRange}`);
+          if (!inRange) {
+            //console.log(`  - FILTERED: Not in date range`);
+            return false;
+          }
+        } else {
+          // If no pushedMo, show the pot
+          //console.log(`  - No pushedMo, showing pot`);
         }
-      } else {
-        // If no pushedMo, show the pot
-        //console.log(`  - No pushedMo, showing pot`);
-      }
-        
-        //console.log(`  - PASSED: This pot will be shown`);
-        return true;
+          
+          //console.log(`  - PASSED: This pot will be shown`);
+          return true;
       });
 
       //console.log('Active pots after filtering:', activePots);
@@ -2290,7 +2544,7 @@ const activePots = acc.savings.filter(p => {
       const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
       const isCompleted = p.current >= p.target;
       
-      // Calculate monthly contribution needed
+      // Calculate default monthly savings amount
       const today = new Date();
       const targetDate = new Date(p.targetMonth + '-01');
       const monthsRemaining = Math.max(1, 
@@ -2298,7 +2552,7 @@ const activePots = acc.savings.filter(p => {
         (targetDate.getMonth() - today.getMonth())
       );
       const remaining = p.target - p.current;
-      const monthlyRequired = remaining / monthsRemaining;
+      const defaultMonthly = remaining / monthsRemaining;
       
       // Use emoji fallback
       const iconDisplay = p.icon === 'fa-baby' ? '👶' 
@@ -2315,18 +2569,30 @@ const activePots = acc.savings.filter(p => {
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s2); margin-bottom: var(--s2);">
               <div>
-                  <div class="lbl" style="font-size:0.7rem;">Monthly</div>
-                  <div style="font-size: 1rem; font-weight: 700; color: var(--text2);">${fm(monthlyRequired)}</div>
+                  <div class="lbl" style="font-size:0.7rem;">Suggested Monthly</div>
+                  <div style="font-size: 1rem; font-weight: 700; color: var(--green); background: var(--green-bg); padding: 4px 8px; border-radius: 4px; text-align: center;">
+                    ${fm(defaultMonthly)}
+                  </div>
+                  <div class="lbl" style="font-size:0.6rem; color: var(--text3); margin-top: 2px;">
+                    ${monthsRemaining} months left
+                  </div>
                 </div>
                 <div>
                   <div class="lbl" style="font-size:0.7rem;">Progress</div>
                   <div style="font-size: 0.9rem; font-weight: 800; color: var(--ac);">${pct}%</div>
+                  <div class="lbl" style="font-size:0.6rem; color: var(--text3); margin-top: 2px;">
+                    ${fm(p.current)} / ${fm(p.target)}
+                  </div>
                 </div>
               </div>
               
               <div class="neu-in" style="height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: var(--s2);">
-                <div style="width: ${pct}%; height: 100%; background: var(--green); transition: width 0.3s ease;"></div>
+                <div style="width: ${pct}%; height: 100%; background: ${pct >= 80 ? 'var(--green)' : (pct >= 40 ? 'var(--orange)' : 'var(--ac)')}; transition: width 0.3s ease;"></div>
               </div>
+              
+              <button id="payBtn_${p.id}" class="btn btn-p" style="width: 100%; height: 44px; font-weight: 700; background: linear-gradient(135deg, ${p.color || 'var(--ac)'} 0%, ${(p.color || 'var(--ac)')}dd 100%); border: none; color: white;" onclick="event.stopPropagation(); promptAndPayPot('${p.id}', ${defaultMonthly})">
+                <i class="fas fa-plus"></i> Add Money (Suggested: ${fm(defaultMonthly)})
+              </button>
         </div>
       `;
     }
