@@ -921,18 +921,20 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
   <div id="pgC" class="pg">
     <h2 style="font-weight: 900; margin-bottom: 24px; color: var(--ac);">Credit Management</h2>
     
-    <div class="card mb20" style="background: var(--ac); color: #fff; padding: var(--s5);">
-      <span class="lbl" style="color: rgba(255,255,255,0.8);">Total Credit Outstanding</span>
-      <div id="credTotal" style="font-weight: 900; font-size: 2rem;">RM 0.00</div>
-      <div id="credUsageBar" class="neu-in" style="height:10px; border-radius:5px; overflow:hidden; margin-top: var(--s3); background:rgba(255,255,255,0.2);">
-        <div id="credUsageFill" style="width:0%; height:100%; background:#fff; transition:0.3s;"></div>
-      </div>
+    
+
+  <div class="card mb20" style="background: var(--ac); color: #fff; padding: var(--s5);">
+    <span class="lbl" style="color: rgba(255,255,255,0.8);">Total Credit Outstanding</span>
+    <div id="credTotal" style="font-weight: 900; font-size: 2rem;">RM 0.00</div>
+    <div id="credUsageBar" class="neu-in" style="height:10px; border-radius:5px; overflow:hidden; margin-top: var(--s3); background:rgba(255,255,255,0.2);">
+      <div id="credUsageFill" style="width:0%; height:100%; background:#fff; transition:0.3s;"></div>
     </div>
+  </div>
+    
 
     <div class="card mb20">
       <span class="lbl">Quick Pay Credit</span>
       <div class="fbc" style="gap: var(--s3);">
-        <input id="payCredAmt" class="inp" type="number" placeholder="Enter amount to pay">
         <button class="btn btn-p" style="min-width:100px;" onclick="payCreditManual()">Pay</button>
       </div>
     </div>
@@ -944,7 +946,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         <option value="date">Latest First</option>
       </select>
     </div>
-    <!-- <div id="credList"></div> -->
+    <div id="credList"></div>
   </div>
 
   <!-- ANALYTICS PAGE -->
@@ -1168,8 +1170,26 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
   </div>
 
   <script>
-    alert('Script starts here!');
-    
+    function updateCreditTotal() {
+      const acc = ac();
+      if (!acc) return;
+      
+      const unpaidCreditExpenses = acc.expenses.filter(e => e.payment === 'credit' && !e.paid);
+      const totalCreditUsage = unpaidCreditExpenses.reduce((sum, e) => sum + e.amount, 0);
+      
+      const totalEl = $('credTotal');
+      if (totalEl) {
+        totalEl.textContent = 'RM ' + fm(totalCreditUsage);
+      }
+      
+      // Update usage bar
+      const fillEl = $('credUsageFill');
+      if (fillEl) {
+        const percentage = Math.min(100, (totalCreditUsage / 5000) * 100); // Assuming 5000 limit
+        fillEl.style.width = percentage + '%';
+      }
+    }
+        
     // Define all constants and functions FIRST
     const K = 'bf4';
     const DB_DEFAULTS = { accounts: [], prefs: { theme: 'light', accent: 'indigo' } };
@@ -1181,29 +1201,30 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         console.log('No account found');
         return;
       }
-      
+
       console.log('Account:', acc);
       console.log('Expenses:', acc.expenses);
-      
-      // Get only PAID credit expenses (expenses paid with credit card)
-      const paidCreditExpenses = acc.expenses.filter(e => e.payment === 'credit' && e.paid);
-      const totalCreditUsage = paidCreditExpenses.reduce((sum, e) => sum + e.amount, 0);
 
-      console.log('Paid credit expenses:', paidCreditExpenses);
-      console.log('Total credit usage:', totalCreditUsage);
-      
-      /*const container = $('credList');
+      // Get credit expenses (both paid and unpaid) - track all credit usage
+      const creditExpenses = acc.expenses.filter(e => e.payment === 'credit');
+      const totalCreditUsage = creditExpenses.filter(e => !e.paid).reduce((sum, e) => sum + e.amount, 0);
+
+      console.log('All credit expenses:', creditExpenses);
+      console.log('Credit expenses:', creditExpenses);
+      console.log('Total credit usage:', totalCreditUsage); 
+                 
+      const container = $('credList');
       if (!container) {
         console.log('Credit container not found');
         return;
-      }*/
+      }
       
-      if (paidCreditExpenses.length === 0) {
+      if (creditExpenses.length === 0) {
         container.innerHTML = `
           <div class="card" style="padding: var(--s4); margin-bottom: var(--s4);">
-            <h3 style="font-weight: 800; margin-bottom: var(--s3);">Total Credit Usage</h3>
+            <h3 style="font-weight: 800; margin-bottom: var(--s3);">No Credit Expenses</h3>
             <div style="font-weight: 900; font-size: 2rem; color: var(--green); text-align: center; padding: var(--s3) 0;">
-              ${fm(0)}
+              RM 0.00
             </div>
           </div>
         `;
@@ -1212,33 +1233,27 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       
       // Sort by selected option
       const sortValue = $('credSort')?.value || 'high';
-      const sorted = [...unpaidCreditExpenses].sort((a, b) => {
+      const sorted = [...creditExpenses].sort((a, b) => {
         if (sortValue === 'high') return b.amount - a.amount;
         if (sortValue === 'date') return new Date(b.date) - new Date(a.date);
         return 0;
       });
-      
-    container.innerHTML = `
-      <!-- Credit Usage Summary -->
-      <div class="card" style="padding: var(--s4); margin-bottom: var(--s4);">
-        <h3 style="font-weight: 800; margin-bottom: var(--s3);">Total Credit Usage</h3>
-        <div style="font-weight: 900; font-size: 2rem; color: var(--red); text-align: center; padding: var(--s3) 0;">
-          ${fm(totalCreditUsage)}
+
+  // Individual Credit Items
+  sorted.forEach(function(e) {
+    container.innerHTML += `
+      <div class="item-card" style="border-left: 4px solid var(--purple); ${e.paid ? 'opacity: 0.5; background: var(--border2);' : ''}">
+        <div style="flex:1;">
+          <div style="font-weight:800;">${e.name}</div>
+          <div class="lbl">${new Date(e.date).toLocaleDateString('en-GB')} • ${e.category || 'Uncategorized'} • ${e.paid ? 'Paid' : 'Unpaid'}</div>
         </div>
+        <div class="am neg">-${fm(e.amount)}</div>
+        ${e.paid ? '<div style="position: absolute; top: 5px; right: 5px; background: var(--green); color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem;"> </div>' : ''}
       </div>
-      
-      <!-- Individual Credit Items -->
-      ${sorted.map(e => `
-        <div class="item-card" style="border-left: 4px solid var(--purple);">
-          <div style="flex:1;">
-            <div style="font-weight:800;">${e.name}</div>
-            <div class="lbl">${new Date(e.date).toLocaleDateString('en-GB')} • ${e.category || 'Uncategorized'}</div>
-          </div>
-          <div class="am neg">-${fm(e.amount)}</div>
-        </div>
-      `).join('')}
     `;
-      
+  });
+
+      updateCreditTotal();
       console.log('=== END CREDIT PAGE DEBUG ===');
     }
     
@@ -1685,10 +1700,22 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       sv(); renderSettingsCats();
     }
     function togglePaid(id) {
-      const e = ac().expenses.find(x => x.id === id); if (!e) return;
+      console.log('=== TOGGLE PAID DEBUG ===');
+      console.log('Toggling expense ID:', id);
+      
+      const e = ac().expenses.find(x => x.id === id); 
+      if (!e) {
+        console.log('ERROR: Expense not found with ID:', id);
+        return;
+      }
+      
+      console.log('Before toggle - Name:', e.name, 'Payment:', e.payment, 'Paid:', e.paid);
+      
       e.paid = !e.paid;
       
-      console.log(`Toggled expense: ${e.name} - Now paid: ${e.paid}`);
+      console.log('After toggle - Name:', e.name, 'Payment:', e.payment, 'Paid:', e.paid);
+      console.log('Is credit payment?', e.payment === 'credit');
+      console.log('Should show on credit page?', e.payment === 'credit' && e.paid);
       
       // If it's an auto-generated saving item being marked as paid
       if (e.potId && e.paid) {
@@ -1701,9 +1728,13 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       
       // Refresh credit page if we're on it
       if ($('pgC').style.display !== 'none') {
-        console.log('Refreshing credit page...');
+        console.log('Currently on credit page, refreshing...');
         renderCreditPg();
+      } else {
+        console.log('Not on credit page, skipping refresh');
       }
+      
+      console.log('=== END TOGGLE PAID DEBUG ===');
     }
     function toggleReceived(id) {
       const i = ac().incomes.find(x => x.id === id); if (!i) return;
@@ -3012,41 +3043,69 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
     }
 
     function payCreditManual() {
-      const amt = parseFloat($('payCredAmt').value);
-      if (isNaN(amt) || amt <= 0) return alert('Enter valid amount');
-      
       const acc = ac();
-      const credExps = acc.expenses.filter(e => e.payment === 'credit' && !e.paid).sort((a,b) => b.amount - a.amount);
-      const totalOutstanding = credExps.reduce((s, e) => s + e.amount, 0);
+      if (!acc) return;
       
-      if (amt > totalOutstanding) return alert('Payment exceeds outstanding credit');
-
-      let remainingToPay = amt;
-      for (let e of credExps) {
+      const unpaidCreditExpenses = acc.expenses.filter(e => e.payment === 'credit' && !e.paid);
+      const totalOutstanding = unpaidCreditExpenses.reduce((s, e) => s + e.amount, 0);
+      
+      if (totalOutstanding === 0) {
+        alert('No credit outstanding to pay');
+        return;
+      }
+      
+      const amount = prompt(`Enter amount to pay (Total outstanding: RM ${fm(totalOutstanding)}):`, totalOutstanding.toString());
+      if (!amount || isNaN(amount) || parseFloat(amount) <= 0) return;
+      
+      if (parseFloat(amount) > totalOutstanding) {
+        alert('Payment amount cannot exceed total outstanding');
+        return;
+      }
+      
+      let remainingToPay = parseFloat(amount);
+      
+      // Pay off expenses from highest to lowest
+      const sortedExpenses = unpaidCreditExpenses.sort((a, b) => b.amount - a.amount);
+      
+      for (let expense of sortedExpenses) {
         if (remainingToPay <= 0) break;
-        if (e.amount <= remainingToPay) {
-          remainingToPay -= e.amount;
-          e.payment = 'cash'; // Convert to cash when settled
+        
+        if (expense.amount <= remainingToPay) {
+          // Pay full amount
+          remainingToPay -= expense.amount;
+          expense.paid = true;
+          expense.paidAmount = expense.amount;
         } else {
-          // Partially settle if possible (split item)
-          const settledPart = { ...e, id: 'e_'+Math.random(), amount: remainingToPay, payment: 'cash' };
-          e.amount -= remainingToPay;
-          acc.expenses.push(settledPart);
+          // Partial payment - split the expense
+          const paidPart = {
+            ...expense,
+            id: 'e_' + Math.random().toString(36).substr(2, 9),
+            amount: remainingToPay,
+            paid: true,
+            paidAmount: remainingToPay
+          };
+          
+          // Reduce original expense amount
+          expense.amount -= remainingToPay;
+          
+          // Add paid part to expenses
+          acc.expenses.push(paidPart);
+          
           remainingToPay = 0;
         }
       }
       
+      sv();
+      render();
+      renderCreditPg();
+      updateCreditTotal();
       
-      $('cashExpList').innerHTML = listHtml;
-      
-      // Show the cash expenses page
-      $('pgCashExp').style.display = 'block';
+      alert(`Successfully paid RM ${fm(parseFloat(amount))}`);
     }
-
     function closeCashExpenses() {
       $('pgCashExp').style.display = 'none';
     }
-
+/*
     function togglePaid(id) {
       const e = ac().expenses.find(x => x.id === id); if (!e) return;
       e.paid = !e.paid;
@@ -3070,7 +3129,7 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
         }
         console.log('Updated cash balance display to:', fm(currentCashBalance));
       }
-    }
+    } */
 
     function showNotifications() {
       const acc = ac(); if (!acc) return;
@@ -3401,15 +3460,26 @@ function generateTestData() {
   
   const today = td();
   const currentMonth = getCurrentMonth();
-  
-  // Clear existing data first
-  acc.incomes = [];
+
+   // Check if test data already exists
+  if (acc.expenses.length > 0) {
+    if (!confirm('Test data already exists. Clear and regenerate?')) return;
+  } 
+
+  // Clear existing data to prevent duplicates
   acc.expenses = [];
+  acc.incomes = [];
   acc.savings = [];
   acc.loans = [];
   acc.transactions = [];
 
-   console.log('Data cleared, adding new test data...');
+  // Also clear the DOM elements directly to ensure nothing remains visible
+  $('beforeExpensesPots').innerHTML = '';
+  $('afterExpensesPots').innerHTML = '';
+  $('potList').innerHTML = '';
+  $('loanList').innerHTML = '';
+
+  console.log('Data cleared, adding new test data...');
   
   // Add test income
   acc.incomes.push(
@@ -3427,7 +3497,11 @@ function generateTestData() {
     { id: 'e_test4', name: 'Internet', amount: 100, category: 'Bills', type: 'fixed', date: currentMonth + '-20', recurring: true, payment: 'credit', paid: false },
     { id: 'e_test5', name: 'Dining Out', amount: 200, category: 'Food', type: 'variable', date: currentMonth + '-25', recurring: false, payment: 'cash', paid: false },
     { id: 'e_test6', name: 'Car Insurance', amount: 300, category: 'Transport', type: 'fixed', date: currentMonth + '-05', recurring: true, payment: 'cash', paid: false },
-    { id: 'e_test7', name: 'Shopping', amount: 250, category: 'Personal', type: 'variable', date: currentMonth + '-12', recurring: false, payment: 'credit', paid: false }
+    { id: 'e_test7', name: 'Shopping', amount: 250, category: 'Personal', type: 'variable', date: currentMonth + '-12', recurring: false, payment: 'credit', paid: false },
+      // Add some PAID credit expenses for testing
+      { id: 'e_test8', name: 'Netflix Subscription', amount: 15, category: 'Entertainment', type: 'fixed', date: currentMonth + '-05', recurring: true, payment: 'credit', paid: true },
+      { id: 'e_test9', name: 'Amazon Purchase', amount: 120, category: 'Shopping', type: 'variable', date: currentMonth + '-15', recurring: false, payment: 'credit', paid: true },
+      { id: 'e_test10', name: 'Gas Station', amount: 80, category: 'Transport', type: 'variable', date: currentMonth + '-08', recurring: false, payment: 'credit', paid: true }
   );
   
     // Add test savings pots with different conditions
