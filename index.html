@@ -1170,25 +1170,31 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
   </div>
 
   <script>
-    function updateCreditTotal() {
-      const acc = ac();
-      if (!acc) return;
-      
-      const unpaidCreditExpenses = acc.expenses.filter(e => e.payment === 'credit' && !e.paid);
-      const totalCreditUsage = unpaidCreditExpenses.reduce((sum, e) => sum + e.amount, 0);
-      
-      const totalEl = $('credTotal');
-      if (totalEl) {
-        totalEl.textContent = 'RM ' + fm(totalCreditUsage);
-      }
-      
-      // Update usage bar
-      const fillEl = $('credUsageFill');
-      if (fillEl) {
-        const percentage = Math.min(100, (totalCreditUsage / 5000) * 100); // Assuming 5000 limit
-        fillEl.style.width = percentage + '%';
-      }
+
+  function updateCreditTotal() {
+    const acc = ac();
+    if (!acc) return;
+    
+    const creditUsageExpenses = acc.expenses.filter(e => e.payment === 'credit' && e.paid);
+    const creditPayments = acc.expenses.filter(e => e.type === 'credit-payment');
+    
+    const totalUsage = creditUsageExpenses.reduce((sum, e) => sum + e.amount, 0);
+    const totalPaid = creditPayments.reduce((sum, e) => sum + e.amount, 0);
+    const totalCreditUsage = totalUsage - totalPaid;
+    
+    const totalEl = $('credTotal');
+    if (totalEl) {
+      totalEl.textContent = 'RM ' + fm(totalCreditUsage);
     }
+    
+    // Update usage bar
+    const fillEl = $('credUsageFill');
+    if (fillEl) {
+      const percentage = Math.min(100, Math.abs(totalCreditUsage / 5000) * 100);
+      fillEl.style.width = percentage + '%';
+      fillEl.style.background = totalCreditUsage < 0 ? 'var(--green)' : '#fff';
+    }
+  }
         
     // Define all constants and functions FIRST
     const K = 'bf4';
@@ -1202,56 +1208,71 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         return;
       }
 
-      console.log('Account:', acc);
-      console.log('Expenses:', acc.expenses);
-
-      // Get credit expenses (both paid and unpaid) - track all credit usage
-      const creditExpenses = acc.expenses.filter(e => e.payment === 'credit');
-      const totalCreditUsage = creditExpenses.filter(e => !e.paid).reduce((sum, e) => sum + e.amount, 0);
-
-      console.log('All credit expenses:', creditExpenses);
-      console.log('Credit expenses:', creditExpenses);
+      // Get expenses that were marked as "paid with credit" on tracker page
+      const creditUsageExpenses = acc.expenses.filter(e => e.payment === 'credit' && e.paid);
+      const creditPayments = acc.expenses.filter(e => e.type === 'credit-payment');
+      
+      // Calculate total credit usage (original expenses minus payments)
+      const totalUsage = creditUsageExpenses.reduce((sum, e) => sum + e.amount, 0);
+      const totalPaid = creditPayments.reduce((sum, e) => sum + e.amount, 0);
+      const totalCreditUsage = totalUsage - totalPaid;
+      
+      console.log('Credit usage expenses:', creditUsageExpenses);
+      console.log('Credit payments:', creditPayments);
       console.log('Total credit usage:', totalCreditUsage); 
-                 
+                  
       const container = $('credList');
       if (!container) {
         console.log('Credit container not found');
         return;
       }
       
-      if (creditExpenses.length === 0) {
+      // Clear container
+      container.innerHTML = '';
+      
+      // Show original credit expenses (greyed out if payments made)
+      if (creditUsageExpenses.length > 0) {
+        creditUsageExpenses.forEach(function(e) {
+          const hasPayments = creditPayments.length > 0;
+          container.innerHTML += `
+            <div class="item-card" style="border-left: 4px solid var(--purple); ${hasPayments ? 'opacity: 0.5; background: var(--border2);' : ''}">
+              <div style="flex:1;">
+                <div style="font-weight:800;">${e.name}</div>
+                <div class="lbl">${new Date(e.date).toLocaleDateString('en-GB')} • ${e.category || 'Uncategorized'}</div>
+              </div>
+              <div class="am neg">-${fm(e.amount)}</div>
+              ${hasPayments ? '<div style="position: absolute; top: 5px; right: 5px; background: var(--green); color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem;">Accounted</div>' : ''}
+            </div>
+          `;
+        });
+      }
+      
+      // Show credit payments
+      if (creditPayments.length > 0) {
+        creditPayments.forEach(function(e) {
+          container.innerHTML += `
+            <div class="item-card" style="border-left: 4px solid var(--green);">
+              <div style="flex:1;">
+                <div style="font-weight:800;">${e.name}</div>
+                <div class="lbl">${new Date(e.date).toLocaleDateString('en-GB')} • Credit Payment</div>
+              </div>
+              <div class="am pos">+${fm(e.amount)}</div>
+              <div style="position: absolute; top: 5px; right: 5px; background: var(--blue); color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem;">Payment</div>
+            </div>
+          `;
+        });
+      }
+      
+      if (creditUsageExpenses.length === 0 && creditPayments.length === 0) {
         container.innerHTML = `
           <div class="card" style="padding: var(--s4); margin-bottom: var(--s4);">
-            <h3 style="font-weight: 800; margin-bottom: var(--s3);">No Credit Expenses</h3>
+            <h3 style="font-weight: 800; margin-bottom: var(--s3);">No Credit Usage</h3>
             <div style="font-weight: 900; font-size: 2rem; color: var(--green); text-align: center; padding: var(--s3) 0;">
               RM 0.00
             </div>
           </div>
         `;
-        return;
       }
-      
-      // Sort by selected option
-      const sortValue = $('credSort')?.value || 'high';
-      const sorted = [...creditExpenses].sort((a, b) => {
-        if (sortValue === 'high') return b.amount - a.amount;
-        if (sortValue === 'date') return new Date(b.date) - new Date(a.date);
-        return 0;
-      });
-
-  // Individual Credit Items
-  sorted.forEach(function(e) {
-    container.innerHTML += `
-      <div class="item-card" style="border-left: 4px solid var(--purple); ${e.paid ? 'opacity: 0.5; background: var(--border2);' : ''}">
-        <div style="flex:1;">
-          <div style="font-weight:800;">${e.name}</div>
-          <div class="lbl">${new Date(e.date).toLocaleDateString('en-GB')} • ${e.category || 'Uncategorized'} • ${e.paid ? 'Paid' : 'Unpaid'}</div>
-        </div>
-        <div class="am neg">-${fm(e.amount)}</div>
-        ${e.paid ? '<div style="position: absolute; top: 5px; right: 5px; background: var(--green); color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem;"> </div>' : ''}
-      </div>
-    `;
-  });
 
       updateCreditTotal();
       console.log('=== END CREDIT PAGE DEBUG ===');
@@ -1736,30 +1757,31 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       
       console.log('=== END TOGGLE PAID DEBUG ===');
     }
-    function toggleReceived(id) {
-      const i = ac().incomes.find(x => x.id === id); if (!i) return;
-      i.paid = !i.paid;
+
+    function togglePaid(id) {
+      const e = ac().expenses.find(x => x.id === id); 
+      if (!e) return;
       
-      console.log(`Toggled income: ${i.name} - Now paid: ${i.paid}`);
+      e.paid = !e.paid;
+      
+      console.log(`Toggled expense: ${e.name} - Now paid: ${e.paid}`);
+      
+      // If it's an auto-generated saving item being marked as paid
+      if (e.potId && e.paid) {
+        const p = ac().savings.find(x => x.id === e.potId);
+        if (p) p.current += e.amount;
+      }
       
       sv(); 
       render();
       
-      // Force update cash balance display
-      const currentCashBalance = getCurrentBalance();
-      const statNetEl = $('statNet');
-      if (statNetEl) {
-        statNetEl.textContent = fm(currentCashBalance);
-        if (currentCashBalance < 0) {
-          statNetEl.style.color = '#ff6b6b';
-        } else if (currentCashBalance >= 1000) {
-          statNetEl.style.color = '#00ff00';
-        } else {
-          statNetEl.style.color = currentCashBalance >= 0 ? '#ffffff' : 'var(--red)';
-        }
-        console.log('Updated cash balance display to:', fm(currentCashBalance));
+      // Refresh credit page if we're on it
+      if ($('pgC').style.display !== 'none') {
+        console.log('Refreshing credit page...');
+        renderCreditPg();
       }
     }
+    
     function processRecurring() {
       const acc = ac(); if (!acc) return;
       const mo = moKey(viewMo);
@@ -3046,62 +3068,31 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
       const acc = ac();
       if (!acc) return;
       
-      const unpaidCreditExpenses = acc.expenses.filter(e => e.payment === 'credit' && !e.paid);
-      const totalOutstanding = unpaidCreditExpenses.reduce((s, e) => s + e.amount, 0);
-      
-      if (totalOutstanding === 0) {
-        alert('No credit outstanding to pay');
-        return;
-      }
-      
-      const amount = prompt(`Enter amount to pay (Total outstanding: RM ${fm(totalOutstanding)}):`, totalOutstanding.toString());
+      const amount = prompt('Enter amount to pay:', '100');
       if (!amount || isNaN(amount) || parseFloat(amount) <= 0) return;
       
-      if (parseFloat(amount) > totalOutstanding) {
-        alert('Payment amount cannot exceed total outstanding');
-        return;
-      }
+      // Add credit payment entry
+      const payment = {
+        id: 'e_' + Math.random().toString(36).substr(2, 9),
+        name: 'Credit Paid',
+        amount: parseFloat(amount),
+        type: 'credit-payment',
+        category: 'Credit Payment',
+        date: new Date().toISOString().split('T')[0],
+        payment: 'credit',
+        paid: true
+      };
       
-      let remainingToPay = parseFloat(amount);
-      
-      // Pay off expenses from highest to lowest
-      const sortedExpenses = unpaidCreditExpenses.sort((a, b) => b.amount - a.amount);
-      
-      for (let expense of sortedExpenses) {
-        if (remainingToPay <= 0) break;
-        
-        if (expense.amount <= remainingToPay) {
-          // Pay full amount
-          remainingToPay -= expense.amount;
-          expense.paid = true;
-          expense.paidAmount = expense.amount;
-        } else {
-          // Partial payment - split the expense
-          const paidPart = {
-            ...expense,
-            id: 'e_' + Math.random().toString(36).substr(2, 9),
-            amount: remainingToPay,
-            paid: true,
-            paidAmount: remainingToPay
-          };
-          
-          // Reduce original expense amount
-          expense.amount -= remainingToPay;
-          
-          // Add paid part to expenses
-          acc.expenses.push(paidPart);
-          
-          remainingToPay = 0;
-        }
-      }
+      acc.expenses.push(payment);
       
       sv();
       render();
       renderCreditPg();
       updateCreditTotal();
       
-      alert(`Successfully paid RM ${fm(parseFloat(amount))}`);
+      alert(`Credit payment of RM ${fm(parseFloat(amount))} recorded`);
     }
+
     function closeCashExpenses() {
       $('pgCashExp').style.display = 'none';
     }
