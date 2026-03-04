@@ -939,13 +939,10 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       </div>
     </div>
 
-    <div class="fbc mb10">
-      <h3 style="font-weight: 800;">Credit Expenses (Ranked)</h3>
-      <select id="credSort" class="inp" style="width:auto; min-height:36px; padding:8px 12px; font-size:0.75rem;" onchange="renderCreditPg()">
-        <option value="high">Highest First</option>
-        <option value="date">Latest First</option>
-      </select>
+    <div class="mb10">
+      <h3 style="font-weight: 800;">Credit Transactions</h3>
     </div>
+
     <div id="credList"></div>
   </div>
 
@@ -1255,12 +1252,30 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       // Clear container
       container.innerHTML = '';
 
-      // Combine all transactions and sort by date (latest first)
+      // Add this debug to see what's happening
+      console.log('=== TRANSACTION SORT DEBUG ===');
+      console.log('Credit usage expenses:', creditUsageExpenses.length);
+      console.log('Credit payments:', creditPayments.length);
+
+      // Combine all transactions and sort by payment priority then date
       const allTransactions = [
         ...creditUsageExpenses.map(e => ({...e, transactionType: 'usage'})),
         ...creditPayments.map(e => ({...e, transactionType: 'payment'}))
-      ].sort((a, b) => new Date(b.date) - new Date(a.date));
-      
+      ].sort((a, b) => {
+        // First, sort by transaction type (payments first)
+        if (a.transactionType === 'payment' && b.transactionType !== 'payment') return -1;
+        if (a.transactionType !== 'payment' && b.transactionType === 'payment') return 1;
+        
+        // Then sort by date (latest first) within the same type
+        return new Date(b.date) - new Date(a.date);
+      });
+
+      console.log('Final sorted order:');
+      allTransactions.forEach(e => {
+        console.log(`- ${e.name}: ${e.date} (${e.transactionType})`);
+      });
+      console.log('=== END TRANSACTION SORT DEBUG ===');
+
       // Render all transactions
       allTransactions.forEach(function(e) {
         if (e.transactionType === 'usage') {
