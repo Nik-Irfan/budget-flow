@@ -1178,13 +1178,37 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
     const creditUsageExpenses = acc.expenses.filter(e => e.payment === 'credit' && e.paid);
     const creditPayments = acc.expenses.filter(e => e.type === 'credit-payment');
     
+    console.log('=== PAYMENT DEBUG ===');
+    console.log('All credit-payment expenses:');
+    acc.expenses.filter(e => e.type === 'credit-payment').forEach(e => {
+      console.log(`- ${e.name}: type="${e.type}", amount=${e.amount}, date=${e.date}`);
+    });
+    
+    console.log('=== USAGE DEBUG ===');
+    console.log('All paid credit expenses:');
+    acc.expenses.filter(e => e.payment === 'credit' && e.paid).forEach(e => {
+      console.log(`- ${e.name}: payment="${e.payment}", paid=${e.paid}, amount=${e.amount}`);
+    });
+    console.log('=== END USAGE DEBUG ===');
+    
     const totalUsage = creditUsageExpenses.reduce((sum, e) => sum + e.amount, 0);
+
     const totalPaid = creditPayments.reduce((sum, e) => sum + e.amount, 0);
     const totalCreditUsage = totalUsage - totalPaid;
     
+    console.log('Payment calculation:');
+    console.log(`- Total usage: ${totalUsage}`);
+    console.log(`- Total paid: ${totalPaid}`);
+    console.log(`- Final total: ${totalCreditUsage}`);
+    console.log('=== END PAYMENT DEBUG ===');
+    
     const totalEl = $('credTotal');
+    console.log('Total element found:', totalEl ? 'yes' : 'no');
     if (totalEl) {
-      totalEl.textContent = 'RM ' + fm(totalCreditUsage);
+      const newText = fm(totalCreditUsage);
+      console.log('Setting total to:', newText);
+      totalEl.textContent = newText;
+      console.log('Total element now contains:', totalEl.textContent);
     }
     
     // Update usage bar
@@ -1195,7 +1219,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       fillEl.style.background = totalCreditUsage < 0 ? 'var(--green)' : '#fff';
     }
   }
-        
+          
     // Define all constants and functions FIRST
     const K = 'bf4';
     const DB_DEFAULTS = { accounts: [], prefs: { theme: 'light', accent: 'indigo' } };
@@ -1211,6 +1235,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       // Get expenses that were marked as "paid with credit" on tracker page
       const creditUsageExpenses = acc.expenses.filter(e => e.payment === 'credit' && e.paid);
       const creditPayments = acc.expenses.filter(e => e.type === 'credit-payment');
+      console.log('All credit-payment expenses:', acc.expenses.filter(e => e.type === 'credit-payment'));      
       
       // Calculate total credit usage (original expenses minus payments)
       const totalUsage = creditUsageExpenses.reduce((sum, e) => sum + e.amount, 0);
@@ -1229,10 +1254,16 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
       
       // Clear container
       container.innerHTML = '';
+
+      // Combine all transactions and sort by date (latest first)
+      const allTransactions = [
+        ...creditUsageExpenses.map(e => ({...e, transactionType: 'usage'})),
+        ...creditPayments.map(e => ({...e, transactionType: 'payment'}))
+      ].sort((a, b) => new Date(b.date) - new Date(a.date));
       
-      // Show original credit expenses (greyed out if payments made)
-      if (creditUsageExpenses.length > 0) {
-        creditUsageExpenses.forEach(function(e) {
+      // Render all transactions
+      allTransactions.forEach(function(e) {
+        if (e.transactionType === 'usage') {
           const hasPayments = creditPayments.length > 0;
           container.innerHTML += `
             <div class="item-card" style="border-left: 4px solid var(--purple); ${hasPayments ? 'opacity: 0.5; background: var(--border2);' : ''}">
@@ -1244,12 +1275,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
               ${hasPayments ? '<div style="position: absolute; top: 5px; right: 5px; background: var(--green); color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem;">Accounted</div>' : ''}
             </div>
           `;
-        });
-      }
-      
-      // Show credit payments
-      if (creditPayments.length > 0) {
-        creditPayments.forEach(function(e) {
+        } else {
           container.innerHTML += `
             <div class="item-card" style="border-left: 4px solid var(--green);">
               <div style="flex:1;">
@@ -1260,8 +1286,8 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
               <div style="position: absolute; top: 5px; right: 5px; background: var(--blue); color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem;">Payment</div>
             </div>
           `;
-        });
-      }
+        }
+      });
       
       if (creditUsageExpenses.length === 0 && creditPayments.length === 0) {
         container.innerHTML = `
@@ -1781,7 +1807,7 @@ select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg 
         renderCreditPg();
       }
     }
-    
+
     function processRecurring() {
       const acc = ac(); if (!acc) return;
       const mo = moKey(viewMo);
@@ -3065,11 +3091,26 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
     }
 
     function payCreditManual() {
+      console.log('=== PAY CREDIT MANUAL DEBUG START ===');
       const acc = ac();
-      if (!acc) return;
+      console.log('Account check:', acc ? 'found' : 'not found');
+      if (!acc) {
+        console.log('No account, exiting');
+        return;
+      }
+      
+      console.log('Account found, proceeding with payment');
+      console.log('Current expenses count:', acc.expenses.length);
       
       const amount = prompt('Enter amount to pay:', '100');
-      if (!amount || isNaN(amount) || parseFloat(amount) <= 0) return;
+      console.log('Prompt returned:', amount, 'type:', typeof amount);
+      
+      if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+        console.log('Invalid amount, exiting. Amount:', amount, 'isNaN:', isNaN(amount), 'parseFloat:', parseFloat(amount));
+        return;
+      }
+      
+      console.log('Valid amount:', parseFloat(amount));
       
       // Add credit payment entry
       const payment = {
@@ -3083,13 +3124,26 @@ const pct = Math.min(100, (p.current/p.target)*100).toFixed(0);
         paid: true
       };
       
+      console.log('About to create payment:', payment);
+      console.log('Before adding - expenses count:', acc.expenses.length);
+      
       acc.expenses.push(payment);
+      console.log('After adding - expenses count:', acc.expenses.length);
+      console.log('Last expense added:', acc.expenses[acc.expenses.length - 1]);
       
       sv();
+      console.log('After saving, expenses count:', acc.expenses.length);
+      
+      // Reload account to verify save
+      const reloadedAcc = ac();
+      console.log('After reload - expenses count:', reloadedAcc.expenses.length);
+      console.log('Credit payments after reload:', reloadedAcc.expenses.filter(e => e.type === 'credit-payment'));
+      
       render();
       renderCreditPg();
       updateCreditTotal();
       
+      console.log('=== PAY CREDIT MANUAL DEBUG END ===');
       alert(`Credit payment of RM ${fm(parseFloat(amount))} recorded`);
     }
 
